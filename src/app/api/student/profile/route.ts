@@ -1,20 +1,42 @@
 import { NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/supabase-server'
 
 export async function GET() {
   try {
-    // For a single student setup, return hardcoded profile
-    // In a full system, this would fetch from Supabase based on auth
-    const profile = {
-      id: '00000000-0000-0000-0000-000000000001',
-      role: 'student' as const,
-      full_name: 'Ayzac Ng',
-      email: 'student@amath.edu',
-      avatar_url: null,
-      created_at: '2024-01-01T00:00:00Z',
-      updated_at: new Date().toISOString(),
+    const supabase = await createClient()
+
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Not authenticated' },
+        { status: 401 }
+      )
     }
 
-    return NextResponse.json(profile)
+    // Fetch profile from Supabase
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single()
+
+    if (profileError || !profile) {
+      return NextResponse.json(
+        { error: 'Profile not found' },
+        { status: 404 }
+      )
+    }
+
+    return NextResponse.json({
+      id: profile.id,
+      role: profile.role,
+      full_name: profile.full_name,
+      email: user.email,
+      avatar_url: null,
+      created_at: profile.created_at,
+      updated_at: profile.updated_at,
+    })
   } catch (error) {
     console.error('Error fetching profile:', error)
     return NextResponse.json(
@@ -26,21 +48,45 @@ export async function GET() {
 
 export async function PUT(request: Request) {
   try {
+    const supabase = await createClient()
     const body = await request.json()
 
-    // For a single student setup, just return success
-    // In a full system, this would update Supabase
-    const updatedProfile = {
-      id: '00000000-0000-0000-0000-000000000001',
-      role: 'student' as const,
-      full_name: body.full_name || 'Ayzac Ng',
-      email: 'student@amath.edu',
-      avatar_url: body.avatar_url || null,
-      created_at: '2024-01-01T00:00:00Z',
-      updated_at: new Date().toISOString(),
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Not authenticated' },
+        { status: 401 }
+      )
     }
 
-    return NextResponse.json(updatedProfile)
+    // Update profile in Supabase
+    const { data: updatedProfile, error: updateError } = await supabase
+      .from('profiles')
+      .update({
+        full_name: body.full_name,
+      })
+      .eq('id', user.id)
+      .select()
+      .single()
+
+    if (updateError) {
+      console.error('Error updating profile:', updateError)
+      return NextResponse.json(
+        { error: 'Failed to update profile' },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({
+      id: updatedProfile.id,
+      role: updatedProfile.role,
+      full_name: updatedProfile.full_name,
+      email: user.email,
+      avatar_url: null,
+      created_at: updatedProfile.created_at,
+      updated_at: updatedProfile.updated_at,
+    })
   } catch (error) {
     console.error('Error updating profile:', error)
     return NextResponse.json(

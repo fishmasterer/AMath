@@ -6,7 +6,15 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient()
     const { searchParams } = new URL(request.url)
 
-    const studentId = '00000000-0000-0000-0000-000000000001' // Single student setup
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Not authenticated' },
+        { status: 401 }
+      )
+    }
+    const studentId = user.id
 
     // Optional filters
     const quizId = searchParams.get('quiz_id')

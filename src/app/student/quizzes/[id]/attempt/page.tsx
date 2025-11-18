@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useEffect, useState, useCallback } from 'react'
+import { use, useEffect, useState, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Timer from '@/components/quiz/Timer'
 import QuestionPalette from '@/components/quiz/QuestionPalette'
@@ -131,7 +131,15 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
     }
   }, [attemptData, answers, id, autoSaving])
 
-  const handleAnswerChange = (answer: string | string[]) => {
+  // Debounced version for answer changes
+  const debouncedSaveAnswers = useCallback(() => {
+    const timer = setTimeout(() => {
+      saveAnswers()
+    }, 2000) // Wait 2 seconds after user stops typing
+    return () => clearTimeout(timer)
+  }, [saveAnswers])
+
+  const handleAnswerChange = useCallback((answer: string | string[]) => {
     if (!attemptData) return
 
     const questionId = attemptData.quiz.questions[currentQuestionIndex].id
@@ -139,23 +147,24 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
     newAnswers.set(questionId, answer)
     setAnswers(newAnswers)
 
-    // Save after answer change (debounced by auto-save)
-    saveAnswers()
-  }
+    // Debounced save (waits 2s after user stops interacting)
+    const cleanup = debouncedSaveAnswers()
+    return cleanup
+  }, [attemptData, currentQuestionIndex, answers, debouncedSaveAnswers])
 
-  const handlePreviousQuestion = () => {
+  const handlePreviousQuestion = useCallback(() => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1)
     }
-  }
+  }, [currentQuestionIndex])
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = useCallback(() => {
     if (attemptData && currentQuestionIndex < attemptData.quiz.questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1)
     }
-  }
+  }, [attemptData, currentQuestionIndex])
 
-  const handleToggleFlag = () => {
+  const handleToggleFlag = useCallback(() => {
     const newFlagged = new Set(flaggedQuestions)
     if (newFlagged.has(currentQuestionIndex)) {
       newFlagged.delete(currentQuestionIndex)
@@ -163,9 +172,9 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
       newFlagged.add(currentQuestionIndex)
     }
     setFlaggedQuestions(newFlagged)
-  }
+  }, [flaggedQuestions, currentQuestionIndex])
 
-  const getAnsweredQuestions = () => {
+  const getAnsweredQuestions = useMemo(() => {
     if (!attemptData) return new Set<number>()
 
     const answered = new Set<number>()
@@ -175,7 +184,7 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
       }
     })
     return answered
-  }
+  }, [attemptData, answers])
 
   const handleTimeUp = async () => {
     // Auto-submit when time is up
@@ -263,7 +272,7 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
 
   const currentQuestion = attemptData.quiz.questions[currentQuestionIndex]
   const currentAnswer = answers.get(currentQuestion.id) || null
-  const answeredQuestions = getAnsweredQuestions()
+  const answeredQuestions = getAnsweredQuestions
 
   return (
     <div className="min-h-screen bg-slate-950">
