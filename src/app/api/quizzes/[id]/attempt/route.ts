@@ -74,7 +74,15 @@ export async function GET(
     // Check if time is up
     const timeIsUp = remainingSeconds === 0
 
-    return NextResponse.json({
+    // Log the quiz data for debugging
+    console.log('Quiz ID:', quiz.id)
+    console.log('Quiz title:', quiz.title)
+    console.log('Quiz questions type:', typeof quiz.questions)
+    console.log('Quiz questions:', JSON.stringify(quiz.questions).substring(0, 200))
+    console.log('Questions is array?', Array.isArray(quiz.questions))
+    console.log('First question:', quiz.questions?.[0])
+
+    const responseData = {
       attemptId: attempt.id,
       quiz: {
         id: quiz.id,
@@ -91,7 +99,11 @@ export async function GET(
       elapsedSeconds,
       remainingSeconds,
       timeIsUp,
-    })
+    }
+
+    console.log('Response questions:', JSON.stringify(responseData.quiz.questions).substring(0, 200))
+
+    return NextResponse.json(responseData)
   } catch (error) {
     console.error('Error in GET /api/quizzes/[id]/attempt:', error)
     return NextResponse.json(

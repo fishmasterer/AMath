@@ -71,6 +71,17 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
       const data: QuizAttemptData = await attemptRes.json()
       console.log('Quiz attempt data:', data)
       console.log('Questions:', data.quiz?.questions)
+      console.log('Questions type:', typeof data.quiz?.questions)
+      console.log('Questions is array?', Array.isArray(data.quiz?.questions))
+      console.log('Questions length:', data.quiz?.questions?.length)
+      console.log('First question:', data.quiz?.questions?.[0])
+
+      if (!data.quiz?.questions || !Array.isArray(data.quiz.questions) || data.quiz.questions.length === 0) {
+        setError('Quiz has no questions. Please contact support.')
+        setLoading(false)
+        return
+      }
+
       setAttemptData(data)
 
       // Load existing answers
@@ -229,8 +240,13 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
         router.push(`/student/quizzes/${id}/results`)
       } else {
         const error = await response.json()
-        setError(error.error || 'Failed to submit quiz')
+        console.error('Submit error response:', error)
+        const errorMessage = error.details
+          ? `${error.error}: ${error.details}`
+          : error.error || 'Failed to submit quiz'
+        setError(errorMessage)
         setSubmitting(false)
+        setShowSubmitModal(false)
       }
     } catch (err) {
       console.error('Error submitting quiz:', err)
@@ -275,6 +291,31 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="min-h-screen bg-slate-950">
+      {/* Error banner */}
+      {error && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-[60] max-w-2xl w-full mx-4 animate-in slide-in-from-top duration-300">
+          <div className="bg-red-500/10 border-2 border-red-500 rounded-xl p-4 shadow-2xl backdrop-blur-xl">
+            <div className="flex items-start gap-3">
+              <svg className="w-6 h-6 text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div className="flex-1">
+                <h3 className="text-red-400 font-semibold mb-1">Error</h3>
+                <p className="text-red-300 text-sm">{error}</p>
+              </div>
+              <button
+                onClick={() => setError(null)}
+                className="text-red-400 hover:text-red-300 transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header with timer */}
       <div className="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-xl border-b border-white/10">
         <div className="container mx-auto px-4 py-4">
