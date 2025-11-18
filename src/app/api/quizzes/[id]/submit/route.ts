@@ -8,10 +8,10 @@ import { StudentAnswer } from '@/lib/types';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const quizId = params.id;
+    const { id: quizId } = await params;
     
     // Authenticate user
     const supabase = await createClient();
