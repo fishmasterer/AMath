@@ -3,7 +3,7 @@
 
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { createMiddlewareClient } from './lib/supabase/server';
+import { createMiddlewareClient } from './src/lib/supabase/supabase-server';
 
 export async function middleware(request: NextRequest) {
   const supabase = await createMiddlewareClient(request);
