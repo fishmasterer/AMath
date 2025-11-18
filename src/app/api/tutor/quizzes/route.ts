@@ -4,11 +4,20 @@ import { NextRequest, NextResponse } from 'next/server';
 // GET /api/tutor/quizzes - Fetch all quizzes including unpublished (tutor only)
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
+    // Use service role to bypass RLS for tutor access
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
-    // Note: Using simple session-based auth for now
-    // In production, you should implement proper Supabase authentication
-    // The frontend uses sessionStorage with a passcode, so we skip auth here
+    const { createClient: createServiceClient } = await import('@supabase/supabase-js');
+    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    });
+
+    // Note: Using service role key to bypass RLS
+    // In production, implement proper tutor authentication
 
     // Get query parameters for filtering and pagination
     const searchParams = request.nextUrl.searchParams;
