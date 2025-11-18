@@ -12,20 +12,22 @@ export async function POST(
 ) {
   try {
     const { id: quizId } = await params;
-    
-    // Authenticate user
-    const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-    
+    const studentId = '00000000-0000-0000-0000-000000000001'; // Single student setup
+
+    // Use service role to bypass RLS for quiz operations
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+    const { createClient: createServiceClient } = await import('@supabase/supabase-js');
+    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    });
+
     // Parse request body
-    const { answers, time_taken_seconds }: { 
+    const { answers, time_taken_seconds }: {
       answers: StudentAnswer[];
       time_taken_seconds: number;
     } = await request.json();
@@ -49,7 +51,7 @@ export async function POST(
       .from('quiz_attempts')
       .select('*')
       .eq('quiz_id', quizId)
-      .eq('student_id', user.id)
+      .eq('student_id', studentId)
       .single();
     
     if (attemptError || !attempt) {
