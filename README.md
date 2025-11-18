@@ -316,6 +316,24 @@ npm run lint
    - Check middleware configuration
    - Verify RLS policies
 
+## 📚 Reference Books
+
+The `reference_books/` directory contains curriculum reference materials split into manageable chunks:
+
+### AMath Textbook (19 parts, ~1MB each)
+Located in `reference_books/amath_book_small/`:
+- Covers comprehensive Additional Mathematics curriculum
+- Parts 1-19, each under 1MB for easy access
+- Topics: Quadratic functions, calculus, trigonometry, coordinate geometry, etc.
+
+### CSEC Additional Mathematics (5 parts, ~1MB each)
+Located in `reference_books/csec_small/`:
+- Official CSEC syllabus and specimen papers
+- Parts 1-5, optimized for quick reference
+- Includes mark schemes and examination guidelines
+
+**Note:** PDFs are intentionally split into small chunks (~1MB) for optimal loading and accessibility.
+
 ## 📚 Additional Resources
 
 - [Next.js Documentation](https://nextjs.org/docs)

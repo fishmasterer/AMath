@@ -59,4 +59,9 @@ Thumbs.db
 
 # PDF splitter output
 pdf_parts/
-*.pdf
+
+# Allow reference book PDFs
+!reference_books/**/*.pdf
+
+# Ignore root level PDFs (original large files)
+/*.pdf
