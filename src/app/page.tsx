@@ -99,30 +99,32 @@ export default function HomePage() {
           <h2 className="text-3xl font-bold text-white text-center mb-8">
             Complete Topic Coverage
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
             {[
-              { code: 'A1', name: 'Quadratic Functions', color: 'cyan' },
-              { code: 'A2', name: 'Equations & Inequalities', color: 'cyan' },
-              { code: 'A3', name: 'Surds', color: 'cyan' },
-              { code: 'A4', name: 'Polynomials', color: 'blue' },
-              { code: 'A5', name: 'Binomial Expansions', color: 'blue' },
-              { code: 'A6', name: 'Exponential & Log', color: 'blue' },
-              { code: 'G1', name: 'Trigonometry', color: 'indigo' },
-              { code: 'G2', name: 'Coordinate Geometry', color: 'indigo' },
-              { code: 'G3', name: 'Proofs', color: 'indigo' },
-              { code: 'C1', name: 'Calculus', color: 'violet' },
+              { code: 'A1', name: 'Quadratic Functions', colorClass: 'text-cyan-400', href: '/topics/a1' },
+              { code: 'A2', name: 'Equations & Inequalities', colorClass: 'text-cyan-400', href: '/topics/a2' },
+              { code: 'A3', name: 'Surds', colorClass: 'text-cyan-400', href: '/topics/a3' },
+              { code: 'A4', name: 'Polynomials', colorClass: 'text-cyan-400', href: '/topics/a4' },
+              { code: 'A5', name: 'Partial Fractions', colorClass: 'text-blue-400', href: '/topics/a5' },
+              { code: 'A6', name: 'Binomial Expansion', colorClass: 'text-blue-400', href: '/topics/a6' },
+              { code: 'A7', name: 'Exponential & Log', colorClass: 'text-blue-400', href: '/topics/a7' },
+              { code: 'G1', name: 'Trigonometry', colorClass: 'text-purple-400', href: '/topics/g1' },
+              { code: 'G2', name: 'Coordinate Geometry', colorClass: 'text-purple-400', href: '/topics/g2' },
+              { code: 'G3', name: 'Proofs', colorClass: 'text-purple-400', href: '/topics/g3' },
+              { code: 'C1', name: 'Calculus', colorClass: 'text-pink-400', href: '/topics/c1' },
             ].map((topic) => (
-              <div
+              <a
                 key={topic.code}
-                className="group relative bg-slate-900/30 backdrop-blur-sm border border-slate-800/50 rounded-xl p-4 hover:border-cyan-500/50 transition-all duration-300"
+                href={topic.href}
+                className="group relative bg-slate-900/30 backdrop-blur-sm border border-slate-800/50 rounded-xl p-4 hover:border-cyan-500/50 transition-all duration-300 cursor-pointer"
               >
-                <div className={`text-${topic.color}-400 font-bold text-lg mb-1`}>
+                <div className={`${topic.colorClass} font-bold text-lg mb-1`}>
                   {topic.code}
                 </div>
                 <div className="text-slate-400 text-sm leading-tight">
                   {topic.name}
                 </div>
-              </div>
+              </a>
             ))}
           </div>
         </div>
