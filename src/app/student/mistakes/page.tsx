@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { QuizTopic, TOPIC_NAMES } from '@/lib/types'
 import 'katex/dist/katex.min.css'
 import { InlineMath } from 'react-katex'
@@ -91,7 +91,7 @@ export default function MistakesPage() {
   const renderTextWithLatex = (text: string) => {
     if (!text) return text
 
-    const parts: JSX.Element[] = []
+    const parts: React.ReactElement[] = []
     let remaining = text
     let key = 0
 

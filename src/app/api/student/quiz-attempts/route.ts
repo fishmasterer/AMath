@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase/supabase-server'
+import { createClient } from '@/lib/supabase/supabase-server'
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createServerClient()
+    const supabase = await createClient()
     const { searchParams } = new URL(request.url)
 
     const studentId = '00000000-0000-0000-0000-000000000001' // Single student setup
@@ -55,24 +55,27 @@ export async function GET(request: NextRequest) {
     }
 
     // Format response
-    const formattedAttempts = attempts?.map(attempt => ({
-      id: attempt.id,
-      quiz_id: attempt.quiz_id,
-      quiz_title: attempt.quizzes?.title || 'Unknown Quiz',
-      quiz_topic: attempt.quizzes?.topic,
-      quiz_difficulty: attempt.quizzes?.difficulty,
-      quiz_due_date: attempt.quizzes?.due_date,
-      started_at: attempt.started_at,
-      submitted_at: attempt.submitted_at,
-      score: attempt.score,
-      total_marks: attempt.total_marks,
-      percentage: attempt.total_marks && attempt.score !== null
-        ? Math.round((attempt.score / attempt.total_marks) * 100)
-        : null,
-      time_taken_seconds: attempt.time_taken_seconds,
-      completed: attempt.completed,
-      created_at: attempt.created_at,
-    })) || []
+    const formattedAttempts = attempts?.map(attempt => {
+      const quiz = Array.isArray(attempt.quizzes) ? attempt.quizzes[0] : attempt.quizzes
+      return {
+        id: attempt.id,
+        quiz_id: attempt.quiz_id,
+        quiz_title: quiz?.title || 'Unknown Quiz',
+        quiz_topic: quiz?.topic,
+        quiz_difficulty: quiz?.difficulty,
+        quiz_due_date: quiz?.due_date,
+        started_at: attempt.started_at,
+        submitted_at: attempt.submitted_at,
+        score: attempt.score,
+        total_marks: attempt.total_marks,
+        percentage: attempt.total_marks && attempt.score !== null
+          ? Math.round((attempt.score / attempt.total_marks) * 100)
+          : null,
+        time_taken_seconds: attempt.time_taken_seconds,
+        completed: attempt.completed,
+        created_at: attempt.created_at,
+      }
+    }) || []
 
     return NextResponse.json({
       attempts: formattedAttempts,

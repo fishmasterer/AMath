@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase/supabase-server'
-import { getLetterGrade } from '@/lib/utils/grading'
+import { createClient } from '@/lib/supabase/supabase-server'
+import { getGradeLetter } from '@/lib/utils/grading'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = createServerClient()
-    const quizId = params.id
+    const supabase = await createClient()
+    const { id: quizId } = await params
     const studentId = '00000000-0000-0000-0000-000000000001' // Single student setup
 
     // Fetch quiz details
@@ -61,7 +61,7 @@ export async function GET(
 
     // Calculate percentage and grade
     const percentage = (attempt.score! / attempt.total_marks!) * 100
-    const grade = getLetterGrade(percentage)
+    const grade = getGradeLetter(percentage)
 
     // Calculate time stats
     const timeUsedMinutes = Math.floor(attempt.time_taken_seconds! / 60)

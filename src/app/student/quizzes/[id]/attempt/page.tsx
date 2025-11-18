@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { use, useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Timer from '@/components/quiz/Timer'
 import QuestionPalette from '@/components/quiz/QuestionPalette'
@@ -26,7 +26,8 @@ interface QuizAttemptData {
   timeIsUp: boolean
 }
 
-export default function QuizAttemptPage({ params }: { params: { id: string } }) {
+export default function QuizAttemptPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [attemptData, setAttemptData] = useState<QuizAttemptData | null>(null)
@@ -41,12 +42,12 @@ export default function QuizAttemptPage({ params }: { params: { id: string } }) 
 
   useEffect(() => {
     initializeQuiz()
-  }, [params.id])
+  }, [id])
 
   const initializeQuiz = async () => {
     try {
       // First, try to start the quiz (or get existing attempt)
-      const startRes = await fetch(`/api/quizzes/${params.id}/start`, {
+      const startRes = await fetch(`/api/quizzes/${id}/start`, {
         method: 'POST',
       })
 
@@ -58,7 +59,7 @@ export default function QuizAttemptPage({ params }: { params: { id: string } }) 
       }
 
       // Then fetch the full attempt data
-      const attemptRes = await fetch(`/api/quizzes/${params.id}/attempt`)
+      const attemptRes = await fetch(`/api/quizzes/${id}/attempt`)
 
       if (!attemptRes.ok) {
         const error = await attemptRes.json()
@@ -114,7 +115,7 @@ export default function QuizAttemptPage({ params }: { params: { id: string } }) 
         })
       )
 
-      const response = await fetch(`/api/quizzes/${params.id}/attempt`, {
+      const response = await fetch(`/api/quizzes/${id}/attempt`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ answers: answersArray }),
@@ -128,7 +129,7 @@ export default function QuizAttemptPage({ params }: { params: { id: string } }) 
     } finally {
       setAutoSaving(false)
     }
-  }, [attemptData, answers, params.id, autoSaving])
+  }, [attemptData, answers, id, autoSaving])
 
   const handleAnswerChange = (answer: string | string[]) => {
     if (!attemptData) return
@@ -206,7 +207,7 @@ export default function QuizAttemptPage({ params }: { params: { id: string } }) 
       )
 
       // Submit the quiz
-      const response = await fetch(`/api/quizzes/${params.id}/submit`, {
+      const response = await fetch(`/api/quizzes/${id}/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -217,7 +218,7 @@ export default function QuizAttemptPage({ params }: { params: { id: string } }) 
 
       if (response.ok) {
         // Navigate to results page
-        router.push(`/student/quizzes/${params.id}/results`)
+        router.push(`/student/quizzes/${id}/results`)
       } else {
         const error = await response.json()
         setError(error.error || 'Failed to submit quiz')
@@ -250,7 +251,7 @@ export default function QuizAttemptPage({ params }: { params: { id: string } }) 
           </svg>
           <h2 className="text-xl font-semibold text-white mb-2">{error || 'Failed to load quiz'}</h2>
           <button
-            onClick={() => router.push(`/student/quizzes/${params.id}`)}
+            onClick={() => router.push(`/student/quizzes/${id}`)}
             className="mt-4 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
           >
             Back to Quiz Details

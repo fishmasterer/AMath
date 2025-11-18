@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { use, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { QuizTopic, QuizDifficulty, TOPIC_NAMES } from '@/lib/types'
@@ -33,7 +33,8 @@ interface QuizDetail {
   isOverdue: boolean
 }
 
-export default function QuizDetailPage({ params }: { params: { id: string } }) {
+export default function QuizDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
   const router = useRouter()
   const [quiz, setQuiz] = useState<QuizDetail | null>(null)
   const [loading, setLoading] = useState(true)
@@ -41,11 +42,11 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     fetchQuizDetail()
-  }, [params.id])
+  }, [id])
 
   const fetchQuizDetail = async () => {
     try {
-      const response = await fetch(`/api/quizzes/${params.id}`)
+      const response = await fetch(`/api/quizzes/${id}`)
       if (response.ok) {
         const data = await response.json()
         setQuiz(data)
@@ -66,7 +67,7 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
 
   const handleStartQuiz = () => {
     // Navigate to quiz attempt page (to be built in Chunk 3)
-    router.push(`/student/quizzes/${params.id}/attempt`)
+    router.push(`/student/quizzes/${id}/attempt`)
   }
 
   const getDifficultyColor = (difficulty: QuizDifficulty) => {
