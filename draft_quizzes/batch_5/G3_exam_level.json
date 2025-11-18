@@ -1,0 +1,110 @@
+{
+  "title": "Proofs in Plane Geometry - Exam Level",
+  "topic": "G3",
+  "week": 27,
+  "difficulty": "exam_level",
+  "time_limit_minutes": 45,
+  "due_date": "2025-12-18T23:59:59Z",
+  "published": false,
+  "questions": [
+    {
+      "id": 1,
+      "type": "mcq",
+      "question": "In triangle $ABC$, $D$ and $E$ are points on $AB$ and $AC$ respectively such that $DE \\parallel BC$. If $AD = 4$, $DB = 6$, and $AE = 6$, find $EC$.",
+      "options": [
+        "$9$",
+        "$8$",
+        "$10$",
+        "$12$"
+      ],
+      "correctAnswer": "A",
+      "marks": 7,
+      "explanation": "By the basic proportionality theorem (Thales' theorem), if $DE \\parallel BC$, then $\\frac{AD}{DB} = \\frac{AE}{EC}$. So $\\frac{4}{6} = \\frac{6}{EC}$, giving $4 \\times EC = 36$, thus $EC = 9$."
+    },
+    {
+      "id": 2,
+      "type": "mcq",
+      "question": "Two circles with centers $O_1$ and $O_2$ intersect at points $A$ and $B$. If $O_1A = 5$, $O_2A = 7$, and $O_1O_2 = 8$, what type of triangle is $O_1AO_2$?",
+      "options": [
+        "Scalene",
+        "Isosceles",
+        "Equilateral",
+        "Right-angled"
+      ],
+      "correctAnswer": "A",
+      "marks": 6,
+      "explanation": "The triangle $O_1AO_2$ has sides $5$, $7$, and $8$. Since all three sides are different, it is a scalene triangle. Check: $5^2 + 7^2 = 25 + 49 = 74 \\neq 64 = 8^2$, so not right-angled."
+    },
+    {
+      "id": 3,
+      "type": "mcq",
+      "question": "A tangent from an external point $P$ touches a circle at $T$. If $PT = 12$ and the radius of the circle is $5$, find the distance from $P$ to the center $O$.",
+      "options": [
+        "$13$",
+        "$12$",
+        "$17$",
+        "$7$"
+      ],
+      "correctAnswer": "A",
+      "marks": 7,
+      "explanation": "The radius $OT$ is perpendicular to the tangent $PT$ at the point of contact. So triangle $OTP$ is right-angled at $T$. Using Pythagoras: $PO^2 = PT^2 + OT^2 = 12^2 + 5^2 = 144 + 25 = 169$, so $PO = 13$."
+    },
+    {
+      "id": 4,
+      "type": "multi_select",
+      "question": "In the diagram, $AB$ is a diameter of the circle, and $C$ is a point on the circumference. $D$ is a point on $AC$ such that $BD \\perp AC$. Which of the following are true? (Select all that apply)",
+      "options": [
+        "$\\angle ACB = 90°$ (angle in semicircle)",
+        "$BD$ is the altitude from $B$ in triangle $ABC$",
+        "Triangles $ABD$ and $CBD$ are similar",
+        "$AB^2 = AC^2 + BC^2$"
+      ],
+      "correctAnswers": ["A", "B", "D"],
+      "partialCredit": true,
+      "marks": 6,
+      "explanation": "Since $AB$ is a diameter, $\\angle ACB = 90°$ ✓. $BD \\perp AC$ makes $BD$ an altitude ✓. In right triangle $ABC$, $AB^2 = AC^2 + BC^2$ by Pythagoras ✓. Triangles $ABD$ and $CBD$ are not necessarily similar ✗."
+    },
+    {
+      "id": 5,
+      "type": "mcq",
+      "question": "Prove that the line joining the midpoints of two sides of a triangle is parallel to the third side and half its length. In triangle $ABC$ with midpoints $D$ on $AB$ and $E$ on $AC$, if $BC = 10$, find $DE$.",
+      "options": [
+        "$5$",
+        "$10$",
+        "$7.5$",
+        "$2.5$"
+      ],
+      "correctAnswer": "A",
+      "marks": 6,
+      "explanation": "By the midpoint theorem, the line segment joining the midpoints of two sides of a triangle is parallel to the third side and equal to half its length. So $DE = \\frac{1}{2} BC = \\frac{1}{2} \\times 10 = 5$."
+    },
+    {
+      "id": 6,
+      "type": "mcq",
+      "question": "In a circle, two chords $AB$ and $CD$ are equidistant from the center. If $AB = 16$ cm, find the length of $CD$.",
+      "options": [
+        "$16$ cm",
+        "$8$ cm",
+        "$12$ cm",
+        "$32$ cm"
+      ],
+      "correctAnswer": "A",
+      "marks": 7,
+      "explanation": "A circle theorem states that chords equidistant from the center are equal in length. Since $AB$ and $CD$ are equidistant from the center, $CD = AB = 16$ cm."
+    },
+    {
+      "id": 7,
+      "type": "mcq",
+      "question": "Two circles with radii $3$ and $5$ have centers $10$ units apart. How many common tangents do they have?",
+      "options": [
+        "$4$ (two external, two internal)",
+        "$3$ (two external, one internal)",
+        "$2$ (both external)",
+        "$1$ (one external)"
+      ],
+      "correctAnswer": "A",
+      "marks": 8,
+      "explanation": "Distance between centers $= 10$. Sum of radii $= 3 + 5 = 8$. Difference of radii $= 5 - 3 = 2$. Since distance $(10) >$ sum of radii $(8)$, the circles are completely separate and do not intersect. For two separate non-intersecting circles, there are always 4 common tangents: 2 external (transverse) common tangents and 2 internal (direct) common tangents."
+    }
+  ]
+}

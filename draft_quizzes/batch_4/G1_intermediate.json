@@ -1,0 +1,110 @@
+{
+  "title": "Trigonometric Functions - Intermediate",
+  "topic": "G1",
+  "week": 20,
+  "difficulty": "intermediate",
+  "time_limit_minutes": 30,
+  "due_date": "2025-12-18T23:59:59Z",
+  "published": false,
+  "questions": [
+    {
+      "id": 1,
+      "type": "mcq",
+      "question": "Solve $\\sin x = \\frac{\\sqrt{3}}{2}$ for $0° \\leq x \\leq 360°$.",
+      "options": [
+        "$x = 60°$ or $x = 120°$",
+        "$x = 30°$ or $x = 150°$",
+        "$x = 45°$ or $x = 135°$",
+        "$x = 60°$ only"
+      ],
+      "correctAnswer": "A",
+      "marks": 5,
+      "explanation": "$\\sin x = \\frac{\\sqrt{3}}{2}$ in the first quadrant gives $x = 60°$, and in the second quadrant gives $x = 180° - 60° = 120°$."
+    },
+    {
+      "id": 2,
+      "type": "mcq",
+      "question": "Simplify $\\frac{\\sin 2\\theta}{\\cos \\theta}$ given that $\\sin 2\\theta = 2\\sin \\theta \\cos \\theta$.",
+      "options": [
+        "$2\\sin \\theta$",
+        "$\\sin \\theta$",
+        "$2\\cos \\theta$",
+        "$\\tan \\theta$"
+      ],
+      "correctAnswer": "A",
+      "marks": 4,
+      "explanation": "$\\frac{\\sin 2\\theta}{\\cos \\theta} = \\frac{2\\sin \\theta \\cos \\theta}{\\cos \\theta} = 2\\sin \\theta$."
+    },
+    {
+      "id": 3,
+      "type": "mcq",
+      "question": "If $\\cos \\theta = \\frac{3}{5}$ and $\\theta$ is acute, find $\\sin \\theta$.",
+      "options": [
+        "$\\frac{4}{5}$",
+        "$\\frac{3}{5}$",
+        "$\\frac{5}{4}$",
+        "$\\frac{2}{5}$"
+      ],
+      "correctAnswer": "A",
+      "marks": 5,
+      "explanation": "Using $\\sin^2 \\theta + \\cos^2 \\theta = 1$: $\\sin^2 \\theta = 1 - \\left(\\frac{3}{5}\\right)^2 = 1 - \\frac{9}{25} = \\frac{16}{25}$. Since $\\theta$ is acute, $\\sin \\theta = \\frac{4}{5}$."
+    },
+    {
+      "id": 4,
+      "type": "mcq",
+      "question": "Solve $2\\cos x = 1$ for $0° \\leq x \\leq 360°$.",
+      "options": [
+        "$x = 60°$ or $x = 300°$",
+        "$x = 30°$ or $x = 330°$",
+        "$x = 45°$ or $x = 315°$",
+        "$x = 60°$ or $x = 120°$"
+      ],
+      "correctAnswer": "A",
+      "marks": 5,
+      "explanation": "$\\cos x = \\frac{1}{2}$. In the first quadrant: $x = 60°$. In the fourth quadrant: $x = 360° - 60° = 300°$."
+    },
+    {
+      "id": 5,
+      "type": "multi_select",
+      "question": "Which of the following identities are correct? (Select all that apply)",
+      "options": [
+        "$\\sin 2\\theta = 2\\sin \\theta \\cos \\theta$",
+        "$\\cos 2\\theta = \\cos^2 \\theta - \\sin^2 \\theta$",
+        "$\\tan 2\\theta = \\frac{2\\tan \\theta}{1 - \\tan^2 \\theta}$",
+        "$\\sin^2 \\theta = 1 + \\cos^2 \\theta$"
+      ],
+      "correctAnswers": ["A", "B", "C"],
+      "partialCredit": true,
+      "marks": 5,
+      "explanation": "$\\sin 2\\theta = 2\\sin \\theta \\cos \\theta$ ✓. $\\cos 2\\theta = \\cos^2 \\theta - \\sin^2 \\theta$ ✓. $\\tan 2\\theta = \\frac{2\\tan \\theta}{1 - \\tan^2 \\theta}$ ✓. $\\sin^2 \\theta + \\cos^2 \\theta = 1$ (not $\\sin^2 \\theta = 1 + \\cos^2 \\theta$) ✗."
+    },
+    {
+      "id": 6,
+      "type": "mcq",
+      "question": "Express $\\cos 2A$ in terms of $\\cos A$ only.",
+      "options": [
+        "$2\\cos^2 A - 1$",
+        "$\\cos^2 A - \\sin^2 A$",
+        "$1 - 2\\sin^2 A$",
+        "$2\\cos A$"
+      ],
+      "correctAnswer": "A",
+      "marks": 4,
+      "explanation": "Using $\\cos 2A = \\cos^2 A - \\sin^2 A$ and $\\sin^2 A = 1 - \\cos^2 A$: $\\cos 2A = \\cos^2 A - (1 - \\cos^2 A) = 2\\cos^2 A - 1$."
+    },
+    {
+      "id": 7,
+      "type": "mcq",
+      "question": "Solve $\\tan x = \\sqrt{3}$ for $0° \\leq x \\leq 360°$.",
+      "options": [
+        "$x = 60°$ or $x = 240°$",
+        "$x = 30°$ or $x = 210°$",
+        "$x = 45°$ or $x = 225°$",
+        "$x = 60°$ or $x = 300°$"
+      ],
+      "correctAnswer": "A",
+      "marks": 5,
+      "explanation": "$\\tan x = \\sqrt{3}$ gives $x = 60°$ (first quadrant) and $x = 180° + 60° = 240°$ (third quadrant, where tan is also positive)."
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "title": "Binomial Expansions - Intermediate",
+  "topic": "A5",
+  "week": 14,
+  "difficulty": "intermediate",
+  "time_limit_minutes": 30,
+  "due_date": "2025-12-18T23:59:59Z",
+  "published": false,
+  "questions": [
+    {
+      "id": 1,
+      "type": "mcq",
+      "question": "Find the coefficient of $x^4$ in the expansion of $(2+x)^6$.",
+      "options": [
+        "$60$",
+        "$15$",
+        "$30$",
+        "$120$"
+      ],
+      "correctAnswer": "A",
+      "marks": 5,
+      "explanation": "Using binomial theorem: term with $x^4$ is $\\binom{6}{4}(2)^{6-4}(x)^4 = \\binom{6}{4}(2)^2 x^4 = 15 \\times 4 \\times x^4 = 60x^4$. Coefficient is 60."
+    },
+    {
+      "id": 2,
+      "type": "mcq",
+      "question": "In the expansion of $(1+2x)^5$, find the coefficient of $x^3$.",
+      "options": [
+        "$80$",
+        "$40$",
+        "$10$",
+        "$160$"
+      ],
+      "correctAnswer": "A",
+      "marks": 5,
+      "explanation": "Term with $x^3$: $\\binom{5}{3}(1)^{5-3}(2x)^3 = \\binom{5}{3}(2)^3 x^3 = 10 \\times 8 \\times x^3 = 80x^3$. Coefficient is 80."
+    },
+    {
+      "id": 3,
+      "type": "mcq",
+      "question": "Find the term independent of $x$ in the expansion of $(x + \\frac{1}{x})^4$.",
+      "options": [
+        "$6$",
+        "$4$",
+        "$8$",
+        "$12$"
+      ],
+      "correctAnswer": "A",
+      "marks": 6,
+      "explanation": "General term: $\\binom{4}{r}x^{4-r}(\\frac{1}{x})^r = \\binom{4}{r}x^{4-2r}$. For constant term: $4-2r=0$, so $r=2$. Term is $\\binom{4}{2}x^0 = 6$."
+    },
+    {
+      "id": 4,
+      "type": "mcq",
+      "question": "Using binomial expansion, find an approximation for $(1.02)^5$ up to 3 decimal places.",
+      "options": [
+        "$1.104$",
+        "$1.100$",
+        "$1.102$",
+        "$1.105$"
+      ],
+      "correctAnswer": "A",
+      "marks": 5,
+      "explanation": "$(1+0.02)^5 = 1 + 5(0.02) + 10(0.02)^2 + ... \\approx 1 + 0.1 + 0.004 = 1.104$."
+    },
+    {
+      "id": 5,
+      "type": "multi_select",
+      "question": "In the expansion of $(2-3x)^4$, which of the following are true? (Select all that apply)",
+      "options": [
+        "The first term is $16$",
+        "The coefficient of $x$ is $-96$",
+        "The coefficient of $x^2$ is $216$",
+        "There are 4 terms in total"
+      ],
+      "correctAnswers": ["A", "B", "C"],
+      "partialCredit": true,
+      "marks": 5,
+      "explanation": "$(2-3x)^4 = \\binom{4}{0}(2)^4 + \\binom{4}{1}(2)^3(-3x) + \\binom{4}{2}(2)^2(-3x)^2 + ... = 16 - 96x + 216x^2 - 216x^3 + 81x^4$. First term: 16 ✓. Coeff of $x$: -96 ✓. Coeff of $x^2$: 216 ✓. There are 5 terms, not 4 ✗."
+    },
+    {
+      "id": 6,
+      "type": "mcq",
+      "question": "Find the middle term in the expansion of $(x+2)^6$.",
+      "options": [
+        "$160x^3$",
+        "$120x^3$",
+        "$80x^3$",
+        "$240x^3$"
+      ],
+      "correctAnswer": "A",
+      "marks": 5,
+      "explanation": "For $(x+2)^6$ there are 7 terms, so middle term is the 4th term (when $r=3$). Term: $\\binom{6}{3}x^{6-3}(2)^3 = 20 \\times x^3 \\times 8 = 160x^3$."
+    }
+  ]
+}

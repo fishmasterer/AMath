@@ -1,0 +1,96 @@
+{
+  "title": "Exponential and Logarithmic Functions - Foundational",
+  "topic": "A6",
+  "week": 16,
+  "difficulty": "foundational",
+  "time_limit_minutes": 20,
+  "due_date": "2025-12-18T23:59:59Z",
+  "published": false,
+  "questions": [
+    {
+      "id": 1,
+      "type": "mcq",
+      "question": "Simplify $2^3 \\times 2^4$.",
+      "options": [
+        "$2^7$",
+        "$2^{12}$",
+        "$4^7$",
+        "$2^1$"
+      ],
+      "correctAnswer": "A",
+      "marks": 2,
+      "explanation": "Using the law $a^m \\times a^n = a^{m+n}$: $2^3 \\times 2^4 = 2^{3+4} = 2^7$."
+    },
+    {
+      "id": 2,
+      "type": "mcq",
+      "question": "Evaluate $\\log_2 8$.",
+      "options": [
+        "$3$",
+        "$2$",
+        "$4$",
+        "$8$"
+      ],
+      "correctAnswer": "A",
+      "marks": 2,
+      "explanation": "$\\log_2 8 = \\log_2 2^3 = 3$, since $2^3 = 8$."
+    },
+    {
+      "id": 3,
+      "type": "mcq",
+      "question": "Express $3^2 = 9$ in logarithmic form.",
+      "options": [
+        "$\\log_3 9 = 2$",
+        "$\\log_9 3 = 2$",
+        "$\\log_2 9 = 3$",
+        "$\\log_2 3 = 9$"
+      ],
+      "correctAnswer": "A",
+      "marks": 3,
+      "explanation": "If $a^b = c$, then $\\log_a c = b$. So $3^2 = 9$ becomes $\\log_3 9 = 2$."
+    },
+    {
+      "id": 4,
+      "type": "mcq",
+      "question": "Simplify $\\frac{5^6}{5^2}$.",
+      "options": [
+        "$5^4$",
+        "$5^3$",
+        "$5^8$",
+        "$1$"
+      ],
+      "correctAnswer": "A",
+      "marks": 3,
+      "explanation": "Using the law $\\frac{a^m}{a^n} = a^{m-n}$: $\\frac{5^6}{5^2} = 5^{6-2} = 5^4$."
+    },
+    {
+      "id": 5,
+      "type": "multi_select",
+      "question": "Which of the following are true? (Select all that apply)",
+      "options": [
+        "$\\log_a a = 1$",
+        "$\\log_a 1 = 0$",
+        "$\\log_a (xy) = \\log_a x + \\log_a y$",
+        "$\\log_a (x+y) = \\log_a x + \\log_a y$"
+      ],
+      "correctAnswers": ["A", "B", "C"],
+      "partialCredit": true,
+      "marks": 4,
+      "explanation": "$\\log_a a = 1$ ✓ (since $a^1 = a$). $\\log_a 1 = 0$ ✓ (since $a^0 = 1$). $\\log_a(xy) = \\log_a x + \\log_a y$ ✓ (product law). $\\log_a(x+y) \\neq \\log_a x + \\log_a y$ ✗."
+    },
+    {
+      "id": 6,
+      "type": "mcq",
+      "question": "Evaluate $\\log_{10} 100$.",
+      "options": [
+        "$2$",
+        "$10$",
+        "$100$",
+        "$1$"
+      ],
+      "correctAnswer": "A",
+      "marks": 2,
+      "explanation": "$\\log_{10} 100 = \\log_{10} 10^2 = 2$."
+    }
+  ]
+}

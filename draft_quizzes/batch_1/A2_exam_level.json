@@ -1,0 +1,110 @@
+{
+  "title": "Equations and Inequalities - Exam Level",
+  "topic": "A2",
+  "week": 6,
+  "difficulty": "exam_level",
+  "time_limit_minutes": 45,
+  "due_date": "2025-12-18T23:59:59Z",
+  "published": false,
+  "questions": [
+    {
+      "id": 1,
+      "type": "mcq",
+      "question": "Solve the equation $\\sqrt{x+12} = x$.",
+      "options": [
+        "$x = 4$",
+        "$x = -3$",
+        "$x = 4$ or $x = -3$",
+        "No real solutions"
+      ],
+      "correctAnswer": "A",
+      "marks": 6,
+      "explanation": "Square both sides: $x+12=x^2$, giving $x^2-x-12=0$. Factoring: $(x-4)(x+3)=0$, so $x=4$ or $x=-3$. Check both: $x=4$ gives $\\sqrt{16}=4$ (true); $x=-3$ gives $\\sqrt{9}=-3$ (false, as square root must be non-negative). Therefore, $x=4$ only."
+    },
+    {
+      "id": 2,
+      "type": "mcq",
+      "question": "Find the range of values of $k$ for which the inequality $kx^2 + 2x + k > 0$ is true for all real values of $x$.",
+      "options": [
+        "$k > 1$",
+        "$k \\geq 1$",
+        "$k > 0$",
+        "$k < -1$"
+      ],
+      "correctAnswer": "A",
+      "marks": 7,
+      "explanation": "For the inequality to be true for all $x$: (1) $k > 0$ (parabola opens upward), and (2) discriminant $< 0$ (no real roots). So $4 - 4k^2 < 0$, giving $k^2 > 1$. Combined with $k > 0$: $k > 1$."
+    },
+    {
+      "id": 3,
+      "type": "mcq",
+      "question": "Solve the inequality $\\frac{x-4}{x+1} \\leq 0$.",
+      "options": [
+        "$-1 < x \\leq 4$",
+        "$x \\leq -1$ or $x \\geq 4$",
+        "$x \\leq 4$",
+        "$x < -4$ or $x > 1$"
+      ],
+      "correctAnswer": "A",
+      "marks": 7,
+      "explanation": "The fraction is negative or zero when numerator and denominator have opposite signs (or numerator is zero). Critical points: $x = 4$ (numerator zero), $x = -1$ (denominator zero, excluded). Testing: solution is $-1 < x \\leq 4$."
+    },
+    {
+      "id": 4,
+      "type": "multi_select",
+      "question": "The equation $px^2 + (p+1)x + p = 0$ has two distinct real roots. Which of the following must be true? (Select all that apply)",
+      "options": [
+        "$-\\frac{1}{3} < p < 1$",
+        "$p \\neq 0$",
+        "The product of the roots is 1 when $p \\neq 0$",
+        "$p$ must be negative"
+      ],
+      "correctAnswers": ["A", "B", "C"],
+      "partialCredit": true,
+      "marks": 6,
+      "explanation": "For two distinct real roots: $p \\neq 0$ and $(p+1)^2 - 4p^2 > 0$. Expanding: $p^2 + 2p + 1 - 4p^2 > 0$, giving $-3p^2 + 2p + 1 > 0$ or $3p^2 - 2p - 1 < 0$. Factoring: $(3p+1)(p-1) < 0$, thus $-\\frac{1}{3} < p < 1$ with $p \\neq 0$. Product of roots $= \\frac{p}{p} = 1$ when $p \\neq 0$."
+    },
+    {
+      "id": 5,
+      "type": "mcq",
+      "question": "Solve simultaneously: $x^2 + y^2 = 25$ and $y = x + 1$.",
+      "options": [
+        "$x = 3, y = 4$ or $x = -4, y = -3$",
+        "$x = 4, y = 3$ or $x = -3, y = -4$",
+        "$x = 5, y = 0$ or $x = 0, y = 5$",
+        "$x = 3, y = 4$ only"
+      ],
+      "correctAnswer": "A",
+      "marks": 6,
+      "explanation": "Substitute $y = x+1$ into first equation: $x^2 + (x+1)^2 = 25$. Expanding: $x^2 + x^2 + 2x + 1 = 25$, giving $2x^2 + 2x - 24 = 0$ or $x^2 + x - 12 = 0$. Factoring: $(x+4)(x-3) = 0$, so $x = 3$ or $x = -4$. When $x = 3$: $y = 4$. When $x = -4$: $y = -3$."
+    },
+    {
+      "id": 6,
+      "type": "mcq",
+      "question": "The quadratic equation $x^2 - 2px + (p^2 - q) = 0$ has equal roots. Express $q$ in terms of $p$.",
+      "options": [
+        "$q = 0$",
+        "$q = p^2$",
+        "$q = -p^2$",
+        "$q = 2p$"
+      ],
+      "correctAnswer": "A",
+      "marks": 7,
+      "explanation": "For equal roots, discriminant $= 0$: $(-2p)^2 - 4(1)(p^2-q) = 0$. Simplifying: $4p^2 - 4p^2 + 4q = 0$, thus $4q = 0$, giving $q = 0$."
+    },
+    {
+      "id": 7,
+      "type": "mcq",
+      "question": "Solve the equation $4^x - 6(2^x) + 8 = 0$.",
+      "options": [
+        "$x = 1$ or $x = 2$",
+        "$x = 0$ or $x = 3$",
+        "$x = 2$ only",
+        "$x = 1$ only"
+      ],
+      "correctAnswer": "A",
+      "marks": 7,
+      "explanation": "Let $y = 2^x$. Then $4^x = (2^2)^x = (2^x)^2 = y^2$. The equation becomes: $y^2 - 6y + 8 = 0$. Factoring: $(y-2)(y-4) = 0$, so $y = 2$ or $y = 4$. Thus $2^x = 2$ giving $x = 1$, or $2^x = 4 = 2^2$ giving $x = 2$."
+    }
+  ]
+}

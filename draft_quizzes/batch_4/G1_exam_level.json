@@ -1,0 +1,110 @@
+{
+  "title": "Trigonometric Functions - Exam Level",
+  "topic": "G1",
+  "week": 21,
+  "difficulty": "exam_level",
+  "time_limit_minutes": 45,
+  "due_date": "2025-12-18T23:59:59Z",
+  "published": false,
+  "questions": [
+    {
+      "id": 1,
+      "type": "mcq",
+      "question": "Prove that $\\frac{1 - \\cos 2\\theta}{\\sin 2\\theta} = \\tan \\theta$. Which identity is used in the first step?",
+      "options": [
+        "$\\cos 2\\theta = 1 - 2\\sin^2 \\theta$",
+        "$\\cos 2\\theta = 2\\cos^2 \\theta - 1$",
+        "$\\sin 2\\theta = 2\\sin \\theta \\cos \\theta$",
+        "$\\tan 2\\theta = \\frac{2\\tan \\theta}{1-\\tan^2\\theta}$"
+      ],
+      "correctAnswer": "A",
+      "marks": 7,
+      "explanation": "Using $\\cos 2\\theta = 1 - 2\\sin^2 \\theta$: $\\frac{1 - \\cos 2\\theta}{\\sin 2\\theta} = \\frac{1-(1-2\\sin^2\\theta)}{2\\sin\\theta\\cos\\theta} = \\frac{2\\sin^2\\theta}{2\\sin\\theta\\cos\\theta} = \\frac{\\sin\\theta}{\\cos\\theta} = \\tan\\theta$."
+    },
+    {
+      "id": 2,
+      "type": "mcq",
+      "question": "Solve the equation $\\sin 2x = \\cos x$ for $0° \\leq x \\leq 360°$.",
+      "options": [
+        "$x = 30°, 90°, 150°, 270°$",
+        "$x = 60°, 180°, 300°$",
+        "$x = 45°, 135°, 315°$",
+        "$x = 30°, 150°, 270°$"
+      ],
+      "correctAnswer": "A",
+      "marks": 8,
+      "explanation": "$2\\sin x \\cos x = \\cos x$, so $\\cos x(2\\sin x - 1) = 0$. Either $\\cos x = 0$ giving $x = 90°, 270°$, or $\\sin x = \\frac{1}{2}$ giving $x = 30°, 150°$. Solutions: $x = 30°, 90°, 150°, 270°$."
+    },
+    {
+      "id": 3,
+      "type": "mcq",
+      "question": "If $\\sin A + \\cos A = \\frac{1}{2}$, find the value of $\\sin A \\cos A$.",
+      "options": [
+        "$-\\frac{3}{8}$",
+        "$\\frac{3}{8}$",
+        "$-\\frac{1}{4}$",
+        "$\\frac{1}{4}$"
+      ],
+      "correctAnswer": "A",
+      "marks": 7,
+      "explanation": "Square both sides: $(\\sin A + \\cos A)^2 = \\frac{1}{4}$. Expanding: $\\sin^2 A + 2\\sin A \\cos A + \\cos^2 A = \\frac{1}{4}$. Using $\\sin^2 A + \\cos^2 A = 1$: $1 + 2\\sin A \\cos A = \\frac{1}{4}$, so $\\sin A \\cos A = \\frac{1/4 - 1}{2} = \\frac{-3/4}{2} = -\\frac{3}{8}$."
+    },
+    {
+      "id": 4,
+      "type": "multi_select",
+      "question": "Which of the following are solutions to $2\\sin^2 x - 3\\sin x + 1 = 0$ for $0° \\leq x \\leq 360°$? (Select all that apply)",
+      "options": [
+        "$x = 30°$",
+        "$x = 150°$",
+        "$x = 90°$",
+        "$x = 270°$"
+      ],
+      "correctAnswers": ["A", "B", "C"],
+      "partialCredit": true,
+      "marks": 6,
+      "explanation": "Let $y = \\sin x$: $2y^2 - 3y + 1 = 0$, so $(2y-1)(y-1) = 0$. Thus $y = \\frac{1}{2}$ or $y = 1$. For $\\sin x = \\frac{1}{2}$: $x = 30°, 150°$. For $\\sin x = 1$: $x = 90°$."
+    },
+    {
+      "id": 5,
+      "type": "mcq",
+      "question": "Express $\\sin 3\\theta$ in terms of $\\sin \\theta$ using the formula $\\sin 3\\theta = 3\\sin \\theta - 4\\sin^3 \\theta$. If $\\sin \\theta = \\frac{1}{3}$, find $\\sin 3\\theta$.",
+      "options": [
+        "$\\frac{23}{27}$",
+        "$\\frac{1}{27}$",
+        "$1$",
+        "$\\frac{7}{9}$"
+      ],
+      "correctAnswer": "A",
+      "marks": 7,
+      "explanation": "$\\sin 3\\theta = 3\\sin \\theta - 4\\sin^3 \\theta = 3 \\cdot \\frac{1}{3} - 4 \\cdot \\left(\\frac{1}{3}\\right)^3 = 1 - 4 \\cdot \\frac{1}{27} = 1 - \\frac{4}{27} = \\frac{23}{27}$."
+    },
+    {
+      "id": 6,
+      "type": "mcq",
+      "question": "Solve the equation $\\cos 2x + \\cos x = 0$ for $0° \\leq x \\leq 360°$.",
+      "options": [
+        "$x = 60°, 180°, 300°$",
+        "$x = 120°, 180°, 240°$",
+        "$x = 90°, 180°, 270°$",
+        "$x = 30°, 150°, 330°$"
+      ],
+      "correctAnswer": "A",
+      "marks": 8,
+      "explanation": "Using $\\cos 2x = 2\\cos^2 x - 1$: $2\\cos^2 x - 1 + \\cos x = 0$, so $2\\cos^2 x + \\cos x - 1 = 0$. Factoring: $(2\\cos x - 1)(\\cos x + 1) = 0$. Thus $\\cos x = \\frac{1}{2}$ giving $x = 60°, 300°$, or $\\cos x = -1$ giving $x = 180°$. Solutions: $x = 60°, 180°, 300°$."
+    },
+    {
+      "id": 7,
+      "type": "mcq",
+      "question": "If $\\tan \\theta = 2$, find the value of $\\frac{2\\sin \\theta + 3\\cos \\theta}{4\\sin \\theta - \\cos \\theta}$.",
+      "options": [
+        "$1$",
+        "$\\frac{7}{7}$",
+        "$2$",
+        "$\\frac{1}{2}$"
+      ],
+      "correctAnswer": "A",
+      "marks": 7,
+      "explanation": "Divide numerator and denominator by $\\cos \\theta$: $\\frac{2\\tan \\theta + 3}{4\\tan \\theta - 1} = \\frac{2(2) + 3}{4(2) - 1} = \\frac{4+3}{8-1} = \\frac{7}{7} = 1$."
+    }
+  ]
+}

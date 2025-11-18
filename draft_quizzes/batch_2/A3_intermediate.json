@@ -1,0 +1,110 @@
+{
+  "title": "Surds - Intermediate",
+  "topic": "A3",
+  "week": 8,
+  "difficulty": "intermediate",
+  "time_limit_minutes": 30,
+  "due_date": "2025-12-18T23:59:59Z",
+  "published": false,
+  "questions": [
+    {
+      "id": 1,
+      "type": "mcq",
+      "question": "Simplify $(2\\sqrt{3} + \\sqrt{2})(\\sqrt{3} - \\sqrt{2})$.",
+      "options": [
+        "$4 - \\sqrt{6}$",
+        "$6 - 2$",
+        "$4 + \\sqrt{6}$",
+        "$6 + \\sqrt{6}$"
+      ],
+      "correctAnswer": "A",
+      "marks": 4,
+      "explanation": "Expand: $2\\sqrt{3} \\cdot \\sqrt{3} - 2\\sqrt{3} \\cdot \\sqrt{2} + \\sqrt{2} \\cdot \\sqrt{3} - \\sqrt{2} \\cdot \\sqrt{2} = 6 - 2\\sqrt{6} + \\sqrt{6} - 2 = 4 - \\sqrt{6}$."
+    },
+    {
+      "id": 2,
+      "type": "mcq",
+      "question": "Rationalize the denominator: $\\frac{6}{2 - \\sqrt{3}}$.",
+      "options": [
+        "$12 + 6\\sqrt{3}$",
+        "$12 - 6\\sqrt{3}$",
+        "$4 + 2\\sqrt{3}$",
+        "$6(2 + \\sqrt{3})$"
+      ],
+      "correctAnswer": "A",
+      "marks": 5,
+      "explanation": "Multiply by conjugate: $\\frac{6}{2-\\sqrt{3}} \\times \\frac{2+\\sqrt{3}}{2+\\sqrt{3}} = \\frac{6(2+\\sqrt{3})}{4-3} = \\frac{6(2+\\sqrt{3})}{1} = 12 + 6\\sqrt{3}$."
+    },
+    {
+      "id": 3,
+      "type": "mcq",
+      "question": "Simplify $\\frac{\\sqrt{48}}{\\sqrt{3}}$.",
+      "options": [
+        "$4$",
+        "$\\sqrt{16}$",
+        "$2\\sqrt{3}$",
+        "$16$"
+      ],
+      "correctAnswer": "A",
+      "marks": 4,
+      "explanation": "$\\frac{\\sqrt{48}}{\\sqrt{3}} = \\sqrt{\\frac{48}{3}} = \\sqrt{16} = 4$."
+    },
+    {
+      "id": 4,
+      "type": "mcq",
+      "question": "Given that $\\sqrt{x} + \\frac{1}{\\sqrt{x}} = 4$, find the value of $x + \\frac{1}{x}$.",
+      "options": [
+        "$14$",
+        "$16$",
+        "$12$",
+        "$18$"
+      ],
+      "correctAnswer": "A",
+      "marks": 5,
+      "explanation": "Square both sides: $(\\sqrt{x} + \\frac{1}{\\sqrt{x}})^2 = 16$. Expanding: $x + 2 + \\frac{1}{x} = 16$, thus $x + \\frac{1}{x} = 14$."
+    },
+    {
+      "id": 5,
+      "type": "multi_select",
+      "question": "Which of the following are true? (Select all that apply)",
+      "options": [
+        "$\\sqrt{a} \\times \\sqrt{b} = \\sqrt{ab}$ for $a, b > 0$",
+        "$\\sqrt{a} + \\sqrt{b} = \\sqrt{a+b}$ for $a, b > 0$",
+        "$\\frac{\\sqrt{a}}{\\sqrt{b}} = \\sqrt{\\frac{a}{b}}$ for $a, b > 0$",
+        "$(\\sqrt{a})^2 = a$ for $a > 0$"
+      ],
+      "correctAnswers": ["A", "C", "D"],
+      "partialCredit": true,
+      "marks": 4,
+      "explanation": "Options A, C, D are fundamental surd laws. Option B is false: $\\sqrt{4} + \\sqrt{9} = 2 + 3 = 5 \\neq \\sqrt{13}$."
+    },
+    {
+      "id": 6,
+      "type": "mcq",
+      "question": "Simplify $(\\sqrt{5} + 2)^2$.",
+      "options": [
+        "$9 + 4\\sqrt{5}$",
+        "$5 + 4$",
+        "$9 + 2\\sqrt{5}$",
+        "$7 + 4\\sqrt{5}$"
+      ],
+      "correctAnswer": "A",
+      "marks": 4,
+      "explanation": "$(\\sqrt{5} + 2)^2 = (\\sqrt{5})^2 + 2 \\cdot \\sqrt{5} \\cdot 2 + 2^2 = 5 + 4\\sqrt{5} + 4 = 9 + 4\\sqrt{5}$."
+    },
+    {
+      "id": 7,
+      "type": "mcq",
+      "question": "Simplify $\\sqrt{12} + \\sqrt{27} - \\sqrt{75}$.",
+      "options": [
+        "$0$",
+        "$2\\sqrt{3}$",
+        "$-2\\sqrt{3}$",
+        "$\\sqrt{3}$"
+      ],
+      "correctAnswer": "A",
+      "marks": 5,
+      "explanation": "$\\sqrt{12} + \\sqrt{27} - \\sqrt{75} = 2\\sqrt{3} + 3\\sqrt{3} - 5\\sqrt{3} = (2+3-5)\\sqrt{3} = 0$."
+    }
+  ]
+}

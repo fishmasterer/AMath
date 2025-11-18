@@ -1,0 +1,110 @@
+{
+  "title": "Exponential and Logarithmic Functions - Exam Level",
+  "topic": "A6",
+  "week": 18,
+  "difficulty": "exam_level",
+  "time_limit_minutes": 45,
+  "due_date": "2025-12-18T23:59:59Z",
+  "published": false,
+  "questions": [
+    {
+      "id": 1,
+      "type": "mcq",
+      "question": "Solve the equation $4^x - 3(2^x) + 2 = 0$.",
+      "options": [
+        "$x = 0$ or $x = 1$",
+        "$x = 1$ or $x = 2$",
+        "$x = -1$ or $x = 1$",
+        "$x = 0$ or $x = 2$"
+      ],
+      "correctAnswer": "A",
+      "marks": 7,
+      "explanation": "Let $y = 2^x$. Then $4^x = (2^2)^x = (2^x)^2 = y^2$. Equation becomes: $y^2 - 3y + 2 = 0$, which factors as $(y-1)(y-2) = 0$. So $y = 1$ or $y = 2$. Thus $2^x = 1 = 2^0$ giving $x = 0$, or $2^x = 2 = 2^1$ giving $x = 1$."
+    },
+    {
+      "id": 2,
+      "type": "mcq",
+      "question": "Solve simultaneously: $\\log_2 x + \\log_2 y = 5$ and $\\log_2 x - \\log_2 y = 1$.",
+      "options": [
+        "$x = 8, y = 4$",
+        "$x = 16, y = 2$",
+        "$x = 4, y = 8$",
+        "$x = 32, y = 1$"
+      ],
+      "correctAnswer": "A",
+      "marks": 7,
+      "explanation": "Add equations: $2\\log_2 x = 6$, so $\\log_2 x = 3$ and $x = 2^3 = 8$. Subtract: $2\\log_2 y = 4$, so $\\log_2 y = 2$ and $y = 2^2 = 4$."
+    },
+    {
+      "id": 3,
+      "type": "mcq",
+      "question": "Given that $\\log_a 2 = x$ and $\\log_a 3 = y$, express $\\log_a 12$ in terms of $x$ and $y$.",
+      "options": [
+        "$2x + y$",
+        "$x + 2y$",
+        "$3x + y$",
+        "$x + y$"
+      ],
+      "correctAnswer": "A",
+      "marks": 6,
+      "explanation": "$\\log_a 12 = \\log_a(4 \\times 3) = \\log_a 4 + \\log_a 3 = \\log_a 2^2 + y = 2\\log_a 2 + y = 2x + y$."
+    },
+    {
+      "id": 4,
+      "type": "multi_select",
+      "question": "Which of the following are solutions to the equation $\\log_3(x^2 - 8) = 2$? (Select all that apply)",
+      "options": [
+        "$x = \\sqrt{17}$",
+        "$x = -\\sqrt{17}$",
+        "$x = 5$",
+        "$x = -5$"
+      ],
+      "correctAnswers": ["A", "B"],
+      "partialCredit": true,
+      "marks": 6,
+      "explanation": "$\\log_3(x^2-8) = 2$ gives $x^2 - 8 = 3^2 = 9$, so $x^2 = 17$ and $x = \\pm\\sqrt{17}$. Both values satisfy the original equation since $x^2 - 8 > 0$ for both."
+    },
+    {
+      "id": 5,
+      "type": "mcq",
+      "question": "Solve the inequality $2^x > 16$.",
+      "options": [
+        "$x > 4$",
+        "$x < 4$",
+        "$x \\geq 4$",
+        "$x > 2$"
+      ],
+      "correctAnswer": "A",
+      "marks": 6,
+      "explanation": "$2^x > 16 = 2^4$. Since the exponential function with base $> 1$ is increasing, $x > 4$."
+    },
+    {
+      "id": 6,
+      "type": "mcq",
+      "question": "If $\\log_5 x + \\log_x 5 = \\frac{13}{6}$, find the value of $\\log_5 x$.",
+      "options": [
+        "$\\log_5 x = \\frac{3}{2}$ or $\\log_5 x = \\frac{2}{3}$",
+        "$\\log_5 x = 2$ or $\\log_5 x = 3$",
+        "$\\log_5 x = 1$ or $\\log_5 x = \\frac{13}{6}$",
+        "$\\log_5 x = \\frac{13}{12}$"
+      ],
+      "correctAnswer": "A",
+      "marks": 8,
+      "explanation": "Let $\\log_5 x = t$. Then $\\log_x 5 = \\frac{1}{\\log_5 x} = \\frac{1}{t}$. So $t + \\frac{1}{t} = \\frac{13}{6}$. Multiply by $6t$: $6t^2 + 6 = 13t$, giving $6t^2 - 13t + 6 = 0$. Factoring: $(2t-3)(3t-2) = 0$, so $t = \\frac{3}{2}$ or $t = \\frac{2}{3}$."
+    },
+    {
+      "id": 7,
+      "type": "mcq",
+      "question": "Solve $2^{x+2} = 4^{x-1}$.",
+      "options": [
+        "$x = 4$",
+        "$x = 2$",
+        "$x = 3$",
+        "$x = 5$"
+      ],
+      "correctAnswer": "A",
+      "marks": 7,
+      "explanation": "$2^{x+2} = 4^{x-1} = (2^2)^{x-1} = 2^{2(x-1)} = 2^{2x-2}$. So $x + 2 = 2x - 2$, giving $2 + 2 = 2x - x$, thus $x = 4$."
+    }
+  ]
+}
