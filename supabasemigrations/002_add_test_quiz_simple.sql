@@ -1,30 +1,8 @@
--- Add Test Quiz for Student Portal
--- Migration: 002_add_test_quiz
+-- Simple Test Quiz Migration
+-- INSTRUCTIONS: Replace YOUR_TUTOR_UUID_HERE with your actual tutor user ID
+-- You can find your tutor UUID by running: SELECT id FROM profiles WHERE role = 'tutor';
 
--- NOTE: This migration requires at least one tutor profile to exist.
--- If you don't have a tutor user yet, you have two options:
---   1. Create a tutor account through Supabase Auth UI first, OR
---   2. Use the tutor dashboard (/tutor) to upload quizzes via the UI
-
--- Get the first available tutor ID (or use a specific one if you know it)
--- If you know your tutor's UUID, replace the SELECT query with your UUID directly
-DO $$
-DECLARE
-  tutor_id UUID;
-BEGIN
-  -- Try to find any existing tutor
-  SELECT id INTO tutor_id FROM profiles WHERE role = 'tutor' LIMIT 1;
-
-  -- If no tutor exists, create a temporary one
-  -- NOTE: This will only work if you comment out the auth.users foreign key constraint temporarily
-  -- Otherwise, you MUST create a real user via Supabase Auth first
-  IF tutor_id IS NULL THEN
-    RAISE EXCEPTION 'No tutor profile found. Please create a tutor user via Supabase Auth first, or use the tutor dashboard to upload quizzes.';
-  END IF;
-
-  -- Insert a test quiz (A1 - Quadratic Functions)
-  INSERT INTO quizzes (
-  id,
+INSERT INTO quizzes (
   title,
   topic,
   week,
@@ -36,7 +14,6 @@ BEGIN
   created_by,
   published
 ) VALUES (
-  '10000000-0000-0000-0000-000000000001',
   'Quadratic Functions - Test Quiz',
   'A1',
   1,
@@ -116,11 +93,9 @@ BEGIN
       "explanation": "The x-coordinate of the vertex is given by $x = -\\frac{b}{2a} = -\\frac{-4}{2(1)} = 2$."
     }
   ]'::jsonb,
-  tutor_id,
+  'YOUR_TUTOR_UUID_HERE', -- REPLACE THIS with your actual tutor UUID
   true
-) ON CONFLICT (id) DO UPDATE SET
-  published = true,
-  due_date = NOW() + INTERVAL '30 days',
-  updated_at = NOW();
+);
 
-END $$;
+-- After inserting, verify the quiz was created:
+-- SELECT id, title, topic, published FROM quizzes ORDER BY created_at DESC LIMIT 1;
