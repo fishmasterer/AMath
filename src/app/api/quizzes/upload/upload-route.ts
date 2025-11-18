@@ -37,30 +37,33 @@ export async function POST(request: NextRequest) {
     
     // Validate quiz data
     const validation = validateQuizUpload(body);
-    
+
     if (!validation.success) {
       return NextResponse.json(
-        { 
-          success: false, 
+        {
+          success: false,
           error: 'Validation failed',
-          errors: validation.errors 
+          errors: validation.errors
         },
         { status: 400 }
       );
     }
-    
+
+    // Extract validated data (TypeScript knows it's non-null after success check)
+    const validatedData = validation.data!;
+
     // Insert quiz into database
     const { data: quiz, error: insertError } = await supabase
       .from('quizzes')
       .insert({
-        title: validation.data.title,
-        topic: validation.data.topic,
-        week: validation.data.week,
-        difficulty: validation.data.difficulty,
-        time_limit_minutes: validation.data.time_limit_minutes,
-        due_date: validation.data.due_date,
-        total_marks: validation.data.total_marks,
-        questions: validation.data.questions,
+        title: validatedData.title,
+        topic: validatedData.topic,
+        week: validatedData.week,
+        difficulty: validatedData.difficulty,
+        time_limit_minutes: validatedData.time_limit_minutes,
+        due_date: validatedData.due_date,
+        total_marks: validatedData.total_marks,
+        questions: validatedData.questions,
         created_by: user.id,
         published: true, // Auto-publish (or add a flag to control this)
       })
