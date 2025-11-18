@@ -197,6 +197,11 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
 
     setSubmitting(true)
     try {
+      // Calculate time taken
+      const startedAt = new Date(attemptData.startedAt)
+      const now = new Date()
+      const timeTakenSeconds = Math.floor((now.getTime() - startedAt.getTime()) / 1000)
+
       // Prepare answers array
       const answersArray: StudentAnswer[] = Array.from(answersToSubmit.entries()).map(
         ([question_id, answer]) => ({
@@ -213,6 +218,7 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
         body: JSON.stringify({
           attemptId: attemptData.attemptId,
           answers: answersArray,
+          time_taken_seconds: timeTakenSeconds,
         }),
       })
 
