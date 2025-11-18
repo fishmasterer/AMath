@@ -1,0 +1,110 @@
+{
+  "title": "Quadratic Functions - Intermediate",
+  "topic": "A1",
+  "week": 2,
+  "difficulty": "intermediate",
+  "time_limit_minutes": 30,
+  "due_date": "2025-12-18T23:59:59Z",
+  "published": false,
+  "questions": [
+    {
+      "id": 1,
+      "type": "mcq",
+      "question": "The quadratic function $f(x) = 2x^2 + px + 8$ has its minimum value at $x = 3$. Find the value of $p$.",
+      "options": [
+        "$-12$",
+        "$12$",
+        "$-6$",
+        "$6$"
+      ],
+      "correctAnswer": "A",
+      "marks": 4,
+      "explanation": "For minimum at $x = 3$: $-\\frac{p}{2(2)} = 3$, thus $-\\frac{p}{4} = 3$, giving $p = -12$."
+    },
+    {
+      "id": 2,
+      "type": "mcq",
+      "question": "Express $3x^2 - 12x + 5$ in the form $a(x-h)^2 + k$. Find the value of $k$.",
+      "options": [
+        "$-7$",
+        "$5$",
+        "$-12$",
+        "$17$"
+      ],
+      "correctAnswer": "A",
+      "marks": 4,
+      "explanation": "Completing the square: $3(x^2 - 4x) + 5 = 3[(x-2)^2 - 4] + 5 = 3(x-2)^2 - 12 + 5 = 3(x-2)^2 - 7$."
+    },
+    {
+      "id": 3,
+      "type": "mcq",
+      "question": "The graph of $y = x^2 + 4x + c$ touches the x-axis at exactly one point. Find the value of $c$.",
+      "options": [
+        "$4$",
+        "$-4$",
+        "$2$",
+        "$-2$"
+      ],
+      "correctAnswer": "A",
+      "marks": 4,
+      "explanation": "For the graph to touch the x-axis, discriminant $= 0$: $b^2 - 4ac = 16 - 4(1)(c) = 0$, thus $c = 4$."
+    },
+    {
+      "id": 4,
+      "type": "multi_select",
+      "question": "The quadratic function $f(x) = -x^2 + 6x - 5$ can be written as $f(x) = -(x-3)^2 + 4$. Which statements are correct? (Select all that apply)",
+      "options": [
+        "The range of $f$ is $f(x) \\leq 4$",
+        "The graph cuts the x-axis at two points",
+        "The line $x = 3$ is the axis of symmetry",
+        "The y-intercept is at $(0, 4)$"
+      ],
+      "correctAnswers": ["A", "B", "C"],
+      "partialCredit": true,
+      "marks": 4,
+      "explanation": "Maximum value is $4$ (so range is $f(x) \\leq 4$), discriminant $36-20=16>0$ (two x-intercepts), axis of symmetry is $x=3$, and y-intercept is at $(0,-5)$."
+    },
+    {
+      "id": 5,
+      "type": "mcq",
+      "question": "Find the range of values of $k$ for which the equation $x^2 + 2x + k = 0$ has two distinct real roots.",
+      "options": [
+        "$k < 1$",
+        "$k > 1$",
+        "$k < -1$",
+        "$k > -1$"
+      ],
+      "correctAnswer": "A",
+      "marks": 5,
+      "explanation": "For two distinct real roots: $\\Delta > 0$. Thus $4 - 4k > 0$, giving $k < 1$."
+    },
+    {
+      "id": 6,
+      "type": "mcq",
+      "question": "The quadratic function $f(x) = ax^2 + bx + c$ has a maximum value of $5$ when $x = -2$, and $f(0) = 1$. Find the value of $a$.",
+      "options": [
+        "$-1$",
+        "$1$",
+        "$-2$",
+        "$2$"
+      ],
+      "correctAnswer": "A",
+      "marks": 5,
+      "explanation": "From vertex form: $f(x) = a(x+2)^2 + 5$. Using $f(0) = 1$: $a(4) + 5 = 1$, thus $4a = -4$, giving $a = -1$."
+    },
+    {
+      "id": 7,
+      "type": "mcq",
+      "question": "The line $y = 2x + c$ is a tangent to the curve $y = x^2 - 4x + 7$. Find the value of $c$.",
+      "options": [
+        "$2$",
+        "$-2$",
+        "$7$",
+        "$3$"
+      ],
+      "correctAnswer": "A",
+      "marks": 5,
+      "explanation": "For tangency: $x^2 - 4x + 7 = 2x + c$ gives $x^2 - 6x + (7-c) = 0$. Discriminant $= 0$: $36 - 4(7-c) = 0$, thus $c = 2$."
+    }
+  ]
+}

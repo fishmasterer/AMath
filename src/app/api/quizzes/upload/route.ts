@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
         total_marks: validatedData.total_marks,
         questions: validatedData.questions,
         created_by: user.id,
-        published: true, // Auto-publish (or add a flag to control this)
+        published: validatedData.published ?? true, // Default to true for backward compatibility
       })
       .select()
       .single();

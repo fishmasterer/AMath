@@ -1,0 +1,110 @@
+{
+  "title": "Equations and Inequalities - Intermediate",
+  "topic": "A2",
+  "week": 5,
+  "difficulty": "intermediate",
+  "time_limit_minutes": 30,
+  "due_date": "2025-12-18T23:59:59Z",
+  "published": false,
+  "questions": [
+    {
+      "id": 1,
+      "type": "mcq",
+      "question": "Solve the equation $\\frac{x}{2} + \\frac{x}{3} = 5$.",
+      "options": [
+        "$x = 6$",
+        "$x = 10$",
+        "$x = 15$",
+        "$x = 30$"
+      ],
+      "correctAnswer": "A",
+      "marks": 4,
+      "explanation": "Multiply through by 6 (LCM of 2 and 3): $3x + 2x = 30$, giving $5x = 30$, thus $x = 6$."
+    },
+    {
+      "id": 2,
+      "type": "mcq",
+      "question": "Solve the inequality $x^2 - 5x + 6 < 0$.",
+      "options": [
+        "$2 < x < 3$",
+        "$x < 2$ or $x > 3$",
+        "$x < -3$ or $x > -2$",
+        "$-3 < x < -2$"
+      ],
+      "correctAnswer": "A",
+      "marks": 5,
+      "explanation": "Factorize: $(x-2)(x-3) < 0$. The expression is negative between the roots: $2 < x < 3$."
+    },
+    {
+      "id": 3,
+      "type": "mcq",
+      "question": "Solve the equation $2^{x+1} = 32$.",
+      "options": [
+        "$x = 4$",
+        "$x = 5$",
+        "$x = 3$",
+        "$x = 6$"
+      ],
+      "correctAnswer": "A",
+      "marks": 4,
+      "explanation": "Since $32 = 2^5$: $2^{x+1} = 2^5$. Therefore $x + 1 = 5$, giving $x = 4$."
+    },
+    {
+      "id": 4,
+      "type": "multi_select",
+      "question": "For what values of $k$ does the equation $x^2 + kx + 9 = 0$ have equal roots? (Select all that apply)",
+      "options": [
+        "$k = 6$",
+        "$k = -6$",
+        "$k = 3$",
+        "$k = -3$"
+      ],
+      "correctAnswers": ["A", "B"],
+      "partialCredit": true,
+      "marks": 4,
+      "explanation": "For equal roots, discriminant $= 0$: $k^2 - 4(1)(9) = 0$, thus $k^2 = 36$, giving $k = \\pm 6$."
+    },
+    {
+      "id": 5,
+      "type": "mcq",
+      "question": "Solve the inequality $\\frac{x+2}{x-1} > 0$.",
+      "options": [
+        "$x < -2$ or $x > 1$",
+        "$-2 < x < 1$",
+        "$x > 1$ only",
+        "$x < -2$ only"
+      ],
+      "correctAnswer": "A",
+      "marks": 5,
+      "explanation": "The fraction is positive when both numerator and denominator have the same sign. This occurs when $x < -2$ (both negative) or $x > 1$ (both positive). Note $x \\neq 1$."
+    },
+    {
+      "id": 6,
+      "type": "mcq",
+      "question": "Solve simultaneously: $2x + y = 7$ and $x - y = 2$.",
+      "options": [
+        "$x = 3, y = 1$",
+        "$x = 2, y = 3$",
+        "$x = 1, y = 5$",
+        "$x = 4, y = -1$"
+      ],
+      "correctAnswer": "A",
+      "marks": 4,
+      "explanation": "Add the equations: $3x = 9$, so $x = 3$. Substitute into second equation: $3 - y = 2$, giving $y = 1$."
+    },
+    {
+      "id": 7,
+      "type": "mcq",
+      "question": "Find the range of values of $x$ satisfying $|2x - 3| < 5$.",
+      "options": [
+        "$-1 < x < 4$",
+        "$x < -1$ or $x > 4$",
+        "$-4 < x < 1$",
+        "$1 < x < 4$"
+      ],
+      "correctAnswer": "A",
+      "marks": 5,
+      "explanation": "The inequality $|2x-3| < 5$ means $-5 < 2x - 3 < 5$. Adding 3: $-2 < 2x < 8$. Dividing by 2: $-1 < x < 4$."
+    }
+  ]
+}

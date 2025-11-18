@@ -46,6 +46,7 @@ export const quizUploadSchema = z.object({
   difficulty: z.enum(['foundational', 'intermediate', 'exam_level']),
   time_limit_minutes: z.number().int().min(5).max(135, 'Time limit between 5 and 135 minutes'),
   due_date: z.string().datetime('Due date must be ISO 8601 format'),
+  published: z.boolean().optional(),
   questions: z.array(questionSchema)
     .min(1, 'At least one question required')
     .max(20, 'Maximum 20 questions per quiz'),

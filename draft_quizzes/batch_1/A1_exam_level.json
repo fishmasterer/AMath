@@ -1,0 +1,110 @@
+{
+  "title": "Quadratic Functions - Exam Level",
+  "topic": "A1",
+  "week": 3,
+  "difficulty": "exam_level",
+  "time_limit_minutes": 45,
+  "due_date": "2025-12-18T23:59:59Z",
+  "published": false,
+  "questions": [
+    {
+      "id": 1,
+      "type": "mcq",
+      "question": "The quadratic function $f(x) = 2x^2 + 8x + 3$ can be expressed in the form $f(x) = 2(x+p)^2 + q$. The graph of $y = f(x)$ is translated 3 units to the right and 2 units up to give the graph of $y = g(x)$. Express $g(x)$ in the form $a(x-h)^2 + k$.",
+      "options": [
+        "$g(x) = 2(x-1)^2 - 3$",
+        "$g(x) = 2(x+1)^2 - 3$",
+        "$g(x) = 2(x-1)^2 + 7$",
+        "$g(x) = 2(x+5)^2 - 3$"
+      ],
+      "correctAnswer": "A",
+      "marks": 6,
+      "explanation": "First, $f(x) = 2(x^2+4x) + 3 = 2(x+2)^2 - 8 + 3 = 2(x+2)^2 - 5$. After translation: $g(x) = 2(x-3+2)^2 + (-5+2) = 2(x-1)^2 - 3$."
+    },
+    {
+      "id": 2,
+      "type": "mcq",
+      "question": "Find the range of values of $m$ such that the equation $x^2 - 2mx + (m^2 - 5) = 0$ has no real roots.",
+      "options": [
+        "No such values of $m$ exist",
+        "$m < -\\sqrt{5}$ or $m > \\sqrt{5}$",
+        "$-\\sqrt{5} < m < \\sqrt{5}$",
+        "$m = 0$"
+      ],
+      "correctAnswer": "A",
+      "marks": 6,
+      "explanation": "Discriminant: $\\Delta = 4m^2 - 4(m^2-5) = 4m^2 - 4m^2 + 20 = 20 > 0$ for all $m$. Thus, the equation always has real roots."
+    },
+    {
+      "id": 3,
+      "type": "mcq",
+      "question": "The equation $kx^2 + (k+3)x + 1 = 0$ has two distinct real roots. Find the range of values of $k$.",
+      "options": [
+        "$k < -1$ or $k > 9$",
+        "$-1 < k < 9$, $k \\neq 0$",
+        "$k < -1$ or $0 < k < 9$",
+        "$k > 9$"
+      ],
+      "correctAnswer": "B",
+      "marks": 7,
+      "explanation": "For two distinct real roots: $\\Delta > 0$ and $k \\neq 0$. $(k+3)^2 - 4k > 0$ gives $k^2 + 6k + 9 - 4k > 0$, thus $k^2 + 2k + 9 > 0$. Also $(k+1)(k-9) < 0$, giving $-1 < k < 9$, with $k \\neq 0$."
+    },
+    {
+      "id": 4,
+      "type": "multi_select",
+      "question": "The curve $y = ax^2 + bx + c$ passes through the points $(0, -3)$, $(2, 5)$ and has its axis of symmetry at $x = 1$. Which of the following are true? (Select all that apply)",
+      "options": [
+        "$c = -3$",
+        "$a = 2$",
+        "$b = -4$",
+        "The vertex is at $(1, -7)$"
+      ],
+      "correctAnswers": ["A", "B", "C"],
+      "partialCredit": true,
+      "marks": 6,
+      "explanation": "From $(0,-3)$: $c=-3$. Axis at $x=1$: $-\\frac{b}{2a}=1$, so $b=-2a$. From $(2,5)$: $4a+2b-3=5$, thus $4a-4a=8$, giving $a=2$, $b=-4$. Vertex: $y=2(1)^2-4(1)-3=-5$."
+    },
+    {
+      "id": 5,
+      "type": "mcq",
+      "question": "The function $f(x) = -2x^2 + 12x + k$ has a maximum value of 25. Find the value of $k$.",
+      "options": [
+        "$7$",
+        "$-7$",
+        "$18$",
+        "$25$"
+      ],
+      "correctAnswer": "A",
+      "marks": 6,
+      "explanation": "Complete the square: $f(x) = -2(x^2-6x) + k = -2[(x-3)^2-9] + k = -2(x-3)^2 + 18 + k$. Maximum value: $18 + k = 25$, thus $k = 7$."
+    },
+    {
+      "id": 6,
+      "type": "mcq",
+      "question": "A quadratic function $f(x) = ax^2 + bx + c$ satisfies $f(1) = 0$, $f(3) = 0$, and $f(0) = -6$. Find the value of $a + b + c$.",
+      "options": [
+        "$0$",
+        "$-6$",
+        "$2$",
+        "$6$"
+      ],
+      "correctAnswer": "A",
+      "marks": 7,
+      "explanation": "Since $f(1)=0$ and $f(3)=0$: $f(x)=a(x-1)(x-3)$. From $f(0)=-6$: $a(3)=-6$, so $a=2$. Thus $f(x)=2(x-1)(x-3)=2x^2-8x+6$, giving $a+b+c=2-8+6=0$. Also, $a+b+c=f(1)=0$."
+    },
+    {
+      "id": 7,
+      "type": "mcq",
+      "question": "The quadratic curve $y = x^2 - 6x + p$ and the straight line $y = qx - 5$ intersect at exactly one point. Express $p$ in terms of $q$.",
+      "options": [
+        "$p = \\frac{q^2}{4} + 3q + 4$",
+        "$p = q^2 - 6q - 5$",
+        "$p = \\frac{q^2}{4} - 3q + 4$",
+        "$p = -q^2 + 6q + 5$"
+      ],
+      "correctAnswer": "A",
+      "marks": 8,
+      "explanation": "For one intersection: $x^2-6x+p=qx-5$, giving $x^2-(6+q)x+(p+5)=0$. Discriminant $=0$: $(6+q)^2-4(p+5)=0$. Expanding: $36+12q+q^2-4p-20=0$, thus $4p=q^2+12q+16$, so $p=\\frac{q^2}{4}+3q+4$."
+    }
+  ]
+}
