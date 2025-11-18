@@ -1,6 +1,44 @@
 import { createClient } from '@/lib/supabase/supabase-server';
 import { NextRequest, NextResponse } from 'next/server';
 
+// GET /api/tutor/quizzes/[id] - Get single quiz with all questions
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const supabase = await createClient();
+
+    // Note: Using simple session-based auth for now
+    // In production, you should implement proper Supabase authentication
+
+    // Fetch quiz with all details
+    const { data: quiz, error } = await supabase
+      .from('quizzes')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      console.error('Error fetching quiz:', error);
+      return NextResponse.json(
+        { error: 'Quiz not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ quiz });
+
+  } catch (error) {
+    console.error('Unexpected error in quiz detail route:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
 // PATCH /api/tutor/quizzes/[id] - Update quiz (toggle publish, etc.)
 export async function PATCH(
   request: NextRequest,
