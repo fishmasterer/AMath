@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { renderLatex } from '@/components/LatexRenderer';
 
 interface Quiz {
   id: string;
@@ -545,7 +546,9 @@ export default function TutorDashboard() {
                             </span>
                           </div>
 
-                          <div className="mb-4 text-slate-300" dangerouslySetInnerHTML={{ __html: (q.question || '').replace(/\$([^$]+)\$/g, '<code class="text-cyan-400">$1</code>') }} />
+                          <div className="mb-4 text-slate-300">
+                            {renderLatex(q.question || '')}
+                          </div>
 
                           <div className="space-y-2 mb-4">
                             <p className="text-sm font-medium text-slate-400">Options:</p>
@@ -561,7 +564,8 @@ export default function TutorDashboard() {
                                     ? 'bg-green-500/10 border-green-500/30 text-green-300'
                                     : 'bg-slate-800/30 border-slate-700/30 text-slate-300'
                                 }`}>
-                                  <span className="font-semibold">{letter}.</span> {opt}
+                                  <span className="font-semibold">{letter}.</span>{' '}
+                                  <span>{renderLatex(opt)}</span>
                                   {isCorrect && <span className="ml-2 text-green-400">✓ Correct</span>}
                                 </div>
                               );
@@ -571,7 +575,9 @@ export default function TutorDashboard() {
                           {q.explanation && (
                             <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
                               <p className="text-sm font-semibold text-blue-400 mb-2">Explanation:</p>
-                              <p className="text-sm text-slate-300" dangerouslySetInnerHTML={{ __html: (q.explanation || '').replace(/\$([^$]+)\$/g, '<code class="text-cyan-400">$1</code>') }} />
+                              <div className="text-sm text-slate-300">
+                                {renderLatex(q.explanation || '')}
+                              </div>
                             </div>
                           )}
                         </div>
