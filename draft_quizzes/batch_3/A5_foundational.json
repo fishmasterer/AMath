@@ -1,0 +1,96 @@
+{
+  "title": "Binomial Expansions - Foundational",
+  "topic": "A5",
+  "week": 13,
+  "difficulty": "foundational",
+  "time_limit_minutes": 20,
+  "due_date": "2025-12-18T23:59:59Z",
+  "published": false,
+  "questions": [
+    {
+      "id": 1,
+      "type": "mcq",
+      "question": "Expand $(x+2)^2$.",
+      "options": [
+        "$x^2 + 4x + 4$",
+        "$x^2 + 2x + 4$",
+        "$x^2 + 4x + 2$",
+        "$x^2 + 2x + 2$"
+      ],
+      "correctAnswer": "A",
+      "marks": 2,
+      "explanation": "$(x+2)^2 = x^2 + 2(x)(2) + 2^2 = x^2 + 4x + 4$."
+    },
+    {
+      "id": 2,
+      "type": "mcq",
+      "question": "What is the coefficient of $x^2$ in the expansion of $(1+x)^3$?",
+      "options": [
+        "$3$",
+        "$1$",
+        "$2$",
+        "$6$"
+      ],
+      "correctAnswer": "A",
+      "marks": 3,
+      "explanation": "$(1+x)^3 = 1 + 3x + 3x^2 + x^3$. The coefficient of $x^2$ is 3."
+    },
+    {
+      "id": 3,
+      "type": "mcq",
+      "question": "Expand $(2x-1)^2$.",
+      "options": [
+        "$4x^2 - 4x + 1$",
+        "$4x^2 + 4x + 1$",
+        "$2x^2 - 2x + 1$",
+        "$4x^2 - 2x + 1$"
+      ],
+      "correctAnswer": "A",
+      "marks": 3,
+      "explanation": "$(2x-1)^2 = (2x)^2 - 2(2x)(1) + 1^2 = 4x^2 - 4x + 1$."
+    },
+    {
+      "id": 4,
+      "type": "mcq",
+      "question": "Using the binomial theorem, find the value of $\\binom{5}{2}$.",
+      "options": [
+        "$10$",
+        "$5$",
+        "$20$",
+        "$15$"
+      ],
+      "correctAnswer": "A",
+      "marks": 3,
+      "explanation": "$\\binom{5}{2} = \\frac{5!}{2!(5-2)!} = \\frac{5!}{2!3!} = \\frac{5 \\times 4}{2 \\times 1} = 10$."
+    },
+    {
+      "id": 5,
+      "type": "multi_select",
+      "question": "Which of the following are correct expansions? (Select all that apply)",
+      "options": [
+        "$(x+1)^2 = x^2 + 2x + 1$",
+        "$(x-1)^2 = x^2 - 2x + 1$",
+        "$(x+2)^2 = x^2 + 2x + 4$",
+        "$(2x+1)^2 = 4x^2 + 4x + 1$"
+      ],
+      "correctAnswers": ["A", "B", "D"],
+      "partialCredit": true,
+      "marks": 4,
+      "explanation": "A: $(x+1)^2 = x^2+2x+1$ ✓. B: $(x-1)^2 = x^2-2x+1$ ✓. C: $(x+2)^2 = x^2+4x+4$ ✗. D: $(2x+1)^2 = 4x^2+4x+1$ ✓."
+    },
+    {
+      "id": 6,
+      "type": "mcq",
+      "question": "Find the constant term in the expansion of $(x+3)^2$.",
+      "options": [
+        "$9$",
+        "$3$",
+        "$6$",
+        "$1$"
+      ],
+      "correctAnswer": "A",
+      "marks": 2,
+      "explanation": "$(x+3)^2 = x^2 + 6x + 9$. The constant term is 9."
+    }
+  ]
+}
