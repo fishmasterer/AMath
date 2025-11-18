@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/supabase-server';
 import { NextRequest, NextResponse } from 'next/server';
 
 // GET /api/tutor/quizzes - Fetch all quizzes including unpublished (tutor only)

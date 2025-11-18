@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/supabase-server';
 import { NextRequest, NextResponse } from 'next/server';
 
 // PATCH /api/tutor/quizzes/[id] - Update quiz (toggle publish, etc.)
