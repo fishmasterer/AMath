@@ -3,11 +3,32 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+interface Quiz {
+  id: string;
+  title: string;
+  topic: string;
+  week: number;
+  difficulty: string;
+  time_limit_minutes: number;
+  published: boolean;
+  created_at: string;
+  total_marks?: number;
+}
+
 export default function TutorDashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('overview');
   const [jsonInput, setJsonInput] = useState('');
   const [uploadStatus, setUploadStatus] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: '' });
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [filters, setFilters] = useState({
+    search: '',
+    published: 'all', // 'all', 'true', 'false'
+    topic: '',
+    difficulty: ''
+  });
+  const [copyStatus, setCopyStatus] = useState('');
 
   useEffect(() => {
     // Check authentication
@@ -16,6 +37,94 @@ export default function TutorDashboard() {
       router.push('/tutor');
     }
   }, [router]);
+
+  // Fetch quizzes when manage tab is active
+  useEffect(() => {
+    if (activeTab === 'manage') {
+      fetchQuizzes();
+    }
+  }, [activeTab, filters]);
+
+  const fetchQuizzes = async () => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams();
+
+      if (filters.search) params.append('search', filters.search);
+      if (filters.published !== 'all') params.append('published', filters.published);
+      if (filters.topic) params.append('topic', filters.topic);
+      if (filters.difficulty) params.append('difficulty', filters.difficulty);
+      params.append('sortBy', 'created_at');
+      params.append('sortOrder', 'desc');
+
+      const response = await fetch(`/api/tutor/quizzes?${params.toString()}`);
+      const data = await response.json();
+
+      if (response.ok) {
+        setQuizzes(data.quizzes || []);
+      } else {
+        console.error('Failed to fetch quizzes:', data.error);
+      }
+    } catch (error) {
+      console.error('Error fetching quizzes:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const togglePublished = async (quizId: string, currentStatus: boolean) => {
+    try {
+      const response = await fetch(`/api/tutor/quizzes/${quizId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ published: !currentStatus })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Update local state
+        setQuizzes(quizzes.map(q =>
+          q.id === quizId ? { ...q, published: !currentStatus } : q
+        ));
+        setUploadStatus({
+          type: 'success',
+          message: `Quiz ${!currentStatus ? 'published' : 'unpublished'} successfully!`
+        });
+        setTimeout(() => setUploadStatus({ type: null, message: '' }), 3000);
+      } else {
+        setUploadStatus({ type: 'error', message: data.error || 'Failed to update quiz' });
+      }
+    } catch (error) {
+      setUploadStatus({ type: 'error', message: 'Error updating quiz' });
+      console.error('Error toggling published status:', error);
+    }
+  };
+
+  const deleteQuiz = async (quizId: string) => {
+    if (!confirm('Are you sure you want to delete this quiz? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/tutor/quizzes/${quizId}`, {
+        method: 'DELETE'
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setQuizzes(quizzes.filter(q => q.id !== quizId));
+        setUploadStatus({ type: 'success', message: 'Quiz deleted successfully!' });
+        setTimeout(() => setUploadStatus({ type: null, message: '' }), 3000);
+      } else {
+        setUploadStatus({ type: 'error', message: data.error || 'Failed to delete quiz' });
+      }
+    } catch (error) {
+      setUploadStatus({ type: 'error', message: 'Error deleting quiz' });
+      console.error('Error deleting quiz:', error);
+    }
+  };
 
   const handleLogout = () => {
     sessionStorage.removeItem('tutorAuth');
@@ -38,11 +147,144 @@ export default function TutorDashboard() {
       if (result.success) {
         setUploadStatus({ type: 'success', message: `Quiz "${result.data.title}" uploaded successfully!` });
         setJsonInput('');
+        // Refresh quizzes list if on manage tab
+        if (activeTab === 'manage') {
+          fetchQuizzes();
+        }
       } else {
         setUploadStatus({ type: 'error', message: result.error || 'Upload failed' });
       }
     } catch (error) {
       setUploadStatus({ type: 'error', message: error instanceof Error ? error.message : 'Invalid JSON format' });
+    }
+  };
+
+  const copyPromptTemplate = async () => {
+    const promptTemplate = `Generate an O-Level Additional Mathematics quiz with [NUMBER] questions on [TOPIC] at [DIFFICULTY_LEVEL] level in JSON format.
+
+**Quiz Metadata:**
+- title: Clear, descriptive quiz name (e.g., "Quadratic Functions - Foundational Practice")
+- topic: One of [A1: Quadratic Functions, A2: Equations & Inequalities, A3: Surds/Indices/Logs, A4: Polynomials & Partial Fractions, A5: Binomial Expansions, A6: Exponential & Logarithmic Functions, G1: Trigonometric Functions, G2: Coordinate Geometry, G3: Proofs in Plane Geometry, C1: Differentiation & Integration]
+- week: Integer 1-52 (which week this quiz should be assigned)
+- difficulty: One of [foundational: basic concepts & practice | intermediate: mixed problems with moderate complexity | exam_level: challenging exam-standard questions]
+- time_limit_minutes: Recommended time based on difficulty (foundational: 15-20, intermediate: 25-35, exam_level: 40-50)
+- due_date: ISO 8601 datetime format (e.g., "2025-12-31T23:59:59Z")
+- published: Boolean (true = visible to students, false = draft in tutor portal only)
+
+**Question Types & Structure:**
+
+1. **MCQ (Multiple Choice - Single Answer)**
+   - 4 options labeled A, B, C, D
+   - correctAnswer: Single letter "A", "B", "C", or "D"
+   - marks: Integer (typically 2-8 based on difficulty)
+   - Use LaTeX for mathematical notation: $x^2$, $\\frac{a}{b}$, $\\sqrt{x}$, etc.
+
+2. **Multi-Select (Multiple Correct Answers)**
+   - 3-5 options labeled A, B, C, D, (E)
+   - correctAnswers: Array of letters ["A", "C", "D"]
+   - partialCredit: true (allows partial marks for partially correct answers)
+   - marks: Integer (typically 4-8 based on difficulty)
+   - Question text should indicate "Select all that apply"
+
+**Mathematical Content Guidelines:**
+- All calculations in explanations must be mathematically accurate
+- Use proper LaTeX notation:
+  - Inline math: $expression$
+  - Fractions: $\\frac{numerator}{denominator}$
+  - Exponents: $x^{power}$, $x^{a+b}$ (use braces for multi-character exponents)
+  - Roots: $\\sqrt{x}$, $\\sqrt[n]{x}$
+  - Trigonometric: $\\sin$, $\\cos$, $\\tan$, $\\sin^2 x$ (NOT $sin^2(x)$)
+  - Greek letters: $\\alpha$, $\\beta$, $\\theta$, $\\pi$
+  - Special: $\\times$, $\\div$, $\\leq$, $\\geq$, $\\neq$, $\\pm$
+- Explanations should show step-by-step working
+- Answer options should be plausible (include common mistakes as distractors)
+
+**Difficulty Level Requirements:**
+
+*Foundational (6 questions, ~15-20 marks total):*
+- Direct application of formulas
+- Single-step or two-step problems
+- Clear, straightforward questions
+- Marks per question: 2-3 for MCQ, 3-4 for multi-select
+
+*Intermediate (6-7 questions, ~25-33 marks total):*
+- Multi-step problem solving
+- Combining multiple concepts
+- Some word problems
+- Marks per question: 4-5 for MCQ, 5-6 for multi-select
+
+*Exam Level (7 questions, ~43-50 marks total):*
+- Complex, exam-standard questions
+- Proofs and derivations
+- Multi-concept integration
+- Challenging word problems
+- Marks per question: 6-8 for MCQ, 6-8 for multi-select
+
+**JSON Structure:**
+\`\`\`json
+{
+  "title": "Quiz Title - Descriptive Name",
+  "topic": "A1",
+  "week": 1,
+  "difficulty": "foundational",
+  "time_limit_minutes": 20,
+  "due_date": "2025-12-31T23:59:59Z",
+  "published": false,
+  "questions": [
+    {
+      "id": 1,
+      "type": "mcq",
+      "question": "Find the roots of the quadratic equation $x^2 - 5x + 6 = 0$.",
+      "options": [
+        "$x = 2$ or $x = 3$",
+        "$x = -2$ or $x = -3$",
+        "$x = 1$ or $x = 6$",
+        "$x = -1$ or $x = -6$"
+      ],
+      "correctAnswer": "A",
+      "marks": 3,
+      "explanation": "Factorizing: $x^2 - 5x + 6 = (x-2)(x-3) = 0$. Therefore $x = 2$ or $x = 3$."
+    },
+    {
+      "id": 2,
+      "type": "multi_select",
+      "question": "Which of the following are properties of the quadratic function $y = x^2 - 4x + 3$? (Select all that apply)",
+      "options": [
+        "The minimum value is $-1$",
+        "The axis of symmetry is $x = 2$",
+        "The y-intercept is $3$",
+        "The curve opens downward"
+      ],
+      "correctAnswers": ["A", "B", "C"],
+      "partialCredit": true,
+      "marks": 4,
+      "explanation": "Completing the square: $y = (x-2)^2 - 1$. Minimum value is $-1$ ✓. Axis of symmetry $x = 2$ ✓. When $x=0$, $y=3$ (y-intercept) ✓. The coefficient of $x^2$ is positive, so curve opens upward ✗."
+    }
+  ]
+}
+\`\`\`
+
+**Quality Checklist:**
+- [ ] All mathematical expressions use proper LaTeX syntax
+- [ ] All calculations verified for accuracy
+- [ ] Explanations show clear working steps
+- [ ] Correct answers match the options exactly
+- [ ] Total marks approximately match difficulty guidelines
+- [ ] Multi-select questions include "Select all that apply" in question text
+- [ ] Distractors (wrong answers) are plausible based on common errors
+- [ ] Question IDs are sequential starting from 1
+- [ ] No duplicate questions or overly similar questions
+
+**Example Usage:**
+"Generate an O-Level Additional Mathematics quiz with 7 questions on A1: Quadratic Functions at exam_level difficulty in JSON format."`;
+
+    try {
+      await navigator.clipboard.writeText(promptTemplate);
+      setCopyStatus('Copied!');
+      setTimeout(() => setCopyStatus(''), 2000);
+    } catch (error) {
+      setCopyStatus('Failed to copy');
+      setTimeout(() => setCopyStatus(''), 2000);
     }
   };
 
@@ -172,7 +414,18 @@ export default function TutorDashboard() {
 
             {activeTab === 'upload' && (
               <div>
-                <h2 className="text-2xl font-bold text-white mb-6">Upload New Quiz</h2>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-white">Upload New Quiz</h2>
+                  <button
+                    onClick={copyPromptTemplate}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 border border-blue-500/50 text-blue-400 hover:bg-blue-500/30 rounded-lg transition-all text-sm"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    {copyStatus || 'Copy AI Prompt Template'}
+                  </button>
+                </div>
 
                 <div className="mb-4">
                   <div className="flex items-center justify-between mb-2">
@@ -211,13 +464,12 @@ export default function TutorDashboard() {
                 </button>
 
                 <div className="mt-6 p-4 bg-slate-800/30 border border-slate-700/30 rounded-lg">
-                  <h3 className="text-sm font-semibold text-white mb-2">📝 JSON Format Guide</h3>
+                  <h3 className="text-sm font-semibold text-white mb-2">📝 Quick Guide</h3>
                   <ul className="text-xs text-slate-400 space-y-1">
-                    <li>• <code className="text-cyan-400">title</code>: Quiz name</li>
-                    <li>• <code className="text-cyan-400">topic</code>: A1-A6, G1-G3, or C1</li>
-                    <li>• <code className="text-cyan-400">difficulty</code>: foundational, intermediate, or exam_level</li>
-                    <li>• <code className="text-cyan-400">time_limit_minutes</code>: Quiz duration</li>
-                    <li>• <code className="text-cyan-400">due_date</code>: ISO 8601 format</li>
+                    <li>• Click "Copy AI Prompt Template" to get a comprehensive quiz generation prompt</li>
+                    <li>• Use the prompt with Claude or other AI to generate quiz JSON</li>
+                    <li>• Paste the generated JSON above and click Upload</li>
+                    <li>• Set <code className="text-cyan-400">published: false</code> to keep quizzes as drafts</li>
                   </ul>
                 </div>
               </div>
@@ -226,9 +478,151 @@ export default function TutorDashboard() {
             {activeTab === 'manage' && (
               <div>
                 <h2 className="text-2xl font-bold text-white mb-6">Manage Quizzes</h2>
-                <div className="text-center py-12">
-                  <div className="text-6xl mb-4">📚</div>
-                  <p className="text-slate-400">No quizzes yet. Upload your first quiz to see it here!</p>
+
+                {/* Filters */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                  <input
+                    type="text"
+                    placeholder="Search quizzes..."
+                    value={filters.search}
+                    onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                    className="px-3 py-2 bg-slate-950/50 border border-slate-700/50 rounded-lg text-slate-300 text-sm focus:border-cyan-500/50 focus:outline-none"
+                  />
+                  <select
+                    value={filters.published}
+                    onChange={(e) => setFilters({ ...filters, published: e.target.value })}
+                    className="px-3 py-2 bg-slate-950/50 border border-slate-700/50 rounded-lg text-slate-300 text-sm focus:border-cyan-500/50 focus:outline-none"
+                  >
+                    <option value="all">All Status</option>
+                    <option value="true">Published</option>
+                    <option value="false">Draft</option>
+                  </select>
+                  <select
+                    value={filters.topic}
+                    onChange={(e) => setFilters({ ...filters, topic: e.target.value })}
+                    className="px-3 py-2 bg-slate-950/50 border border-slate-700/50 rounded-lg text-slate-300 text-sm focus:border-cyan-500/50 focus:outline-none"
+                  >
+                    <option value="">All Topics</option>
+                    <option value="A1">A1 - Quadratic Functions</option>
+                    <option value="A2">A2 - Equations & Inequalities</option>
+                    <option value="A3">A3 - Surds/Indices/Logs</option>
+                    <option value="A4">A4 - Polynomials</option>
+                    <option value="A5">A5 - Binomial</option>
+                    <option value="A6">A6 - Exponential/Logs</option>
+                    <option value="G1">G1 - Trigonometry</option>
+                    <option value="G2">G2 - Coordinate Geometry</option>
+                    <option value="G3">G3 - Proofs</option>
+                    <option value="C1">C1 - Calculus</option>
+                  </select>
+                  <select
+                    value={filters.difficulty}
+                    onChange={(e) => setFilters({ ...filters, difficulty: e.target.value })}
+                    className="px-3 py-2 bg-slate-950/50 border border-slate-700/50 rounded-lg text-slate-300 text-sm focus:border-cyan-500/50 focus:outline-none"
+                  >
+                    <option value="">All Difficulties</option>
+                    <option value="foundational">Foundational</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="exam_level">Exam Level</option>
+                  </select>
+                </div>
+
+                {uploadStatus.type && (
+                  <div className={`mb-4 p-4 rounded-lg ${
+                    uploadStatus.type === 'success'
+                      ? 'bg-green-500/10 border border-green-500/20 text-green-400'
+                      : 'bg-red-500/10 border border-red-500/20 text-red-400'
+                  }`}>
+                    {uploadStatus.message}
+                  </div>
+                )}
+
+                {/* Quiz List */}
+                {loading ? (
+                  <div className="text-center py-12">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
+                    <p className="text-slate-400">Loading quizzes...</p>
+                  </div>
+                ) : quizzes.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="text-6xl mb-4">📚</div>
+                    <p className="text-slate-400">No quizzes found. Try adjusting your filters or upload a new quiz!</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {quizzes.map((quiz) => (
+                      <div
+                        key={quiz.id}
+                        className="bg-slate-950/50 border border-slate-700/50 rounded-lg p-4 hover:border-cyan-500/30 transition-all"
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-2">
+                              <h3 className="text-white font-semibold truncate">{quiz.title}</h3>
+                              <span className={`px-2 py-0.5 rounded-full text-xs ${
+                                quiz.published
+                                  ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                                  : 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
+                              }`}>
+                                {quiz.published ? '✓ Published' : '○ Draft'}
+                              </span>
+                            </div>
+                            <div className="flex flex-wrap gap-3 text-xs text-slate-400">
+                              <span className="flex items-center gap-1">
+                                <span className="text-cyan-400">📖</span>
+                                {quiz.topic}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <span className="text-blue-400">📊</span>
+                                {quiz.difficulty}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <span className="text-violet-400">⏱️</span>
+                                {quiz.time_limit_minutes} min
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <span className="text-indigo-400">📅</span>
+                                Week {quiz.week}
+                              </span>
+                              {quiz.total_marks && (
+                                <span className="flex items-center gap-1">
+                                  <span className="text-amber-400">⭐</span>
+                                  {quiz.total_marks} marks
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => togglePublished(quiz.id, quiz.published)}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                                quiz.published
+                                  ? 'bg-orange-500/20 border border-orange-500/50 text-orange-400 hover:bg-orange-500/30'
+                                  : 'bg-green-500/20 border border-green-500/50 text-green-400 hover:bg-green-500/30'
+                              }`}
+                            >
+                              {quiz.published ? 'Unpublish' : 'Publish'}
+                            </button>
+                            <button
+                              onClick={() => deleteQuiz(quiz.id)}
+                              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-500/20 border border-red-500/50 text-red-400 hover:bg-red-500/30 transition-all"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="mt-6 p-4 bg-slate-800/30 border border-slate-700/30 rounded-lg">
+                  <h3 className="text-sm font-semibold text-white mb-2">💡 Tips</h3>
+                  <ul className="text-xs text-slate-400 space-y-1">
+                    <li>• <strong className="text-green-400">Published</strong> quizzes are visible to students</li>
+                    <li>• <strong className="text-orange-400">Draft</strong> quizzes remain in the tutor portal only</li>
+                    <li>• Use filters to quickly find specific quizzes</li>
+                    <li>• Toggle publish status to control student access</li>
+                  </ul>
                 </div>
               </div>
             )}
