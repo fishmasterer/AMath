@@ -1,0 +1,96 @@
+{
+  "title": "Trigonometric Functions - Foundational",
+  "topic": "G1",
+  "week": 19,
+  "difficulty": "foundational",
+  "time_limit_minutes": 20,
+  "due_date": "2025-12-18T23:59:59Z",
+  "published": false,
+  "questions": [
+    {
+      "id": 1,
+      "type": "mcq",
+      "question": "Evaluate $\\sin 90°$.",
+      "options": [
+        "$1$",
+        "$0$",
+        "$\\frac{1}{2}$",
+        "$\\frac{\\sqrt{3}}{2}$"
+      ],
+      "correctAnswer": "A",
+      "marks": 2,
+      "explanation": "$\\sin 90° = 1$."
+    },
+    {
+      "id": 2,
+      "type": "mcq",
+      "question": "What is the value of $\\cos 0°$?",
+      "options": [
+        "$1$",
+        "$0$",
+        "$-1$",
+        "$\\frac{1}{2}$"
+      ],
+      "correctAnswer": "A",
+      "marks": 2,
+      "explanation": "$\\cos 0° = 1$."
+    },
+    {
+      "id": 3,
+      "type": "mcq",
+      "question": "Evaluate $\\tan 45°$.",
+      "options": [
+        "$1$",
+        "$\\frac{1}{\\sqrt{2}}$",
+        "$\\sqrt{3}$",
+        "$\\frac{1}{\\sqrt{3}}$"
+      ],
+      "correctAnswer": "A",
+      "marks": 2,
+      "explanation": "$\\tan 45° = 1$."
+    },
+    {
+      "id": 4,
+      "type": "mcq",
+      "question": "If $\\sin \\theta = \\frac{1}{2}$ and $0° < \\theta < 90°$, find $\\theta$.",
+      "options": [
+        "$30°$",
+        "$45°$",
+        "$60°$",
+        "$90°$"
+      ],
+      "correctAnswer": "A",
+      "marks": 3,
+      "explanation": "$\\sin 30° = \\frac{1}{2}$, so $\\theta = 30°$."
+    },
+    {
+      "id": 5,
+      "type": "multi_select",
+      "question": "Which of the following are true? (Select all that apply)",
+      "options": [
+        "$\\sin^2 \\theta + \\cos^2 \\theta = 1$",
+        "$\\tan \\theta = \\frac{\\sin \\theta}{\\cos \\theta}$",
+        "$\\sin 30° = \\frac{1}{2}$",
+        "$\\cos 60° = \\frac{\\sqrt{3}}{2}$"
+      ],
+      "correctAnswers": ["A", "B", "C"],
+      "partialCredit": true,
+      "marks": 4,
+      "explanation": "$\\sin^2 \\theta + \\cos^2 \\theta = 1$ (Pythagorean identity) ✓. $\\tan \\theta = \\frac{\\sin \\theta}{\\cos \\theta}$ ✓. $\\sin 30° = \\frac{1}{2}$ ✓. $\\cos 60° = \\frac{1}{2}$ (not $\\frac{\\sqrt{3}}{2}$) ✗."
+    },
+    {
+      "id": 6,
+      "type": "mcq",
+      "question": "Find the value of $\\sin 60°$.",
+      "options": [
+        "$\\frac{\\sqrt{3}}{2}$",
+        "$\\frac{1}{2}$",
+        "$1$",
+        "$\\frac{1}{\\sqrt{2}}$"
+      ],
+      "correctAnswer": "A",
+      "marks": 3,
+      "explanation": "$\\sin 60° = \\frac{\\sqrt{3}}{2}$."
+    }
+  ]
+}
