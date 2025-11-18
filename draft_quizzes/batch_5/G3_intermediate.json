@@ -1,0 +1,96 @@
+{
+  "title": "Proofs in Plane Geometry - Intermediate",
+  "topic": "G3",
+  "week": 26,
+  "difficulty": "intermediate",
+  "time_limit_minutes": 30,
+  "due_date": "2025-12-18T23:59:59Z",
+  "published": false,
+  "questions": [
+    {
+      "id": 1,
+      "type": "mcq",
+      "question": "In triangle $ABC$, $D$ is the midpoint of $BC$. If $AB = AC$, prove that $AD \\perp BC$. Which property is most directly used?",
+      "options": [
+        "In an isosceles triangle, the median from the vertex angle is perpendicular to the base",
+        "Pythagorean theorem",
+        "Angle sum of triangle",
+        "SAS congruence"
+      ],
+      "correctAnswer": "A",
+      "marks": 5,
+      "explanation": "Since $AB = AC$ (isosceles) and $D$ is the midpoint of $BC$, $AD$ is the median from the vertex angle. A key property of isosceles triangles is that the median from the vertex angle is also the perpendicular bisector of the base."
+    },
+    {
+      "id": 2,
+      "type": "mcq",
+      "question": "Triangles $ABC$ and $DEF$ have $AB = DE$, $BC = EF$, and $\\angle B = \\angle E$. By which congruence criterion are they congruent?",
+      "options": [
+        "SAS (Side-Angle-Side)",
+        "ASA (Angle-Side-Angle)",
+        "SSS (Side-Side-Side)",
+        "RHS (Right angle-Hypotenuse-Side)"
+      ],
+      "correctAnswer": "A",
+      "marks": 4,
+      "explanation": "We have two sides and the included angle equal: $AB = DE$ (side), $\\angle B = \\angle E$ (angle), $BC = EF$ (side). This is the SAS criterion."
+    },
+    {
+      "id": 3,
+      "type": "mcq",
+      "question": "In a circle with center $O$, chord $AB$ subtends an angle of $60°$ at the center. What angle does it subtend at a point $C$ on the major arc?",
+      "options": [
+        "$30°$",
+        "$60°$",
+        "$120°$",
+        "$90°$"
+      ],
+      "correctAnswer": "A",
+      "marks": 6,
+      "explanation": "By the circle theorem, the angle subtended by a chord at the center is twice the angle subtended at any point on the circumference (in the major arc). So $\\angle ACB = \\frac{1}{2} \\times 60° = 30°$."
+    },
+    {
+      "id": 4,
+      "type": "mcq",
+      "question": "Two chords $AB$ and $CD$ of a circle intersect at point $P$ inside the circle. If $AP = 4$, $PB = 6$, and $CP = 3$, find $PD$.",
+      "options": [
+        "$8$",
+        "$6$",
+        "$10$",
+        "$12$"
+      ],
+      "correctAnswer": "A",
+      "marks": 6,
+      "explanation": "By the intersecting chords theorem: $AP \\times PB = CP \\times PD$. So $4 \\times 6 = 3 \\times PD$, giving $24 = 3 \\times PD$, thus $PD = 8$."
+    },
+    {
+      "id": 5,
+      "type": "multi_select",
+      "question": "Triangles $ABC$ and $PQR$ are similar with ratio $AB:PQ = 2:3$. Which of the following are true? (Select all that apply)",
+      "options": [
+        "$\\angle A = \\angle P$",
+        "Area of $ABC$ : Area of $PQR = 4:9$",
+        "$BC:QR = 2:3$",
+        "Perimeter of $ABC$ : Perimeter of $PQR = 2:3$"
+      ],
+      "correctAnswers": ["A", "B", "C", "D"],
+      "partialCredit": true,
+      "marks": 5,
+      "explanation": "In similar triangles: corresponding angles are equal ✓, corresponding sides are in the same ratio ($2:3$) ✓, perimeters are in the same ratio ($2:3$) ✓, areas are in the ratio of the square of the sides ($4:9$) ✓."
+    },
+    {
+      "id": 6,
+      "type": "mcq",
+      "question": "In a cyclic quadrilateral $ABCD$, if $\\angle A = 80°$, find $\\angle C$.",
+      "options": [
+        "$100°$",
+        "$80°$",
+        "$90°$",
+        "$110°$"
+      ],
+      "correctAnswer": "A",
+      "marks": 5,
+      "explanation": "In a cyclic quadrilateral, opposite angles are supplementary (sum to $180°$). So $\\angle A + \\angle C = 180°$, giving $\\angle C = 180° - 80° = 100°$."
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "title": "Proofs in Plane Geometry - Foundational",
+  "topic": "G3",
+  "week": 25,
+  "difficulty": "foundational",
+  "time_limit_minutes": 20,
+  "due_date": "2025-12-18T23:59:59Z",
+  "published": false,
+  "questions": [
+    {
+      "id": 1,
+      "type": "mcq",
+      "question": "In a triangle $ABC$, if $AB = AC$, what can we conclude about the angles?",
+      "options": [
+        "$\\angle B = \\angle C$",
+        "$\\angle A = \\angle B$",
+        "$\\angle A = \\angle C$",
+        "All angles are equal"
+      ],
+      "correctAnswer": "A",
+      "marks": 3,
+      "explanation": "In an isosceles triangle, the base angles (opposite to the equal sides) are equal. Since $AB = AC$, angles $B$ and $C$ are the base angles, so $\\angle B = \\angle C$."
+    },
+    {
+      "id": 2,
+      "type": "mcq",
+      "question": "If two angles of a triangle are $50°$ and $60°$, what is the third angle?",
+      "options": [
+        "$70°$",
+        "$80°$",
+        "$90°$",
+        "$100°$"
+      ],
+      "correctAnswer": "A",
+      "marks": 2,
+      "explanation": "The sum of angles in a triangle is $180°$. Third angle $= 180° - 50° - 60° = 70°$."
+    },
+    {
+      "id": 3,
+      "type": "mcq",
+      "question": "In a parallelogram $ABCD$, if $\\angle A = 70°$, find $\\angle C$.",
+      "options": [
+        "$70°$",
+        "$110°$",
+        "$90°$",
+        "$140°$"
+      ],
+      "correctAnswer": "A",
+      "marks": 3,
+      "explanation": "In a parallelogram, opposite angles are equal. Since $A$ and $C$ are opposite angles, $\\angle C = \\angle A = 70°$."
+    },
+    {
+      "id": 4,
+      "type": "mcq",
+      "question": "If a quadrilateral has all four sides equal, it must be a:",
+      "options": [
+        "Rhombus",
+        "Square",
+        "Rectangle",
+        "Trapezium"
+      ],
+      "correctAnswer": "A",
+      "marks": 2,
+      "explanation": "A quadrilateral with all four sides equal is a rhombus. A square has equal sides AND equal angles (all $90°$), which is not necessarily the case here."
+    },
+    {
+      "id": 5,
+      "type": "multi_select",
+      "question": "Which of the following properties are true for a rectangle? (Select all that apply)",
+      "options": [
+        "Opposite sides are equal",
+        "All angles are $90°$",
+        "Diagonals are equal",
+        "All sides are equal"
+      ],
+      "correctAnswers": ["A", "B", "C"],
+      "partialCredit": true,
+      "marks": 4,
+      "explanation": "In a rectangle: opposite sides are equal ✓, all angles are $90°$ ✓, diagonals are equal ✓. However, not all sides are equal (that would be a square) ✗."
+    },
+    {
+      "id": 6,
+      "type": "mcq",
+      "question": "The angle in a semicircle is:",
+      "options": [
+        "$90°$",
+        "$180°$",
+        "$45°$",
+        "$60°$"
+      ],
+      "correctAnswer": "A",
+      "marks": 3,
+      "explanation": "By the circle theorem, any angle inscribed in a semicircle (with the diameter as the base) is always a right angle ($90°$)."
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "title": "Differentiation and Integration - Exam Level",
+  "topic": "C1",
+  "week": 30,
+  "difficulty": "exam_level",
+  "time_limit_minutes": 45,
+  "due_date": "2025-12-18T23:59:59Z",
+  "published": false,
+  "questions": [
+    {
+      "id": 1,
+      "type": "mcq",
+      "question": "Find $\\frac{dy}{dx}$ if $y = \\frac{x^2 + 1}{x - 2}$ using the quotient rule.",
+      "options": [
+        "$\\frac{x^2 - 4x - 1}{(x - 2)^2}$",
+        "$\\frac{x^2 - 4x + 1}{(x - 2)^2}$",
+        "$\\frac{2x}{x - 2}$",
+        "$\\frac{x^2 + 4x - 1}{(x - 2)^2}$"
+      ],
+      "correctAnswer": "A",
+      "marks": 7,
+      "explanation": "Using quotient rule $\\frac{d}{dx}\\left(\\frac{u}{v}\\right) = \\frac{v\\frac{du}{dx} - u\\frac{dv}{dx}}{v^2}$: Let $u = x^2 + 1$, $v = x - 2$. Then $\\frac{du}{dx} = 2x$, $\\frac{dv}{dx} = 1$. So $\\frac{dy}{dx} = \\frac{(x-2)(2x) - (x^2+1)(1)}{(x-2)^2} = \\frac{2x^2 - 4x - x^2 - 1}{(x-2)^2} = \\frac{x^2 - 4x - 1}{(x-2)^2}$."
+    },
+    {
+      "id": 2,
+      "type": "mcq",
+      "question": "Find the coordinates of the turning points on the curve $y = x^3 - 6x^2 + 9x + 1$.",
+      "options": [
+        "$(1, 5)$ and $(3, 1)$",
+        "$(1, 4)$ and $(3, 1)$",
+        "$(0, 1)$ and $(2, 3)$",
+        "$(2, 3)$ and $(3, 1)$"
+      ],
+      "correctAnswer": "A",
+      "marks": 8,
+      "explanation": "$\\frac{dy}{dx} = 3x^2 - 12x + 9 = 3(x^2 - 4x + 3) = 3(x - 1)(x - 3) = 0$. So $x = 1$ or $x = 3$. When $x = 1$: $y = 1 - 6 + 9 + 1 = 5$. When $x = 3$: $y = 27 - 54 + 27 + 1 = 1$. Turning points: $(1, 5)$ and $(3, 1)$."
+    },
+    {
+      "id": 3,
+      "type": "mcq",
+      "question": "Find $\\int \\frac{3}{(2x - 1)^2} \\, dx$.",
+      "options": [
+        "$-\\frac{3}{2(2x - 1)} + c$",
+        "$\\frac{3}{2(2x - 1)} + c$",
+        "$-\\frac{3}{2x - 1} + c$",
+        "$\\frac{6}{2x - 1} + c$"
+      ],
+      "correctAnswer": "A",
+      "marks": 7,
+      "explanation": "Rewrite as $\\int 3(2x - 1)^{-2} \\, dx$. Using substitution $u = 2x - 1$, $\\frac{du}{dx} = 2$, so $dx = \\frac{du}{2}$. Then $\\int 3u^{-2} \\cdot \\frac{du}{2} = \\frac{3}{2} \\int u^{-2} \\, du = \\frac{3}{2} \\cdot (-u^{-1}) + c = -\\frac{3}{2u} + c = -\\frac{3}{2(2x - 1)} + c$."
+    },
+    {
+      "id": 4,
+      "type": "multi_select",
+      "question": "The curve $y = x^3 - 12x + 5$ has a stationary point at $x = 2$. Which of the following are true? (Select all that apply)",
+      "options": [
+        "At $x = 2$, $y = -11$",
+        "$x = 2$ is a local minimum",
+        "The curve also has a stationary point at $x = -2$",
+        "$\\frac{dy}{dx} = 3x^2 - 12$"
+      ],
+      "correctAnswers": ["A", "B", "C", "D"],
+      "partialCredit": true,
+      "marks": 6,
+      "explanation": "$\\frac{dy}{dx} = 3x^2 - 12$ ✓. Setting $= 0$: $3x^2 = 12$, so $x = \\pm 2$ ✓. When $x = 2$: $y = 8 - 24 + 5 = -11$ ✓. $\\frac{d^2y}{dx^2} = 6x$. At $x = 2$: $\\frac{d^2y}{dx^2} = 12 > 0$, so local minimum ✓."
+    },
+    {
+      "id": 5,
+      "type": "mcq",
+      "question": "Evaluate $\\int_0^2 (x^2 + 2x) \\, dx$.",
+      "options": [
+        "$\\frac{20}{3}$",
+        "$8$",
+        "$\\frac{16}{3}$",
+        "$6$"
+      ],
+      "correctAnswer": "A",
+      "marks": 6,
+      "explanation": "$\\int (x^2 + 2x) \\, dx = \\frac{x^3}{3} + x^2 + c$. Evaluating: $\\left[\\frac{x^3}{3} + x^2\\right]_0^2 = \\left(\\frac{8}{3} + 4\\right) - 0 = \\frac{8}{3} + \\frac{12}{3} = \\frac{20}{3}$."
+    },
+    {
+      "id": 6,
+      "type": "mcq",
+      "question": "The gradient of the curve $y = ax^2 + bx$ at the point $(1, 7)$ is $9$. Find the values of $a$ and $b$.",
+      "options": [
+        "$a = 2$, $b = 5$",
+        "$a = 3$, $b = 4$",
+        "$a = 1$, $b = 6$",
+        "$a = 4$, $b = 3$"
+      ],
+      "correctAnswer": "A",
+      "marks": 8,
+      "explanation": "Point $(1, 7)$ lies on curve: $a(1)^2 + b(1) = 7$, so $a + b = 7$ ... (1). $\\frac{dy}{dx} = 2ax + b$. At $x = 1$, gradient $= 9$: $2a(1) + b = 9$, so $2a + b = 9$ ... (2). Subtracting (1) from (2): $(2a + b) - (a + b) = 9 - 7$, giving $a = 2$. From (1): $2 + b = 7$, so $b = 5$."
+    },
+    {
+      "id": 7,
+      "type": "mcq",
+      "question": "Find the area bounded by the curve $y = 4 - x^2$, the x-axis, and the lines $x = 0$ and $x = 2$.",
+      "options": [
+        "$\\frac{16}{3}$",
+        "$8$",
+        "$\\frac{20}{3}$",
+        "$4$"
+      ],
+      "correctAnswer": "A",
+      "marks": 7,
+      "explanation": "Area $= \\int_0^2 (4 - x^2) \\, dx = \\left[4x - \\frac{x^3}{3}\\right]_0^2 = \\left(8 - \\frac{8}{3}\\right) - 0 = \\frac{24 - 8}{3} = \\frac{16}{3}$."
+    }
+  ]
+}
