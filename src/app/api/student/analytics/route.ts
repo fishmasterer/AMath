@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase/supabase-server'
+import { createClient } from '@/lib/supabase/supabase-server'
 import { TOPIC_NAMES, QuizTopic } from '@/lib/types'
 
 export async function GET() {
   try {
-    const supabase = createServerClient()
+    const supabase = await createClient()
     const studentId = '00000000-0000-0000-0000-000000000001' // Single student setup
 
     // Fetch all completed attempts with quiz info
@@ -51,20 +51,24 @@ export async function GET() {
 
     // Score trend (last 20 attempts or all if less)
     const recentAttempts = attempts.slice(-20)
-    const scoreTrend = recentAttempts.map((attempt, index) => ({
-      quiz_number: attempts.length - recentAttempts.length + index + 1,
-      quiz_title: attempt.quizzes?.title || 'Unknown',
-      percentage: Math.round((attempt.score! / attempt.total_marks!) * 100),
-      score: attempt.score,
-      total: attempt.total_marks,
-      date: attempt.submitted_at,
-      topic: attempt.quizzes?.topic,
-    }))
+    const scoreTrend = recentAttempts.map((attempt, index) => {
+      const quiz = Array.isArray(attempt.quizzes) ? attempt.quizzes[0] : attempt.quizzes
+      return {
+        quiz_number: attempts.length - recentAttempts.length + index + 1,
+        quiz_title: quiz?.title || 'Unknown',
+        percentage: Math.round((attempt.score! / attempt.total_marks!) * 100),
+        score: attempt.score,
+        total: attempt.total_marks,
+        date: attempt.submitted_at,
+        topic: quiz?.topic,
+      }
+    })
 
     // Difficulty performance
     const difficultyStats = new Map<string, { total: number; score: number; count: number }>()
     attempts.forEach(attempt => {
-      const difficulty = attempt.quizzes?.difficulty || 'unknown'
+      const quiz = Array.isArray(attempt.quizzes) ? attempt.quizzes[0] : attempt.quizzes
+      const difficulty = quiz?.difficulty || 'unknown'
       const current = difficultyStats.get(difficulty) || { total: 0, score: 0, count: 0 }
       current.total += attempt.total_marks || 0
       current.score += attempt.score || 0
@@ -80,7 +84,8 @@ export async function GET() {
 
     // Time efficiency
     const avgTimeEfficiency = attempts.reduce((sum, attempt) => {
-      const efficiency = (attempt.time_taken_seconds! / (attempt.quizzes!.time_limit_minutes * 60)) * 100
+      const quiz = Array.isArray(attempt.quizzes) ? attempt.quizzes[0] : attempt.quizzes
+      const efficiency = (attempt.time_taken_seconds! / (quiz!.time_limit_minutes * 60)) * 100
       return sum + efficiency
     }, 0) / attempts.length
 
@@ -95,14 +100,17 @@ export async function GET() {
     const worstQuiz = sortedByPercentage[sortedByPercentage.length - 1]
 
     // Recent activity (last 5 quizzes)
-    const recentActivity = attempts.slice(-5).reverse().map(attempt => ({
-      quiz_title: attempt.quizzes?.title || 'Unknown',
-      topic: attempt.quizzes?.topic,
-      score: attempt.score,
-      total_marks: attempt.total_marks,
-      percentage: Math.round((attempt.score! / attempt.total_marks!) * 100),
-      submitted_at: attempt.submitted_at,
-    }))
+    const recentActivity = attempts.slice(-5).reverse().map(attempt => {
+      const quiz = Array.isArray(attempt.quizzes) ? attempt.quizzes[0] : attempt.quizzes
+      return {
+        quiz_title: quiz?.title || 'Unknown',
+        topic: quiz?.topic,
+        score: attempt.score,
+        total_marks: attempt.total_marks,
+        percentage: Math.round((attempt.score! / attempt.total_marks!) * 100),
+        submitted_at: attempt.submitted_at,
+      }
+    })
 
     // Improvement trend (compare first 5 vs last 5)
     let improvement = null
@@ -113,6 +121,9 @@ export async function GET() {
         sum + ((a.score! / a.total_marks!) * 100), 0) / 5
       improvement = Math.round(last5Avg - first5Avg)
     }
+
+    const bestQuizData = Array.isArray(bestQuiz.quizzes) ? bestQuiz.quizzes[0] : bestQuiz.quizzes
+    const worstQuizData = Array.isArray(worstQuiz.quizzes) ? worstQuiz.quizzes[0] : worstQuiz.quizzes
 
     return NextResponse.json({
       hasData: true,
@@ -127,14 +138,14 @@ export async function GET() {
       scoreTrend,
       difficultyBreakdown,
       best: {
-        quiz_title: bestQuiz.quizzes?.title || 'Unknown',
+        quiz_title: bestQuizData?.title || 'Unknown',
         percentage: Math.round((bestQuiz.score! / bestQuiz.total_marks!) * 100),
         score: bestQuiz.score,
         total: bestQuiz.total_marks,
         date: bestQuiz.submitted_at,
       },
       worst: {
-        quiz_title: worstQuiz.quizzes?.title || 'Unknown',
+        quiz_title: worstQuizData?.title || 'Unknown',
         percentage: Math.round((worstQuiz.score! / worstQuiz.total_marks!) * 100),
         score: worstQuiz.score,
         total: worstQuiz.total_marks,

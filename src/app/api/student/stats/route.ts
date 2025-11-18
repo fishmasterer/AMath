@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase/supabase-server'
+import { createClient } from '@/lib/supabase/supabase-server'
 
 export async function GET() {
   try {
-    const supabase = createServerClient()
+    const supabase = await createClient()
 
     // For single student setup, we'll use a hardcoded student ID
     // In a full auth system, this would come from the session

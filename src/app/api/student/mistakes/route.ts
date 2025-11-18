@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase/supabase-server'
+import { createClient } from '@/lib/supabase/supabase-server'
 import { TOPIC_NAMES, QuizTopic } from '@/lib/types'
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createServerClient()
+    const supabase = await createClient()
     const studentId = '00000000-0000-0000-0000-000000000001' // Single student setup
     const { searchParams } = new URL(request.url)
 

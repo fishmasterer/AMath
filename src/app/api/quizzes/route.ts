@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase/supabase-server'
+import { createClient } from '@/lib/supabase/supabase-server'
 import { QuizTopic, QuizDifficulty } from '@/lib/types'
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createServerClient()
+    const supabase = await createClient()
     const { searchParams } = new URL(request.url)
 
     // For single student setup
@@ -116,8 +116,8 @@ export async function GET(request: NextRequest) {
           comparison = new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
           break
         case 'difficulty':
-          const difficultyOrder = { foundational: 1, intermediate: 2, exam_level: 3 }
-          comparison = difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty]
+          const difficultyOrder: Record<QuizDifficulty, number> = { foundational: 1, intermediate: 2, exam_level: 3 }
+          comparison = difficultyOrder[a.difficulty as QuizDifficulty] - difficultyOrder[b.difficulty as QuizDifficulty]
           break
         case 'topic':
           comparison = a.topic.localeCompare(b.topic)

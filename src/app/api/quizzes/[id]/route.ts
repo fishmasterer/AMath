@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@/lib/supabase/supabase-server'
+import { createClient } from '@/lib/supabase/supabase-server'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = createServerClient()
-    const quizId = params.id
+    const supabase = await createClient()
+    const { id: quizId } = await params
     const studentId = '00000000-0000-0000-0000-000000000001' // Single student setup
 
     // Fetch quiz details

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import React, { use, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { TOPIC_NAMES } from '@/lib/types'
 import 'katex/dist/katex.min.css'
@@ -61,7 +61,8 @@ interface ResultsData {
   questionResults: QuestionResult[]
 }
 
-export default function QuizResultsPage({ params }: { params: { id: string } }) {
+export default function QuizResultsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
   const [results, setResults] = useState<ResultsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -69,11 +70,11 @@ export default function QuizResultsPage({ params }: { params: { id: string } }) 
 
   useEffect(() => {
     fetchResults()
-  }, [params.id])
+  }, [id])
 
   const fetchResults = async () => {
     try {
-      const response = await fetch(`/api/quizzes/${params.id}/results`)
+      const response = await fetch(`/api/quizzes/${id}/results`)
       if (response.ok) {
         const data = await response.json()
         setResults(data)
@@ -110,7 +111,7 @@ export default function QuizResultsPage({ params }: { params: { id: string } }) 
   const renderTextWithLatex = (text: string) => {
     if (!text) return text
 
-    const parts: JSX.Element[] = []
+    const parts: React.ReactElement[] = []
     let remaining = text
     let key = 0
 

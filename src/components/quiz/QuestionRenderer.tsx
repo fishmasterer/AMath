@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import { Question, MCQQuestion, MultiSelectQuestion } from '@/lib/types'
 import 'katex/dist/katex.min.css'
 import { InlineMath, BlockMath } from 'react-katex'
@@ -24,7 +25,7 @@ export default function QuestionRenderer({
   // Function to render text with LaTeX support
   const renderTextWithLatex = (text: string) => {
     // Split text by LaTeX delimiters
-    const parts: JSX.Element[] = []
+    const parts: React.ReactElement[] = []
     let remaining = text
     let key = 0
 
@@ -57,7 +58,7 @@ export default function QuestionRenderer({
   }
 
   const processInlineMath = (text: string) => {
-    const parts: JSX.Element[] = []
+    const parts: React.ReactElement[] = []
     let remaining = text
     let key = 0
 
