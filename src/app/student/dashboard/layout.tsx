@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 
@@ -14,19 +14,8 @@ export default function StudentDashboardLayout({
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [notifications, setNotifications] = useState(3) // Mock notification count
 
-  useEffect(() => {
-    // Check authentication
-    if (typeof window !== 'undefined') {
-      const isAuth = sessionStorage.getItem('studentAuth')
-      if (isAuth !== 'true') {
-        router.push('/student')
-      }
-    }
-  }, [router])
-
-  const handleLogout = () => {
-    sessionStorage.removeItem('studentAuth')
-    router.push('/student')
+  const handleBackHome = () => {
+    router.push('/')
   }
 
   const navItems = [
@@ -133,13 +122,13 @@ export default function StudentDashboardLayout({
               </div>
             </div>
             <button
-              onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-sm font-medium transition-all"
+              onClick={handleBackHome}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 rounded-lg text-blue-400 text-sm font-medium transition-all"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
-              Logout
+              Back to Home
             </button>
           </div>
         </div>
