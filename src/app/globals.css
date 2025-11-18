@@ -76,6 +76,22 @@
   @apply my-4;
 }
 
+/* KaTeX dark mode fix - make formulas white/light colored */
+.katex {
+  color: rgb(226, 232, 240) !important; /* slate-200 */
+}
+
+.katex .mord,
+.katex .mrel,
+.katex .mop,
+.katex .mbin,
+.katex .mopen,
+.katex .mclose,
+.katex .mpunct,
+.katex .minner {
+  color: rgb(226, 232, 240) !important; /* slate-200 */
+}
+
 /* Quiz question styling */
 .quiz-question {
   @apply mb-6 p-4 bg-card rounded-lg border border-border;

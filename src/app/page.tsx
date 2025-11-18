@@ -28,9 +28,9 @@ export default function HomePage() {
         {/* Feature Cards */}
         <div className="grid md:grid-cols-2 gap-6 mb-16 max-w-5xl mx-auto">
           {/* Students Card */}
-          <div className="group relative">
+          <a href="/student/dashboard" className="group relative block">
             <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl opacity-20 group-hover:opacity-30 transition duration-300 blur"></div>
-            <div className="relative bg-slate-900/50 backdrop-blur-xl border border-slate-800/50 rounded-2xl p-8 hover:border-cyan-500/50 transition-all duration-300">
+            <div className="relative bg-slate-900/50 backdrop-blur-xl border border-slate-800/50 rounded-2xl p-8 hover:border-cyan-500/50 transition-all duration-300 cursor-pointer">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center">
                   <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -58,7 +58,7 @@ export default function HomePage() {
                 </li>
               </ul>
             </div>
-          </div>
+          </a>
 
           {/* Tutors Card */}
           <div className="group relative">

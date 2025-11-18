@@ -94,32 +94,7 @@ export default function StudentDashboard() {
         },
       ])
 
-      setRecentActivity([
-        {
-          id: '1',
-          type: 'quiz_completed',
-          title: 'Completed: Surds Quiz',
-          description: 'Scored 85/100',
-          timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-          icon: '✓',
-        },
-        {
-          id: '2',
-          type: 'achievement',
-          title: '5-Day Streak!',
-          description: 'You completed quizzes for 5 consecutive days',
-          timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          icon: '🔥',
-        },
-        {
-          id: '3',
-          type: 'quiz_assigned',
-          title: 'New Quiz Available',
-          description: 'Quadratic Functions - Week 5',
-          timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-          icon: '📝',
-        },
-      ])
+      setRecentActivity([])
 
       setLoading(false)
     } catch (error) {
@@ -305,20 +280,30 @@ export default function StudentDashboard() {
         {/* Recent activity */}
         <div className="bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-6">
           <h2 className="text-xl font-bold text-white mb-6">Recent Activity</h2>
-          <div className="space-y-4">
-            {recentActivity.map((activity) => (
-              <div key={activity.id} className="flex gap-3">
-                <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center text-xl flex-shrink-0">
-                  {activity.icon}
+          {recentActivity.length > 0 ? (
+            <div className="space-y-4">
+              {recentActivity.map((activity) => (
+                <div key={activity.id} className="flex gap-3">
+                  <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center text-xl flex-shrink-0">
+                    {activity.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white text-sm font-medium">{activity.title}</p>
+                    <p className="text-gray-400 text-xs">{activity.description}</p>
+                    <p className="text-gray-500 text-xs mt-1">{formatRelativeTime(activity.timestamp)}</p>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-white text-sm font-medium">{activity.title}</p>
-                  <p className="text-gray-400 text-xs">{activity.description}</p>
-                  <p className="text-gray-500 text-xs mt-1">{formatRelativeTime(activity.timestamp)}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-400">
+              <svg className="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p>No recent activity</p>
+              <p className="text-sm mt-1">Complete some quizzes to see your activity!</p>
+            </div>
+          )}
         </div>
       </div>
 
