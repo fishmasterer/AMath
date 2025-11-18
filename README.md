@@ -2,6 +2,12 @@
 
 A comprehensive quiz and homework management system for Singapore O-Level Additional Mathematics tutoring.
 
+## 🚀 Live Deployment
+
+**Production URL:** https://a-math.vercel.app
+
+The application is deployed on Vercel with automatic deployments from the `main` branch.
+
 ## 🏗️ Architecture
 
 **Tech Stack:**
