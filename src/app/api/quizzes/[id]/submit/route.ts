@@ -71,12 +71,18 @@ export async function POST(
     
     // Grade the quiz
     const gradingResult = gradeQuiz(quiz.questions, answers, quiz.topic);
-    
+
+    console.log('Grading result:', JSON.stringify(gradingResult, null, 2));
+
     // Update attempt
     const { error: updateError } = await supabase
       .from('quiz_attempts')
       .update({
-        answers,
+        answers: answers.map(a => ({
+          question_id: a.question_id,
+          answer: a.answer,
+          time_spent_seconds: a.time_spent_seconds
+        })),
         score: gradingResult.score,
         total_marks: gradingResult.total_marks,
         time_taken_seconds,
@@ -84,28 +90,41 @@ export async function POST(
         submitted_at: new Date().toISOString(),
       })
       .eq('id', attempt.id);
-    
+
     if (updateError) {
       console.error('Failed to update attempt:', updateError);
       return NextResponse.json(
-        { success: false, error: 'Failed to submit quiz' },
+        { success: false, error: 'Failed to submit quiz', details: updateError.message },
         { status: 500 }
       );
     }
-    
+
     // Insert question results (for mistakes journal)
     const questionResultsToInsert = gradingResult.question_results.map(result => ({
       attempt_id: attempt.id,
-      ...result,
+      question_index: result.question_index,
+      question_text: result.question_text,
+      topic: result.topic,
+      question_type: result.question_type,
+      student_answer: result.student_answer || '',
+      correct_answer: result.correct_answer,
+      is_correct: result.is_correct,
+      marks_awarded: result.marks_awarded,
+      marks_possible: result.marks_possible,
     }));
-    
+
+    console.log('Inserting question results:', JSON.stringify(questionResultsToInsert, null, 2));
+
     const { error: resultsError } = await supabase
       .from('question_results')
       .insert(questionResultsToInsert);
-    
+
     if (resultsError) {
       console.error('Failed to insert question results:', resultsError);
-      // Non-critical error, continue
+      return NextResponse.json(
+        { success: false, error: 'Failed to save question results', details: resultsError.message },
+        { status: 500 }
+      );
     }
     
     // Return results

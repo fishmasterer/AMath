@@ -142,8 +142,10 @@ export default function QuestionRenderer({
       </div>
 
       {/* Question text */}
-      <div className="text-white text-lg leading-relaxed mb-6">
-        {renderTextWithLatex(question.question)}
+      <div className="text-white text-lg leading-relaxed mb-6 transition-all duration-300">
+        {question.question ? renderTextWithLatex(question.question) : (
+          <div className="text-red-400">Question text not available</div>
+        )}
       </div>
 
       {/* Options */}
@@ -157,10 +159,10 @@ export default function QuestionRenderer({
             return (
               <label
                 key={letter}
-                className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all duration-300 ease-in-out transform hover:scale-[1.02] hover:shadow-lg ${
                   isSelected
-                    ? 'bg-blue-500/20 border-blue-500 text-white'
-                    : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'
+                    ? 'bg-blue-500/20 border-blue-500 text-white shadow-blue-500/20 scale-[1.01]'
+                    : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:border-white/20'
                 }`}
               >
                 <input
@@ -187,10 +189,10 @@ export default function QuestionRenderer({
             return (
               <label
                 key={letter}
-                className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all duration-300 ease-in-out transform hover:scale-[1.02] hover:shadow-lg ${
                   isSelected
-                    ? 'bg-blue-500/20 border-blue-500 text-white'
-                    : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'
+                    ? 'bg-blue-500/20 border-blue-500 text-white shadow-blue-500/20 scale-[1.01]'
+                    : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:border-white/20'
                 }`}
               >
                 <input
