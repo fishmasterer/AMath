@@ -6,9 +6,20 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createClient()
     const { id: quizId } = await params
     const studentId = '00000000-0000-0000-0000-000000000001' // Single student setup
+
+    // Use service role to bypass RLS for quiz operations
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+    const { createClient: createServiceClient } = await import('@supabase/supabase-js');
+    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    });
 
     // Fetch quiz to ensure it exists and is published
     const { data: quiz, error: quizError } = await supabase
