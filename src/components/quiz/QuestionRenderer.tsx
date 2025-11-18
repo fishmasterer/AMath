@@ -24,6 +24,9 @@ export default function QuestionRenderer({
 }: QuestionRendererProps) {
   // Function to render text with LaTeX support
   const renderTextWithLatex = (text: string) => {
+    // Handle undefined/null text
+    if (!text) return null
+
     // Split text by LaTeX delimiters
     const parts: React.ReactElement[] = []
     let remaining = text
@@ -58,6 +61,9 @@ export default function QuestionRenderer({
   }
 
   const processInlineMath = (text: string) => {
+    // Handle undefined/null text
+    if (!text) return null
+
     const parts: React.ReactElement[] = []
     let remaining = text
     let key = 0
