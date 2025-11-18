@@ -2,7 +2,7 @@
 // API endpoint for uploading new quizzes
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/supabase-server';
 import { validateQuizUpload } from '@/lib/validators/quiz.validator';
 
 export async function POST(request: NextRequest) {

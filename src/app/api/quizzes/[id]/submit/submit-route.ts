@@ -2,7 +2,7 @@
 // API endpoint for submitting quiz attempts
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/supabase-server';
 import { gradeQuiz } from '@/lib/utils/grading';
 import { StudentAnswer } from '@/lib/types';
 
