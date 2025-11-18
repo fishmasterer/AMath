@@ -7,7 +7,7 @@ export async function GET() {
     const profile = {
       id: '00000000-0000-0000-0000-000000000001',
       role: 'student' as const,
-      full_name: 'Alex Chen',
+      full_name: 'Ayzac Ng',
       email: 'student@amath.edu',
       avatar_url: null,
       created_at: '2024-01-01T00:00:00Z',
@@ -33,7 +33,7 @@ export async function PUT(request: Request) {
     const updatedProfile = {
       id: '00000000-0000-0000-0000-000000000001',
       role: 'student' as const,
-      full_name: body.full_name || 'Alex Chen',
+      full_name: body.full_name || 'Ayzac Ng',
       email: 'student@amath.edu',
       avatar_url: body.avatar_url || null,
       created_at: '2024-01-01T00:00:00Z',

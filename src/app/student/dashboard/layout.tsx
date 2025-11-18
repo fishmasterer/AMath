@@ -136,7 +136,7 @@ export default function StudentDashboardLayout({
 
       {/* Main content */}
       <div
-        className={`transition-all ${isSidebarOpen ? 'ml-[280px]' : 'ml-0'}`}
+        className={`transition-all min-h-screen bg-slate-950 ${isSidebarOpen ? 'ml-[280px]' : 'ml-0'}`}
       >
         {/* Top bar */}
         <header className="sticky top-0 z-30 bg-slate-900/50 backdrop-blur-xl border-b border-white/10">

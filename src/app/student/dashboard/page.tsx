@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
 interface Stats {
@@ -71,55 +72,14 @@ export default function StudentDashboard() {
         setProfile(profileData)
       }
 
-      // For now, mock the upcoming quizzes and activity
-      // These would come from additional API endpoints in a full implementation
-      setUpcomingQuizzes([
-        {
-          id: '1',
-          title: 'Quadratic Functions - Week 5',
-          topic: 'A1',
-          due_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-          difficulty: 'intermediate',
-          total_marks: 50,
-          time_limit_minutes: 45,
-        },
-        {
-          id: '2',
-          title: 'Trigonometry Identities',
-          topic: 'G1',
-          due_date: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-          difficulty: 'exam_level',
-          total_marks: 75,
-          time_limit_minutes: 60,
-        },
-      ])
+      // Fetch upcoming quizzes from API
+      const quizzesRes = await fetch('/api/quizzes?limit=3&sortBy=due_date&sortOrder=asc')
+      if (quizzesRes.ok) {
+        const quizzesData = await quizzesRes.json()
+        setUpcomingQuizzes(quizzesData.quizzes?.slice(0, 3) || [])
+      }
 
-      setRecentActivity([
-        {
-          id: '1',
-          type: 'quiz_completed',
-          title: 'Completed: Surds Quiz',
-          description: 'Scored 85/100',
-          timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-          icon: '✓',
-        },
-        {
-          id: '2',
-          type: 'achievement',
-          title: '5-Day Streak!',
-          description: 'You completed quizzes for 5 consecutive days',
-          timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          icon: '🔥',
-        },
-        {
-          id: '3',
-          type: 'quiz_assigned',
-          title: 'New Quiz Available',
-          description: 'Quadratic Functions - Week 5',
-          timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-          icon: '📝',
-        },
-      ])
+      setRecentActivity([])
 
       setLoading(false)
     } catch (error) {
@@ -305,32 +265,51 @@ export default function StudentDashboard() {
         {/* Recent activity */}
         <div className="bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-6">
           <h2 className="text-xl font-bold text-white mb-6">Recent Activity</h2>
-          <div className="space-y-4">
-            {recentActivity.map((activity) => (
-              <div key={activity.id} className="flex gap-3">
-                <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center text-xl flex-shrink-0">
-                  {activity.icon}
+          {recentActivity.length > 0 ? (
+            <div className="space-y-4">
+              {recentActivity.map((activity) => (
+                <div key={activity.id} className="flex gap-3">
+                  <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center text-xl flex-shrink-0">
+                    {activity.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white text-sm font-medium">{activity.title}</p>
+                    <p className="text-gray-400 text-xs">{activity.description}</p>
+                    <p className="text-gray-500 text-xs mt-1">{formatRelativeTime(activity.timestamp)}</p>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-white text-sm font-medium">{activity.title}</p>
-                  <p className="text-gray-400 text-xs">{activity.description}</p>
-                  <p className="text-gray-500 text-xs mt-1">{formatRelativeTime(activity.timestamp)}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-400">
+              <svg className="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p>No recent activity</p>
+              <p className="text-sm mt-1">Complete some quizzes to see your activity!</p>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Upcoming quizzes */}
       <div className="bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-6">
-        <h2 className="text-xl font-bold text-white mb-6">Upcoming Quizzes</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-white">Upcoming Quizzes</h2>
+          <Link href="/student/quizzes" className="text-blue-400 hover:text-blue-300 text-sm flex items-center gap-1">
+            View All
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
         {upcomingQuizzes.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {upcomingQuizzes.map((quiz) => (
-              <div
+              <Link
                 key={quiz.id}
-                className="bg-white/5 rounded-lg border border-white/10 p-5 hover:bg-white/10 transition-all cursor-pointer"
+                href={`/student/quizzes/${quiz.id}`}
+                className="bg-white/5 rounded-lg border border-white/10 p-5 hover:bg-white/10 transition-all"
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
@@ -363,19 +342,26 @@ export default function StudentDashboard() {
                     {formatDueDate(quiz.due_date)}
                   </div>
                 </div>
-                <button className="w-full mt-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors">
-                  Start Quiz
-                </button>
-              </div>
+              </Link>
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-400">
-            <svg className="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <p>No upcoming quizzes</p>
-            <p className="text-sm mt-1">Check back later for new assignments!</p>
+          <div className="text-center py-8">
+            <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-8 max-w-md mx-auto">
+              <svg className="w-16 h-16 mx-auto mb-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <h3 className="text-white font-semibold mb-2">No Quizzes Yet</h3>
+              <p className="text-gray-400 text-sm mb-4">
+                Your tutor hasn't assigned any quizzes yet. Once quizzes are available, they'll appear here!
+              </p>
+              <Link
+                href="/student/quizzes"
+                className="inline-block px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
+              >
+                Browse Quiz Library
+              </Link>
+            </div>
           </div>
         )}
       </div>
