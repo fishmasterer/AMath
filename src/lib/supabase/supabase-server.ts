@@ -3,6 +3,7 @@
 
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server';
 import { Database } from '../database.types';
 
 export const createClient = async () => {
@@ -31,28 +32,33 @@ export const createClient = async () => {
 };
 
 // Middleware-specific client
-export const createMiddlewareClient = async (request: Request) => {
-  const response = new Response(request);
-  
-  return createServerClient<Database>(
+export const createMiddlewareClient = async (request: NextRequest) => {
+  // Create response for setting cookies
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  });
+
+  const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() {
-          return request.headers.get('cookie')?.split('; ').map(cookie => {
-            const [name, ...rest] = cookie.split('=');
-            return { name, value: rest.join('=') };
-          }) || [];
+          return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
-            response.headers.append('Set-Cookie', `${name}=${value}; ${Object.entries(options || {}).map(([k, v]) => `${k}=${v}`).join('; ')}`);
+            request.cookies.set(name, value);
+            response.cookies.set(name, value, options);
           });
         },
       },
     }
   );
+
+  return supabase;
 };
 
 // Helper to get user profile with role
