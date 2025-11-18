@@ -82,6 +82,12 @@ export async function GET(
     console.log('Questions is array?', Array.isArray(quiz.questions))
     console.log('First question:', quiz.questions?.[0])
 
+    // Transform questions to ensure correct field names
+    const transformedQuestions = (quiz.questions || []).map((q: any) => ({
+      ...q,
+      question: q.question || q.text || '', // Support both field names
+    }))
+
     const responseData = {
       attemptId: attempt.id,
       quiz: {
@@ -92,7 +98,7 @@ export async function GET(
         time_limit_minutes: quiz.time_limit_minutes,
         due_date: quiz.due_date,
         total_marks: quiz.total_marks,
-        questions: quiz.questions, // Include full questions for active attempt
+        questions: transformedQuestions, // Include full questions for active attempt
       },
       answers: attempt.answers || [],
       startedAt: attempt.started_at,

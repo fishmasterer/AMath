@@ -91,10 +91,8 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
       })
       setAnswers(answerMap)
 
-      // If time is already up, auto-submit
-      if (data.timeIsUp) {
-        await handleSubmit(answerMap)
-      }
+      // Don't auto-submit if time is up - let user manually submit
+      // The timer will show 00:00 and they can still submit
 
       setLoading(false)
     } catch (err) {
