@@ -70,9 +70,21 @@ export async function POST(
     }
     
     // Grade the quiz
-    const gradingResult = gradeQuiz(quiz.questions, answers, quiz.topic);
+    console.log('Starting grading with:', {
+      questionsCount: quiz.questions?.length,
+      answersCount: answers.length,
+      topic: quiz.topic,
+      firstQuestion: quiz.questions?.[0]
+    });
 
-    console.log('Grading result:', JSON.stringify(gradingResult, null, 2));
+    let gradingResult;
+    try {
+      gradingResult = gradeQuiz(quiz.questions, answers, quiz.topic);
+      console.log('Grading result:', JSON.stringify(gradingResult, null, 2));
+    } catch (gradingError) {
+      console.error('Grading failed:', gradingError);
+      throw new Error(`Grading failed: ${gradingError instanceof Error ? gradingError.message : 'Unknown error'}`);
+    }
 
     // Update attempt
     const { error: updateError } = await supabase
@@ -142,8 +154,16 @@ export async function POST(
     
   } catch (error) {
     console.error('Quiz submission error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : '';
+    console.error('Error details:', { message: errorMessage, stack: errorStack });
+
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
+      {
+        success: false,
+        error: 'Internal server error',
+        details: errorMessage
+      },
       { status: 500 }
     );
   }
