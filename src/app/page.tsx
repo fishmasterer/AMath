@@ -127,14 +127,22 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Status */}
+        {/* Status & Access */}
         <div className="text-center">
           <div className="inline-flex items-center gap-2 bg-slate-900/50 backdrop-blur-xl border border-slate-800/50 rounded-full px-6 py-3 mb-4">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
             <span className="text-slate-300">System Online</span>
           </div>
+          <div className="flex items-center justify-center gap-4 mb-2">
+            <a
+              href="/tutor"
+              className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors underline underline-offset-2"
+            >
+              Tutor Access →
+            </a>
+          </div>
           <p className="text-slate-500 text-sm">
-            Authentication coming soon · Configure Supabase to enable login
+            Student authentication coming soon · Configure Supabase to enable login
           </p>
         </div>
       </div>
