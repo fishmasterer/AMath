@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
         id: mistake.id,
         question_index: mistake.question_index,
         question_text: mistake.question_text,
-        question_full: question?.question || mistake.question_text,
+        question_full: question?.question || question?.text || mistake.question_text,
         options: question?.options || [],
         explanation: question?.explanation,
         topic: mistake.topic,

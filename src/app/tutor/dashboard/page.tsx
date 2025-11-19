@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { renderLatex } from '@/components/LatexRenderer';
+import { TOPIC_NAMES } from '@/lib/types';
 
 interface Quiz {
   id: string;
@@ -13,6 +16,44 @@ interface Quiz {
   published: boolean;
   created_at: string;
   total_marks?: number;
+  questions?: any[]; // Full quiz data when viewing details
+}
+
+interface AnalyticsData {
+  hasData: boolean;
+  overview: {
+    total_quizzes: number;
+    published_quizzes: number;
+    total_attempts: number;
+    completed_attempts: number;
+    average_score: number;
+    active_students: number;
+  };
+  topicPerformance?: Array<{
+    topic: string;
+    topic_name: string;
+    attempts: number;
+    average_score: number;
+  }>;
+  difficultyBreakdown?: Array<{
+    difficulty: string;
+    attempts: number;
+    average_score: number;
+  }>;
+  scoreDistribution?: Array<{
+    range: string;
+    count: number;
+    percentage: number;
+  }>;
+  recentSubmissions?: Array<{
+    attempt_id: string;
+    quiz_title: string;
+    student_id: string;
+    score: number;
+    total_marks: number;
+    percentage: number;
+    submitted_at: string;
+  }>;
 }
 
 export default function TutorDashboard() {
@@ -29,6 +70,9 @@ export default function TutorDashboard() {
     difficulty: ''
   });
   const [copyStatus, setCopyStatus] = useState('');
+  const [viewingQuiz, setViewingQuiz] = useState<Quiz | null>(null);
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
   useEffect(() => {
     // Check authentication
@@ -44,6 +88,13 @@ export default function TutorDashboard() {
       fetchQuizzes();
     }
   }, [activeTab, filters]);
+
+  // Fetch analytics when analytics tab is active
+  useEffect(() => {
+    if (activeTab === 'analytics') {
+      fetchAnalytics();
+    }
+  }, [activeTab]);
 
   const fetchQuizzes = async () => {
     try {
@@ -69,6 +120,24 @@ export default function TutorDashboard() {
       console.error('Error fetching quizzes:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAnalytics = async () => {
+    try {
+      setAnalyticsLoading(true);
+      const response = await fetch('/api/tutor/analytics');
+      const data = await response.json();
+
+      if (response.ok) {
+        setAnalytics(data);
+      } else {
+        console.error('Failed to fetch analytics:', data.error);
+      }
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
+    } finally {
+      setAnalyticsLoading(false);
     }
   };
 
@@ -123,6 +192,25 @@ export default function TutorDashboard() {
     } catch (error) {
       setUploadStatus({ type: 'error', message: 'Error deleting quiz' });
       console.error('Error deleting quiz:', error);
+    }
+  };
+
+  const viewQuizDetails = async (quizId: string) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/tutor/quizzes/${quizId}`);
+      const data = await response.json();
+
+      if (response.ok) {
+        setViewingQuiz(data.quiz);
+      } else {
+        setUploadStatus({ type: 'error', message: 'Failed to load quiz details' });
+      }
+    } catch (error) {
+      setUploadStatus({ type: 'error', message: 'Error loading quiz' });
+      console.error('Error loading quiz details:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -477,7 +565,95 @@ export default function TutorDashboard() {
 
             {activeTab === 'manage' && (
               <div>
-                <h2 className="text-2xl font-bold text-white mb-6">Manage Quizzes</h2>
+                {viewingQuiz ? (
+                  // Quiz Detail View
+                  <div>
+                    <button
+                      onClick={() => setViewingQuiz(null)}
+                      className="mb-4 flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                      Back to Quiz List
+                    </button>
+
+                    <div className="bg-slate-950/50 border border-slate-700/50 rounded-lg p-6 mb-4">
+                      <div className="flex items-start justify-between mb-4">
+                        <div>
+                          <h2 className="text-2xl font-bold text-white mb-2">{viewingQuiz.title}</h2>
+                          <div className="flex flex-wrap gap-3 text-sm">
+                            <span className="text-cyan-400">Topic: {viewingQuiz.topic}</span>
+                            <span className="text-blue-400">Difficulty: {viewingQuiz.difficulty}</span>
+                            <span className="text-violet-400">Time: {viewingQuiz.time_limit_minutes} min</span>
+                            <span className="text-indigo-400">Week: {viewingQuiz.week}</span>
+                            <span className="text-amber-400">Total: {viewingQuiz.total_marks} marks</span>
+                          </div>
+                        </div>
+                        <span className={`px-3 py-1 rounded-full text-sm ${
+                          viewingQuiz.published
+                            ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                            : 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
+                        }`}>
+                          {viewingQuiz.published ? '✓ Published' : '○ Draft'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      {viewingQuiz.questions?.map((q: any, idx: number) => (
+                        <div key={idx} className="bg-slate-950/50 border border-slate-700/50 rounded-lg p-6">
+                          <div className="flex items-start justify-between mb-3">
+                            <h3 className="text-lg font-semibold text-white">
+                              Question {q.id} ({q.marks} mark{q.marks > 1 ? 's' : ''})
+                            </h3>
+                            <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded">
+                              {q.type === 'mcq' ? 'MCQ' : 'Multi-Select'}
+                            </span>
+                          </div>
+
+                          <div className="mb-4 text-slate-300">
+                            {renderLatex(q.question || '')}
+                          </div>
+
+                          <div className="space-y-2 mb-4">
+                            <p className="text-sm font-medium text-slate-400">Options:</p>
+                            {q.options?.map((opt: string, i: number) => {
+                              const letter = String.fromCharCode(65 + i); // A, B, C, D
+                              const isCorrect = q.type === 'mcq'
+                                ? q.correctAnswer === letter
+                                : q.correctAnswers?.includes(letter);
+
+                              return (
+                                <div key={i} className={`p-3 rounded-lg border ${
+                                  isCorrect
+                                    ? 'bg-green-500/10 border-green-500/30 text-green-300'
+                                    : 'bg-slate-800/30 border-slate-700/30 text-slate-300'
+                                }`}>
+                                  <span className="font-semibold">{letter}.</span>{' '}
+                                  <span>{renderLatex(opt)}</span>
+                                  {isCorrect && <span className="ml-2 text-green-400">✓ Correct</span>}
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {q.explanation && (
+                            <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                              <p className="text-sm font-semibold text-blue-400 mb-2">Explanation:</p>
+                              <div className="text-sm text-slate-300">
+                                {renderLatex(q.explanation || '')}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  // Quiz List View
+                  <div>
+                    <h2 className="text-2xl font-bold text-white mb-6">Manage Quizzes</h2>
 
                 {/* Filters */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -593,6 +769,12 @@ export default function TutorDashboard() {
                           </div>
                           <div className="flex items-center gap-2">
                             <button
+                              onClick={() => viewQuizDetails(quiz.id)}
+                              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-500/20 border border-blue-500/50 text-blue-400 hover:bg-blue-500/30 transition-all"
+                            >
+                              View
+                            </button>
+                            <button
                               onClick={() => togglePublished(quiz.id, quiz.published)}
                               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                                 quiz.published
@@ -625,15 +807,178 @@ export default function TutorDashboard() {
                   </ul>
                 </div>
               </div>
+                )}
+              </div>
             )}
 
             {activeTab === 'analytics' && (
               <div>
-                <h2 className="text-2xl font-bold text-white mb-6">Student Analytics</h2>
-                <div className="text-center py-12">
-                  <div className="text-6xl mb-4">📈</div>
-                  <p className="text-slate-400">Analytics will appear once students start taking quizzes.</p>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-white">Student Analytics</h2>
+                  <Link
+                    href="/tutor/submissions"
+                    className="px-4 py-2 rounded-lg bg-cyan-500/20 border border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/30 transition-all text-sm font-medium"
+                  >
+                    View All Submissions
+                  </Link>
                 </div>
+
+                {analyticsLoading ? (
+                  <div className="text-center py-12">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto mb-4"></div>
+                    <p className="text-slate-400">Loading analytics...</p>
+                  </div>
+                ) : !analytics?.hasData ? (
+                  <div className="text-center py-12">
+                    <div className="text-6xl mb-4">📈</div>
+                    <p className="text-slate-400 mb-4">No analytics data yet.</p>
+                    <p className="text-slate-500 text-sm">Analytics will appear once students start taking quizzes.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {/* Overview Stats */}
+                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                      <div className="bg-slate-950/50 border border-slate-700/50 rounded-lg p-4">
+                        <div className="text-slate-400 text-sm mb-1">Total Quizzes</div>
+                        <div className="text-3xl font-bold text-white">{analytics.overview.total_quizzes}</div>
+                        <div className="text-xs text-slate-500 mt-1">
+                          {analytics.overview.published_quizzes} published
+                        </div>
+                      </div>
+                      <div className="bg-slate-950/50 border border-slate-700/50 rounded-lg p-4">
+                        <div className="text-slate-400 text-sm mb-1">Total Attempts</div>
+                        <div className="text-3xl font-bold text-white">{analytics.overview.total_attempts}</div>
+                        <div className="text-xs text-slate-500 mt-1">
+                          {analytics.overview.completed_attempts} completed
+                        </div>
+                      </div>
+                      <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
+                        <div className="text-slate-400 text-sm mb-1">Avg Score</div>
+                        <div className="text-3xl font-bold text-green-400">{analytics.overview.average_score}%</div>
+                      </div>
+                      <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+                        <div className="text-slate-400 text-sm mb-1">Active Students</div>
+                        <div className="text-3xl font-bold text-blue-400">{analytics.overview.active_students}</div>
+                      </div>
+                    </div>
+
+                    {/* Topic Performance */}
+                    {analytics.topicPerformance && analytics.topicPerformance.length > 0 && (
+                      <div className="bg-slate-950/50 border border-slate-700/50 rounded-lg p-6">
+                        <h3 className="text-lg font-bold text-white mb-4">Topic Performance</h3>
+                        <div className="space-y-3">
+                          {analytics.topicPerformance.map(topic => (
+                            <div key={topic.topic} className="flex items-center gap-4">
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="text-slate-300 text-sm">
+                                    <span className="text-cyan-400 font-mono font-semibold">{topic.topic}</span> - {topic.topic_name}
+                                  </span>
+                                  <span className="text-white font-bold">{topic.average_score}%</span>
+                                </div>
+                                <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                                  <div
+                                    className={`h-full ${
+                                      topic.average_score >= 80
+                                        ? 'bg-green-500'
+                                        : topic.average_score >= 60
+                                        ? 'bg-blue-500'
+                                        : 'bg-orange-500'
+                                    }`}
+                                    style={{ width: `${topic.average_score}%` }}
+                                  />
+                                </div>
+                                <div className="text-xs text-slate-500 mt-1">{topic.attempts} attempts</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Difficulty Breakdown */}
+                    {analytics.difficultyBreakdown && analytics.difficultyBreakdown.length > 0 && (
+                      <div className="bg-slate-950/50 border border-slate-700/50 rounded-lg p-6">
+                        <h3 className="text-lg font-bold text-white mb-4">Performance by Difficulty</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          {analytics.difficultyBreakdown.map(diff => (
+                            <div key={diff.difficulty} className="bg-slate-800/30 border border-slate-700/30 rounded-lg p-4">
+                              <div className="text-slate-400 text-sm mb-2 capitalize">{diff.difficulty.replace('_', ' ')}</div>
+                              <div className="text-2xl font-bold text-white mb-1">{diff.average_score}%</div>
+                              <div className="text-xs text-slate-500">{diff.attempts} attempts</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Score Distribution */}
+                    {analytics.scoreDistribution && analytics.scoreDistribution.length > 0 && (
+                      <div className="bg-slate-950/50 border border-slate-700/50 rounded-lg p-6">
+                        <h3 className="text-lg font-bold text-white mb-4">Score Distribution</h3>
+                        <div className="space-y-2">
+                          {analytics.scoreDistribution.map(range => (
+                            <div key={range.range} className="flex items-center gap-4">
+                              <div className="w-20 text-slate-400 text-sm">{range.range}%</div>
+                              <div className="flex-1">
+                                <div className="h-8 bg-slate-800 rounded-lg overflow-hidden">
+                                  <div
+                                    className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-end pr-2"
+                                    style={{ width: `${Math.max(range.percentage, 5)}%` }}
+                                  >
+                                    <span className="text-white text-xs font-bold">{range.count}</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="w-16 text-right text-slate-400 text-sm">{range.percentage}%</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Recent Submissions */}
+                    {analytics.recentSubmissions && analytics.recentSubmissions.length > 0 && (
+                      <div className="bg-slate-950/50 border border-slate-700/50 rounded-lg p-6">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-lg font-bold text-white">Recent Submissions</h3>
+                          <Link
+                            href="/tutor/submissions"
+                            className="text-cyan-400 hover:text-cyan-300 text-sm transition-colors"
+                          >
+                            View all →
+                          </Link>
+                        </div>
+                        <div className="space-y-2">
+                          {analytics.recentSubmissions.map(sub => (
+                            <Link
+                              key={sub.attempt_id}
+                              href={`/tutor/submissions/${sub.attempt_id}`}
+                              className="flex items-center justify-between p-3 bg-slate-800/30 border border-slate-700/30 rounded-lg hover:border-cyan-500/30 transition-all"
+                            >
+                              <div className="flex-1 min-w-0">
+                                <div className="text-white text-sm font-medium truncate">{sub.quiz_title}</div>
+                                <div className="text-slate-500 text-xs">
+                                  {new Date(sub.submitted_at).toLocaleDateString()}
+                                </div>
+                              </div>
+                              <div className="text-right ml-4">
+                                <div className={`text-lg font-bold ${
+                                  sub.percentage >= 80 ? 'text-green-400' :
+                                  sub.percentage >= 60 ? 'text-blue-400' :
+                                  'text-orange-400'
+                                }`}>
+                                  {sub.percentage}%
+                                </div>
+                                <div className="text-xs text-slate-500">{sub.score}/{sub.total_marks}</div>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>

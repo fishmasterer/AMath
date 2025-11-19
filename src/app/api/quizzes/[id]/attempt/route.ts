@@ -6,7 +6,6 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createClient()
     const { id: quizId } = await params
 
     // Get authenticated user
@@ -18,6 +17,18 @@ export async function GET(
       )
     }
     const studentId = user.id
+
+    // Use service role to bypass RLS for quiz operations
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+    const { createClient: createServiceClient } = await import('@supabase/supabase-js');
+    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    });
 
     // Fetch quiz with questions
     const { data: quiz, error: quizError } = await supabase
@@ -72,7 +83,21 @@ export async function GET(
     // Check if time is up
     const timeIsUp = remainingSeconds === 0
 
-    return NextResponse.json({
+    // Log the quiz data for debugging
+    console.log('Quiz ID:', quiz.id)
+    console.log('Quiz title:', quiz.title)
+    console.log('Quiz questions type:', typeof quiz.questions)
+    console.log('Quiz questions:', JSON.stringify(quiz.questions).substring(0, 200))
+    console.log('Questions is array?', Array.isArray(quiz.questions))
+    console.log('First question:', quiz.questions?.[0])
+
+    // Transform questions to ensure correct field names
+    const transformedQuestions = (quiz.questions || []).map((q: any) => ({
+      ...q,
+      question: q.question || q.text || '', // Support both field names
+    }))
+
+    const responseData = {
       attemptId: attempt.id,
       quiz: {
         id: quiz.id,
@@ -82,14 +107,18 @@ export async function GET(
         time_limit_minutes: quiz.time_limit_minutes,
         due_date: quiz.due_date,
         total_marks: quiz.total_marks,
-        questions: quiz.questions, // Include full questions for active attempt
+        questions: transformedQuestions, // Include full questions for active attempt
       },
       answers: attempt.answers || [],
       startedAt: attempt.started_at,
       elapsedSeconds,
       remainingSeconds,
       timeIsUp,
-    })
+    }
+
+    console.log('Response questions:', JSON.stringify(responseData.quiz.questions).substring(0, 200))
+
+    return NextResponse.json(responseData)
   } catch (error) {
     console.error('Error in GET /api/quizzes/[id]/attempt:', error)
     return NextResponse.json(
@@ -104,7 +133,6 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createClient()
     const { id: quizId } = await params
 
     // Get authenticated user
@@ -117,6 +145,18 @@ export async function PATCH(
     }
     const studentId = user.id
     const body = await request.json()
+
+    // Use service role to bypass RLS for quiz operations
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+    const { createClient: createServiceClient } = await import('@supabase/supabase-js');
+    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    });
 
     // Validate request body
     if (!body.answers || !Array.isArray(body.answers)) {

@@ -4,7 +4,6 @@ import { QuizTopic, QuizDifficulty } from '@/lib/types'
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient()
     const { searchParams } = new URL(request.url)
 
     // Get authenticated user
@@ -16,6 +15,18 @@ export async function GET(request: NextRequest) {
       )
     }
     const studentId = user.id
+
+    // Use service role to bypass RLS for quiz operations
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+    const { createClient: createServiceClient } = await import('@supabase/supabase-js');
+    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    });
 
     // Parse query parameters
     const page = parseInt(searchParams.get('page') || '1')

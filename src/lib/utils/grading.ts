@@ -20,10 +20,13 @@ const gradeMCQQuestion = (
 ): Omit<QuestionResult, 'id' | 'attempt_id' | 'created_at'> => {
   const answer = Array.isArray(studentAnswer) ? studentAnswer[0] : studentAnswer;
   const isCorrect = answer === question.correctAnswer;
-  
+
+  // Support both 'question' and 'text' field names
+  const questionText = (question as any).question || (question as any).text || '';
+
   return {
     question_index: questionIndex,
-    question_text: question.question,
+    question_text: questionText,
     topic: topic as any,
     question_type: 'mcq',
     student_answer: answer || '',
@@ -45,14 +48,14 @@ const gradeMultiSelectQuestion = (
 ): Omit<QuestionResult, 'id' | 'attempt_id' | 'created_at'> => {
   const answers = Array.isArray(studentAnswer) ? studentAnswer : [];
   const correctAnswers = question.correctAnswers;
-  
+
   // Check if answers are exactly correct
   const sortedStudentAnswers = [...answers].sort();
   const sortedCorrectAnswers = [...correctAnswers].sort();
   const isExactMatch = JSON.stringify(sortedStudentAnswers) === JSON.stringify(sortedCorrectAnswers);
-  
+
   let marksAwarded = 0;
-  
+
   if (isExactMatch) {
     // Full marks for exact match
     marksAwarded = question.marks;
@@ -61,16 +64,19 @@ const gradeMultiSelectQuestion = (
     const correctSelected = answers.filter(ans => correctAnswers.includes(ans)).length;
     const incorrectSelected = answers.filter(ans => !correctAnswers.includes(ans)).length;
     const totalCorrect = correctAnswers.length;
-    
+
     // Partial credit formula: (correct - incorrect) / total * marks
     // Minimum 0 marks
     const ratio = Math.max(0, (correctSelected - incorrectSelected) / totalCorrect);
     marksAwarded = Math.floor(ratio * question.marks);
   }
-  
+
+  // Support both 'question' and 'text' field names
+  const questionText = (question as any).question || (question as any).text || '';
+
   return {
     question_index: questionIndex,
-    question_text: question.question,
+    question_text: questionText,
     topic: topic as any,
     question_type: 'multi_select',
     student_answer: answers,
@@ -89,23 +95,33 @@ export const gradeQuiz = (
   studentAnswers: StudentAnswer[],
   topic: string
 ): GradingResult => {
+  // Ensure questions is an array
+  if (!Array.isArray(questions)) {
+    console.error('Questions is not an array:', typeof questions, questions);
+    throw new Error(`Questions must be an array, got ${typeof questions}`);
+  }
+
+  if (questions.length === 0) {
+    throw new Error('Questions array is empty');
+  }
+
   const answerMap = new Map(
     studentAnswers.map(ans => [ans.question_id, ans.answer])
   );
-  
+
   const question_results = questions.map((question, index) => {
     const studentAnswer = answerMap.get(question.id);
-    
+
     if (question.type === 'mcq') {
       return gradeMCQQuestion(question, studentAnswer, index, topic);
     } else {
       return gradeMultiSelectQuestion(question, studentAnswer, index, topic);
     }
   });
-  
+
   const score = question_results.reduce((sum, result) => sum + result.marks_awarded, 0);
   const total_marks = question_results.reduce((sum, result) => sum + result.marks_possible, 0);
-  
+
   return {
     score,
     total_marks,

@@ -69,6 +69,19 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
       }
 
       const data: QuizAttemptData = await attemptRes.json()
+      console.log('Quiz attempt data:', data)
+      console.log('Questions:', data.quiz?.questions)
+      console.log('Questions type:', typeof data.quiz?.questions)
+      console.log('Questions is array?', Array.isArray(data.quiz?.questions))
+      console.log('Questions length:', data.quiz?.questions?.length)
+      console.log('First question:', data.quiz?.questions?.[0])
+
+      if (!data.quiz?.questions || !Array.isArray(data.quiz.questions) || data.quiz.questions.length === 0) {
+        setError('Quiz has no questions. Please contact support.')
+        setLoading(false)
+        return
+      }
+
       setAttemptData(data)
 
       // Load existing answers
@@ -78,10 +91,8 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
       })
       setAnswers(answerMap)
 
-      // If time is already up, auto-submit
-      if (data.timeIsUp) {
-        await handleSubmit(answerMap)
-      }
+      // Don't auto-submit if time is up - let user manually submit
+      // The timer will show 00:00 and they can still submit
 
       setLoading(false)
     } catch (err) {
@@ -206,6 +217,11 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
 
     setSubmitting(true)
     try {
+      // Calculate time taken
+      const startedAt = new Date(attemptData.startedAt)
+      const now = new Date()
+      const timeTakenSeconds = Math.floor((now.getTime() - startedAt.getTime()) / 1000)
+
       // Prepare answers array
       const answersArray: StudentAnswer[] = Array.from(answersToSubmit.entries()).map(
         ([question_id, answer]) => ({
@@ -222,6 +238,7 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
         body: JSON.stringify({
           attemptId: attemptData.attemptId,
           answers: answersArray,
+          time_taken_seconds: timeTakenSeconds,
         }),
       })
 
@@ -230,8 +247,13 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
         router.push(`/student/quizzes/${id}/results`)
       } else {
         const error = await response.json()
-        setError(error.error || 'Failed to submit quiz')
+        console.error('Submit error response:', error)
+        const errorMessage = error.details
+          ? `${error.error}: ${error.details}`
+          : error.error || 'Failed to submit quiz'
+        setError(errorMessage)
         setSubmitting(false)
+        setShowSubmitModal(false)
       }
     } catch (err) {
       console.error('Error submitting quiz:', err)
@@ -276,6 +298,31 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="min-h-screen bg-slate-950">
+      {/* Error banner */}
+      {error && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-[60] max-w-2xl w-full mx-4 animate-in slide-in-from-top duration-300">
+          <div className="bg-red-500/10 border-2 border-red-500 rounded-xl p-4 shadow-2xl backdrop-blur-xl">
+            <div className="flex items-start gap-3">
+              <svg className="w-6 h-6 text-red-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div className="flex-1">
+                <h3 className="text-red-400 font-semibold mb-1">Error</h3>
+                <p className="text-red-300 text-sm">{error}</p>
+              </div>
+              <button
+                onClick={() => setError(null)}
+                className="text-red-400 hover:text-red-300 transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header with timer */}
       <div className="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-xl border-b border-white/10">
         <div className="container mx-auto px-4 py-4">
@@ -338,9 +385,9 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
               <button
                 onClick={handlePreviousQuestion}
                 disabled={currentQuestionIndex === 0}
-                className="px-6 py-3 bg-white/5 border border-white/10 rounded-lg text-white font-medium hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-6 py-3 bg-white/5 border border-white/10 rounded-lg text-white font-medium hover:bg-white/10 hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center gap-2 shadow-lg hover:shadow-xl"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 transition-transform duration-200 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
                 Previous
@@ -349,20 +396,20 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
               {currentQuestionIndex === attemptData.quiz.questions.length - 1 ? (
                 <button
                   onClick={handleSubmitClick}
-                  className="px-8 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold transition-colors flex items-center gap-2"
+                  className="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg font-semibold transition-all duration-200 hover:scale-105 hover:shadow-2xl shadow-lg shadow-green-500/50 flex items-center gap-2"
                 >
                   Submit Quiz
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 transition-transform duration-200 group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </button>
               ) : (
                 <button
                   onClick={handleNextQuestion}
-                  className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-medium transition-all duration-200 hover:scale-105 hover:shadow-2xl shadow-lg shadow-blue-500/50 flex items-center gap-2"
                 >
                   Next
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </button>

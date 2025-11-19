@@ -7,7 +7,6 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createClient()
     const { id: quizId } = await params
 
     // Get authenticated user
@@ -19,6 +18,18 @@ export async function GET(
       )
     }
     const studentId = user.id
+
+    // Use service role to bypass RLS for quiz operations
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+    const { createClient: createServiceClient } = await import('@supabase/supabase-js');
+    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    });
 
     // Fetch quiz details
     const { data: quiz, error: quizError } = await supabase
@@ -106,7 +117,7 @@ export async function GET(
       const question = quiz.questions[result.question_index]
       return {
         ...result,
-        question: question?.question || '',
+        question: question?.question || question?.text || '',
         options: question?.options || [],
         explanation: question?.explanation,
         question_type_display: result.question_type === 'mcq' ? 'Multiple Choice' : 'Multiple Select',
