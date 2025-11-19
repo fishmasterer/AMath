@@ -4,18 +4,21 @@ import { QuizSession } from '@/lib/types'
 
 export async function GET(request: Request) {
   try {
-    const supabase = await createClient()
+    const studentId = '00000000-0000-0000-0000-000000000001'; // Single student setup
     const { searchParams } = new URL(request.url)
     const quizId = searchParams.get('quiz_id')
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401 }
-      )
-    }
+    // Use service role to bypass RLS
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+    const { createClient: createServiceClient } = await import('@supabase/supabase-js');
+    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    });
 
     if (!quizId) {
       return NextResponse.json(
@@ -29,7 +32,7 @@ export async function GET(request: Request) {
       .from('quiz_sessions')
       .select('*')
       .eq('quiz_id', quizId)
-      .eq('student_id', user.id)
+      .eq('student_id', studentId)
       .single()
 
     if (sessionError && sessionError.code !== 'PGRST116') {
@@ -57,17 +60,20 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient()
+    const studentId = '00000000-0000-0000-0000-000000000001'; // Single student setup
     const body = await request.json()
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401 }
-      )
-    }
+    // Use service role to bypass RLS
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+    const { createClient: createServiceClient } = await import('@supabase/supabase-js');
+    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    });
 
     const { quiz_id, current_question, time_remaining_seconds, session_data } = body
 
@@ -83,7 +89,7 @@ export async function POST(request: Request) {
       .from('quiz_sessions')
       .upsert({
         quiz_id,
-        student_id: user.id,
+        student_id: studentId,
         current_question: current_question ?? 0,
         time_remaining_seconds,
         session_data: session_data ?? {}
@@ -113,18 +119,21 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
-    const supabase = await createClient()
+    const studentId = '00000000-0000-0000-0000-000000000001'; // Single student setup
     const { searchParams } = new URL(request.url)
     const quizId = searchParams.get('quiz_id')
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401 }
-      )
-    }
+    // Use service role to bypass RLS
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+    const { createClient: createServiceClient } = await import('@supabase/supabase-js');
+    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    });
 
     if (!quizId) {
       return NextResponse.json(
@@ -138,7 +147,7 @@ export async function DELETE(request: Request) {
       .from('quiz_sessions')
       .delete()
       .eq('quiz_id', quizId)
-      .eq('student_id', user.id)
+      .eq('student_id', studentId)
 
     if (deleteError) {
       console.error('Error deleting quiz session:', deleteError)
