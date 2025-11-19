@@ -4,6 +4,7 @@ import React from 'react'
 import { Question, MCQQuestion, MultiSelectQuestion } from '@/lib/types'
 import 'katex/dist/katex.min.css'
 import { InlineMath, BlockMath } from 'react-katex'
+import { GraphRenderer, GraphConfig } from '@/components/GraphRenderer'
 
 interface QuestionRendererProps {
   question: Question
@@ -147,6 +148,17 @@ export default function QuestionRenderer({
           <div className="text-red-400">Question text not available</div>
         )}
       </div>
+
+      {/* Graph (if provided) */}
+      {(question as any).graph && (
+        <div className="mb-6">
+          <GraphRenderer
+            config={(question as any).graph}
+            height={350}
+            className="animate-in fade-in duration-500"
+          />
+        </div>
+      )}
 
       {/* Options */}
       <div className="space-y-3">
