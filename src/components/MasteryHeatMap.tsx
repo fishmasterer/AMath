@@ -3,7 +3,7 @@
 import { TOPIC_NAMES, QuizTopic } from '@/lib/types'
 
 interface TopicMasteryData {
-  topic: QuizTopic
+  topic: string
   topic_name: string
   accuracy: number
   mastery_level: 'not_started' | 'beginner' | 'developing' | 'proficient' | 'mastered'
