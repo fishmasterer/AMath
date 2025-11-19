@@ -107,8 +107,13 @@ export async function GET(request: NextRequest) {
       latest_mistake: mistakes[0].created_at,
     }))
 
-    // Sort by mistake count descending
-    groupedMistakes.sort((a, b) => b.mistake_count - a.mistake_count)
+    // Sort by topic order: A1-A6, G1-G3, C1
+    const topicOrder: QuizTopic[] = ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'G1', 'G2', 'G3', 'C1']
+    groupedMistakes.sort((a, b) => {
+      const indexA = topicOrder.indexOf(a.topic as QuizTopic)
+      const indexB = topicOrder.indexOf(b.topic as QuizTopic)
+      return indexA - indexB
+    })
 
     // Calculate overall stats
     const totalMistakes = filteredMistakes.length
