@@ -69,17 +69,26 @@ export async function POST(
       );
     }
     
-    // Grade the quiz
+    // Transform questions to ensure correct format
+    const transformedQuestions = Array.isArray(quiz.questions)
+      ? quiz.questions.map((q: any) => ({
+          ...q,
+          question: q.question || q.text || '',
+        }))
+      : [];
+
     console.log('Starting grading with:', {
-      questionsCount: quiz.questions?.length,
+      questionsCount: transformedQuestions.length,
       answersCount: answers.length,
       topic: quiz.topic,
-      firstQuestion: quiz.questions?.[0]
+      questionsType: typeof quiz.questions,
+      questionsIsArray: Array.isArray(quiz.questions),
+      firstQuestion: transformedQuestions[0]
     });
 
     let gradingResult;
     try {
-      gradingResult = gradeQuiz(quiz.questions, answers, quiz.topic);
+      gradingResult = gradeQuiz(transformedQuestions, answers, quiz.topic);
       console.log('Grading result:', JSON.stringify(gradingResult, null, 2));
     } catch (gradingError) {
       console.error('Grading failed:', gradingError);

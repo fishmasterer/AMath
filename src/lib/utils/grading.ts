@@ -95,23 +95,33 @@ export const gradeQuiz = (
   studentAnswers: StudentAnswer[],
   topic: string
 ): GradingResult => {
+  // Ensure questions is an array
+  if (!Array.isArray(questions)) {
+    console.error('Questions is not an array:', typeof questions, questions);
+    throw new Error(`Questions must be an array, got ${typeof questions}`);
+  }
+
+  if (questions.length === 0) {
+    throw new Error('Questions array is empty');
+  }
+
   const answerMap = new Map(
     studentAnswers.map(ans => [ans.question_id, ans.answer])
   );
-  
+
   const question_results = questions.map((question, index) => {
     const studentAnswer = answerMap.get(question.id);
-    
+
     if (question.type === 'mcq') {
       return gradeMCQQuestion(question, studentAnswer, index, topic);
     } else {
       return gradeMultiSelectQuestion(question, studentAnswer, index, topic);
     }
   });
-  
+
   const score = question_results.reduce((sum, result) => sum + result.marks_awarded, 0);
   const total_marks = question_results.reduce((sum, result) => sum + result.marks_possible, 0);
-  
+
   return {
     score,
     total_marks,
