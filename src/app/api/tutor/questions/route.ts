@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     const topicFilter = searchParams.get('topic') as QuizTopic | null
     const typeFilter = searchParams.get('type') // 'exam' or 'practice'
 
-    // Build query
+    // Build query - get all questions (including textbook questions with NULL tutor_id)
     let query = supabase
       .from('question_bank')
       .select('*')
