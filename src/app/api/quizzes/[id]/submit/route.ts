@@ -70,8 +70,24 @@ export async function POST(
     }
     
     // Transform questions to ensure correct format
-    const transformedQuestions = Array.isArray(quiz.questions)
-      ? quiz.questions.map((q: any) => ({
+    console.log('Raw quiz.questions type:', typeof quiz.questions);
+    console.log('Raw quiz.questions value:', JSON.stringify(quiz.questions).substring(0, 300));
+    console.log('Is quiz.questions an array?', Array.isArray(quiz.questions));
+
+    // Parse questions if it's a string
+    let questionsData = quiz.questions;
+    if (typeof questionsData === 'string') {
+      console.log('Questions is a string, parsing...');
+      try {
+        questionsData = JSON.parse(questionsData);
+      } catch (parseError) {
+        console.error('Failed to parse questions JSON:', parseError);
+        throw new Error('Invalid questions data format');
+      }
+    }
+
+    const transformedQuestions = Array.isArray(questionsData)
+      ? questionsData.map((q: any) => ({
           ...q,
           question: q.question || q.text || '',
         }))
@@ -81,10 +97,15 @@ export async function POST(
       questionsCount: transformedQuestions.length,
       answersCount: answers.length,
       topic: quiz.topic,
-      questionsType: typeof quiz.questions,
-      questionsIsArray: Array.isArray(quiz.questions),
+      questionsType: typeof questionsData,
+      questionsIsArray: Array.isArray(questionsData),
+      transformedQuestionsIsArray: Array.isArray(transformedQuestions),
       firstQuestion: transformedQuestions[0]
     });
+
+    if (!Array.isArray(transformedQuestions) || transformedQuestions.length === 0) {
+      throw new Error(`Questions must be a non-empty array. Got: ${typeof transformedQuestions}, length: ${transformedQuestions?.length || 0}`);
+    }
 
     let gradingResult;
     try {
