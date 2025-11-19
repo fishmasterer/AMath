@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { LineChart, Line, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { TOPIC_NAMES } from '@/lib/types'
+import { MasteryHeatMap } from '@/components/MasteryHeatMap'
 
 interface AnalyticsData {
   hasData: boolean
@@ -339,6 +340,12 @@ export default function ProgressPage() {
       {/* Topic Mastery */}
       {topicMastery?.hasData && (
         <>
+          {/* Mastery Heat Map */}
+          <div className="bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-6">
+            <h2 className="text-xl font-bold text-white mb-6">Topic Mastery Heat Map</h2>
+            <MasteryHeatMap topicMastery={topicMastery.topicMastery} />
+          </div>
+
           {/* Topic Overview */}
           <div className="bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-6">
             <h2 className="text-xl font-bold text-white mb-6">Topic Mastery Overview</h2>

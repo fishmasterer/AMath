@@ -33,11 +33,6 @@ export async function GET(
           total_marks,
           time_limit_minutes,
           questions
-        ),
-        students (
-          id,
-          name,
-          email
         )
       `)
       .eq('id', attemptId)
@@ -63,7 +58,6 @@ export async function GET(
     }
 
     const quiz = Array.isArray(attempt.quizzes) ? attempt.quizzes[0] : attempt.quizzes
-    const student = Array.isArray(attempt.students) ? attempt.students[0] : attempt.students
 
     const percentage = attempt.completed && attempt.total_marks
       ? Math.round((attempt.score! / attempt.total_marks!) * 100)
@@ -117,9 +111,9 @@ export async function GET(
           time_limit_minutes: quiz?.time_limit_minutes,
         },
         student: {
-          id: student?.id,
-          name: student?.name || 'Test Student',
-          email: student?.email,
+          id: attempt.student_id,
+          name: 'Test Student', // Single student setup
+          email: null,
         },
         started_at: attempt.started_at,
         submitted_at: attempt.submitted_at,

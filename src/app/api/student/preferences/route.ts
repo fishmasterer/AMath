@@ -4,22 +4,25 @@ import { UserPreferences } from '@/lib/types'
 
 export async function GET() {
   try {
-    const supabase = await createClient()
+    const studentId = '00000000-0000-0000-0000-000000000001'; // Single student setup
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401 }
-      )
-    }
+    // Use service role to bypass RLS
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+    const { createClient: createServiceClient } = await import('@supabase/supabase-js');
+    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    });
 
     // Fetch preferences from Supabase
     const { data: preferences, error: preferencesError } = await supabase
       .from('user_preferences')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', studentId)
       .single()
 
     // If no preferences exist, create default ones
@@ -27,7 +30,7 @@ export async function GET() {
       const { data: newPreferences, error: createError } = await supabase
         .from('user_preferences')
         .insert({
-          user_id: user.id,
+          user_id: studentId,
           show_latex: true,
           show_explanations: true,
           auto_save: true,
@@ -68,17 +71,20 @@ export async function GET() {
 
 export async function PUT(request: Request) {
   try {
-    const supabase = await createClient()
+    const studentId = '00000000-0000-0000-0000-000000000001'; // Single student setup
     const body = await request.json()
 
-    // Get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401 }
-      )
-    }
+    // Use service role to bypass RLS
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+    const { createClient: createServiceClient } = await import('@supabase/supabase-js');
+    const supabase = createServiceClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    });
 
     // Prepare update data
     const updateData: Partial<UserPreferences> = {}
@@ -92,7 +98,7 @@ export async function PUT(request: Request) {
     const { data: updatedPreferences, error: updateError } = await supabase
       .from('user_preferences')
       .upsert({
-        user_id: user.id,
+        user_id: studentId,
         ...updateData
       }, {
         onConflict: 'user_id'
