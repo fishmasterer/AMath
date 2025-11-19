@@ -21,6 +21,12 @@ interface Question {
   created_at: string
 }
 
+interface Student {
+  id: string
+  full_name: string
+  email: string
+}
+
 export default function QuestionBankPage() {
   const [questions, setQuestions] = useState<Question[]>([])
   const [loading, setLoading] = useState(true)
@@ -31,11 +37,33 @@ export default function QuestionBankPage() {
     search: ''
   })
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [showViewModal, setShowViewModal] = useState(false)
+  const [showAssignModal, setShowAssignModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null)
+  const [students, setStudents] = useState<Student[]>([])
+  const [selectedStudents, setSelectedStudents] = useState<string[]>([])
+  const [dueDate, setDueDate] = useState('')
+  const [assigning, setAssigning] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [total, setTotal] = useState(0)
 
   useEffect(() => {
     fetchQuestions()
+    fetchStudents()
   }, [filters])
+
+  const fetchStudents = async () => {
+    try {
+      const res = await fetch('/api/tutor/students')
+      if (res.ok) {
+        const data = await res.json()
+        setStudents(data.students || [])
+      }
+    } catch (error) {
+      console.error('Error fetching students:', error)
+    }
+  }
 
   const fetchQuestions = async () => {
     try {
@@ -89,6 +117,90 @@ export default function QuestionBankPage() {
       default:
         return '❓'
     }
+  }
+
+  const handleViewQuestion = (question: Question) => {
+    setSelectedQuestion(question)
+    setShowViewModal(true)
+  }
+
+  const handleAssignQuestion = (question: Question) => {
+    setSelectedQuestion(question)
+    setSelectedStudents([])
+    setDueDate('')
+    setShowAssignModal(true)
+  }
+
+  const handleDeleteQuestion = (question: Question) => {
+    setSelectedQuestion(question)
+    setShowDeleteModal(true)
+  }
+
+  const assignHomework = async () => {
+    if (!selectedQuestion || selectedStudents.length === 0) return
+
+    setAssigning(true)
+    try {
+      for (const studentId of selectedStudents) {
+        const res = await fetch('/api/tutor/assign-homework', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            student_id: studentId,
+            question_ids: [selectedQuestion.id],
+            due_date: dueDate || null
+          })
+        })
+
+        if (!res.ok) {
+          console.error('Failed to assign to student:', studentId)
+        }
+      }
+
+      alert(`Successfully assigned to ${selectedStudents.length} student(s)!`)
+      setShowAssignModal(false)
+      setSelectedQuestion(null)
+      setSelectedStudents([])
+      setDueDate('')
+    } catch (error) {
+      console.error('Error assigning homework:', error)
+      alert('Failed to assign homework. Please try again.')
+    } finally {
+      setAssigning(false)
+    }
+  }
+
+  const deleteQuestion = async () => {
+    if (!selectedQuestion) return
+
+    setDeleting(true)
+    try {
+      const res = await fetch(`/api/tutor/question-bank/${selectedQuestion.id}`, {
+        method: 'DELETE'
+      })
+
+      if (res.ok) {
+        alert('Question deleted successfully!')
+        setShowDeleteModal(false)
+        setSelectedQuestion(null)
+        fetchQuestions() // Refresh list
+      } else {
+        alert('Failed to delete question.')
+      }
+    } catch (error) {
+      console.error('Error deleting question:', error)
+      alert('Failed to delete question. Please try again.')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  const toggleStudentSelection = (studentId: string) => {
+    setSelectedStudents(prev =>
+      prev.includes(studentId)
+        ? prev.filter(id => id !== studentId)
+        : [...prev, studentId]
+    )
   }
 
   if (loading) {
@@ -366,18 +478,30 @@ export default function QuestionBankPage() {
                   </div>
 
                   <div className="flex gap-2">
-                    <button className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg transition-colors">
+                    <button
+                      onClick={() => handleViewQuestion(question)}
+                      className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg transition-colors"
+                      title="View Question"
+                    >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                       </svg>
                     </button>
-                    <button className="p-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-lg transition-colors">
+                    <button
+                      onClick={() => handleAssignQuestion(question)}
+                      className="p-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-lg transition-colors"
+                      title="Assign to Students"
+                    >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                       </svg>
                     </button>
-                    <button className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors">
+                    <button
+                      onClick={() => handleDeleteQuestion(question)}
+                      className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors"
+                      title="Delete Question"
+                    >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
@@ -389,6 +513,232 @@ export default function QuestionBankPage() {
           </div>
         )}
       </div>
+
+      {/* View Question Modal */}
+      {showViewModal && selectedQuestion && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 rounded-xl border border-white/20 p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-white">View Question</h2>
+              <button
+                onClick={() => setShowViewModal(false)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Metadata */}
+              <div className="flex flex-wrap gap-3">
+                {selectedQuestion.question_code && (
+                  <span className="px-3 py-1 bg-green-500/20 text-green-400 rounded-lg text-sm font-mono font-bold border border-green-500/50">
+                    {selectedQuestion.question_code}
+                  </span>
+                )}
+                <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-lg text-sm font-mono">
+                  {selectedQuestion.topic} - {TOPIC_NAMES[selectedQuestion.topic as QuizTopic]}
+                </span>
+                <span className={`px-3 py-1 rounded-lg text-sm font-semibold border ${getDifficultyColor(selectedQuestion.difficulty)}`}>
+                  {selectedQuestion.difficulty.replace('_', ' ')}
+                </span>
+                <span className="px-3 py-1 bg-gray-500/20 text-gray-400 rounded-lg text-sm border border-gray-500/50">
+                  {selectedQuestion.marks} marks
+                </span>
+              </div>
+
+              {/* Question Text */}
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-2">Question:</h3>
+                <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+                  <p className="text-white whitespace-pre-wrap">{selectedQuestion.question_text}</p>
+                </div>
+              </div>
+
+              {/* Source */}
+              {selectedQuestion.source_reference && (
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Source:</h3>
+                  <p className="text-gray-400">{selectedQuestion.source_reference}</p>
+                </div>
+              )}
+
+              {/* Close Button */}
+              <div className="flex justify-end gap-3 pt-4">
+                <button
+                  onClick={() => setShowViewModal(false)}
+                  className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Assign Homework Modal */}
+      {showAssignModal && selectedQuestion && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 rounded-xl border border-white/20 p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-white">Assign Homework</h2>
+              <button
+                onClick={() => setShowAssignModal(false)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {/* Question Preview */}
+              <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+                <div className="flex items-center gap-2 mb-2">
+                  {selectedQuestion.question_code && (
+                    <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs font-mono font-bold border border-green-500/50">
+                      {selectedQuestion.question_code}
+                    </span>
+                  )}
+                  <span className="text-gray-400 text-sm">{selectedQuestion.topic}</span>
+                  <span className="text-gray-400 text-sm">• {selectedQuestion.marks} marks</span>
+                </div>
+                <p className="text-white line-clamp-2">{selectedQuestion.question_text}</p>
+              </div>
+
+              {/* Due Date */}
+              <div>
+                <label className="block text-gray-400 text-sm mb-2">Due Date (Optional)</label>
+                <input
+                  type="date"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              {/* Student Selection */}
+              <div>
+                <label className="block text-gray-400 text-sm mb-2">
+                  Select Students ({selectedStudents.length} selected)
+                </label>
+                <div className="bg-white/5 border border-white/10 rounded-lg max-h-60 overflow-y-auto">
+                  {students.length === 0 ? (
+                    <div className="p-4 text-center text-gray-400">
+                      No students found. Make sure students are registered.
+                    </div>
+                  ) : (
+                    students.map((student) => (
+                      <label
+                        key={student.id}
+                        className="flex items-center gap-3 p-3 hover:bg-white/5 cursor-pointer border-b border-white/5 last:border-0"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedStudents.includes(student.id)}
+                          onChange={() => toggleStudentSelection(student.id)}
+                          className="w-4 h-4 rounded border-gray-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-gray-900"
+                        />
+                        <div className="flex-1">
+                          <div className="text-white font-medium">{student.full_name}</div>
+                          <div className="text-gray-400 text-sm">{student.email}</div>
+                        </div>
+                      </label>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-3 pt-4">
+                <button
+                  onClick={() => setShowAssignModal(false)}
+                  className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={assignHomework}
+                  disabled={assigning || selectedStudents.length === 0}
+                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {assigning ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                      Assigning...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                      </svg>
+                      Assign to {selectedStudents.length} Student{selectedStudents.length !== 1 ? 's' : ''}
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && selectedQuestion && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 rounded-xl border border-red-500/30 p-8 max-w-md w-full">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 bg-red-500/20 rounded-full flex items-center justify-center">
+                <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">Delete Question</h2>
+                <p className="text-gray-400 text-sm">This action cannot be undone</p>
+              </div>
+            </div>
+
+            <div className="bg-white/5 p-4 rounded-lg border border-white/10 mb-6">
+              {selectedQuestion.question_code && (
+                <div className="text-green-400 font-mono text-sm mb-1">{selectedQuestion.question_code}</div>
+              )}
+              <p className="text-white line-clamp-2">{selectedQuestion.question_text}</p>
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={deleteQuestion}
+                disabled={deleting}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {deleting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Delete Question
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Create Modal Placeholder */}
       {showCreateModal && (
