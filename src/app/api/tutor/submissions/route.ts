@@ -32,11 +32,6 @@ export async function GET(request: NextRequest) {
           difficulty,
           total_marks,
           time_limit_minutes
-        ),
-        students (
-          id,
-          name,
-          email
         )
       `)
       .order('submitted_at', { ascending: false })
@@ -63,7 +58,6 @@ export async function GET(request: NextRequest) {
     // Format the results
     const submissions = (attempts || []).map(attempt => {
       const quiz = Array.isArray(attempt.quizzes) ? attempt.quizzes[0] : attempt.quizzes
-      const student = Array.isArray(attempt.students) ? attempt.students[0] : attempt.students
 
       const percentage = attempt.completed && attempt.total_marks
         ? Math.round((attempt.score! / attempt.total_marks!) * 100)
@@ -81,8 +75,8 @@ export async function GET(request: NextRequest) {
         quiz_difficulty: quiz?.difficulty,
         quiz_total_marks: quiz?.total_marks,
         student_id: attempt.student_id,
-        student_name: student?.name || 'Test Student',
-        student_email: student?.email,
+        student_name: 'Test Student', // Single student setup
+        student_email: null,
         started_at: attempt.started_at,
         submitted_at: attempt.submitted_at,
         completed: attempt.completed,
