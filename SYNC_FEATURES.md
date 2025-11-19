@@ -6,6 +6,45 @@ This document describes the cross-device synchronization features implemented in
 
 The sync system ensures that students can seamlessly switch between devices (laptop, tablet, phone) while maintaining their study progress, preferences, and quiz state.
 
+## 🛡️ Bulletproof Sync Features
+
+The sync implementation includes enterprise-grade reliability:
+
+### Automatic Retry with Exponential Backoff
+- **Network failures** are automatically retried up to 3 times
+- **Exponential backoff**: 1s → 2s → 4s delays between retries
+- **Smart retry**: Only retries on 5xx errors and 429 (rate limit), not client errors
+
+### Race Condition Prevention
+- **Request deduplication**: Prevents concurrent identical requests
+- **In-flight tracking**: Only one fetch/save operation at a time
+- **State comparison**: Skips saves if data hasn't actually changed
+
+### Infinite Loop Prevention
+- **Session restoration runs ONCE** after initial load
+- **Change detection**: Only syncs when data actually changes
+- **Reference tracking**: Uses refs to prevent dependency loops
+
+### Debouncing & Batching
+- **Preference updates** debounced by 500ms
+- **Quiz session updates** batched every 10 seconds
+- **Pending updates merged** to avoid data loss
+
+### Optimistic UI Updates
+- **Instant feedback** for user actions
+- **Automatic rollback** on error
+- **Backup state** for error recovery
+
+### Keepalive on Unmount
+- **Pending changes flushed** when user closes tab
+- **Keepalive flag** ensures request completes
+- **No data loss** on navigation
+
+### User Preference Integration
+- **Auto-save respects user preferences**
+- **Visual indicators** when auto-save is disabled
+- **Graceful degradation** if preferences unavailable
+
 ## Synced Data
 
 ### 1. User Preferences ✅

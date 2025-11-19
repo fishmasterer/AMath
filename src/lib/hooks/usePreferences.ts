@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { UserPreferences } from '@/lib/types'
 
 // Default preferences
@@ -12,19 +12,81 @@ const DEFAULT_PREFERENCES: Omit<UserPreferences, 'user_id' | 'created_at' | 'upd
   preferences: {}
 }
 
+// Retry with exponential backoff
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  maxRetries = 3
+): Promise<Response> {
+  let lastError: Error | null = null
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await fetch(url, options)
+
+      // Don't retry on client errors (4xx) except 429 (rate limit)
+      if (!response.ok && response.status >= 400 && response.status < 500 && response.status !== 429) {
+        return response
+      }
+
+      if (response.ok) {
+        return response
+      }
+
+      // Retry on 5xx or 429
+      if (attempt < maxRetries) {
+        const delay = Math.min(1000 * Math.pow(2, attempt), 10000) // Max 10s
+        await new Promise(resolve => setTimeout(resolve, delay))
+        continue
+      }
+
+      return response
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error('Network error')
+
+      if (attempt < maxRetries) {
+        const delay = Math.min(1000 * Math.pow(2, attempt), 10000)
+        await new Promise(resolve => setTimeout(resolve, delay))
+        continue
+      }
+    }
+  }
+
+  throw lastError || new Error('Request failed after retries')
+}
+
 export function usePreferences() {
   const [preferences, setPreferences] = useState<UserPreferences | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [syncing, setSyncing] = useState(false)
 
+  // Track in-flight requests to prevent duplicates
+  const fetchingRef = useRef(false)
+  const updatingRef = useRef(false)
+
+  // Store backup for rollback
+  const backupRef = useRef<UserPreferences | null>(null)
+
+  // Debounce timer
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Pending updates queue
+  const pendingUpdatesRef = useRef<Partial<Omit<UserPreferences, 'user_id' | 'created_at' | 'updated_at'>> | null>(null)
+
   // Fetch preferences from API
   const fetchPreferences = useCallback(async () => {
+    // Prevent concurrent fetches
+    if (fetchingRef.current) {
+      return
+    }
+
     try {
+      fetchingRef.current = true
       setLoading(true)
       setError(null)
 
-      const response = await fetch('/api/student/preferences')
+      const response = await fetchWithRetry('/api/student/preferences', {})
 
       if (!response.ok) {
         if (response.status === 401) {
@@ -37,50 +99,97 @@ export function usePreferences() {
 
       const data = await response.json()
       setPreferences(data)
+      backupRef.current = data
     } catch (err) {
       console.error('Error fetching preferences:', err)
       setError(err instanceof Error ? err.message : 'Failed to fetch preferences')
     } finally {
       setLoading(false)
+      fetchingRef.current = false
     }
   }, [])
 
-  // Update preferences (with optimistic UI update)
-  const updatePreferences = useCallback(async (updates: Partial<Omit<UserPreferences, 'user_id' | 'created_at' | 'updated_at'>>) => {
-    try {
-      setSyncing(true)
-      setError(null)
+  // Update preferences (with optimistic UI update and debouncing)
+  const updatePreferences = useCallback(async (
+    updates: Partial<Omit<UserPreferences, 'user_id' | 'created_at' | 'updated_at'>>,
+    immediate = false
+  ) => {
+    // Clear any pending debounce
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
+      debounceTimerRef.current = null
+    }
 
-      // Optimistic update
-      setPreferences(prev => prev ? { ...prev, ...updates } : null)
+    // Merge with pending updates
+    pendingUpdatesRef.current = {
+      ...pendingUpdatesRef.current,
+      ...updates
+    }
 
-      const response = await fetch('/api/student/preferences', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updates)
-      })
+    // Optimistic update
+    setPreferences(prev => {
+      if (!prev) return null
+      backupRef.current = prev // Store backup for rollback
+      return { ...prev, ...updates }
+    })
 
-      if (!response.ok) {
-        throw new Error('Failed to update preferences')
+    // Debounce the actual API call unless immediate
+    const performUpdate = async () => {
+      if (updatingRef.current || !pendingUpdatesRef.current) {
+        return
       }
 
-      const data = await response.json()
-      setPreferences(data)
+      const updatesToSend = { ...pendingUpdatesRef.current }
+      pendingUpdatesRef.current = null
 
-      return data
-    } catch (err) {
-      console.error('Error updating preferences:', err)
-      setError(err instanceof Error ? err.message : 'Failed to update preferences')
+      try {
+        updatingRef.current = true
+        setSyncing(true)
+        setError(null)
 
-      // Revert optimistic update on error
-      await fetchPreferences()
-      throw err
-    } finally {
-      setSyncing(false)
+        const response = await fetchWithRetry('/api/student/preferences', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(updatesToSend)
+        })
+
+        if (!response.ok) {
+          throw new Error('Failed to update preferences')
+        }
+
+        const data = await response.json()
+        setPreferences(data)
+        backupRef.current = data
+
+        return data
+      } catch (err) {
+        console.error('Error updating preferences:', err)
+        setError(err instanceof Error ? err.message : 'Failed to update preferences')
+
+        // Revert to backup
+        if (backupRef.current) {
+          setPreferences(backupRef.current)
+        }
+        throw err
+      } finally {
+        setSyncing(false)
+        updatingRef.current = false
+      }
     }
-  }, [fetchPreferences])
+
+    if (immediate) {
+      return performUpdate()
+    } else {
+      // Debounce: wait 500ms before sending update
+      return new Promise((resolve, reject) => {
+        debounceTimerRef.current = setTimeout(() => {
+          performUpdate().then(resolve).catch(reject)
+        }, 500)
+      })
+    }
+  }, [])
 
   // Individual preference updaters for convenience
   const setShowLatex = useCallback((value: boolean) => {
@@ -103,6 +212,27 @@ export function usePreferences() {
   useEffect(() => {
     fetchPreferences()
   }, [fetchPreferences])
+
+  // Cleanup debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current)
+      }
+
+      // Flush any pending updates with keepalive
+      if (pendingUpdatesRef.current) {
+        fetch('/api/student/preferences', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(pendingUpdatesRef.current),
+          keepalive: true
+        }).catch(err => console.error('Failed to flush preferences on unmount:', err))
+      }
+    }
+  }, [])
 
   return {
     preferences: preferences || { ...DEFAULT_PREFERENCES, user_id: '', created_at: '', updated_at: '' },
