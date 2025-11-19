@@ -331,6 +331,489 @@ If $y = b^x$, then $x = \\log_b(y)$
       },
     ],
   },
+  {
+    topic: 'A2',
+    title: 'Equations and Inequalities',
+    sections: [
+      {
+        title: 'Simultaneous Equations',
+        content: `Solving systems of equations where two or more equations must be satisfied simultaneously.
+
+**Methods:**
+1. **Substitution:** Solve one equation for a variable, substitute into the other
+2. **Elimination:** Add or subtract equations to eliminate a variable
+3. **Graphical:** Find intersection point of the lines
+
+**Example:** Solve $2x + y = 7$ and $x - y = 2$
+
+Adding equations: $3x = 9$, so $x = 3$
+Substituting: $3 - y = 2$, so $y = 1$
+**Solution:** $(3, 1)$`,
+        graphs: [
+          {
+            title: 'Linear System Example',
+            config: {
+              expressions: [
+                { latex: 'y = -2x + 7', color: '#2563eb', lineWidth: 3, label: '2x + y = 7' },
+                { latex: 'y = x - 2', color: '#dc2626', lineWidth: 3, label: 'x - y = 2' },
+                { latex: '(3, 1)', color: '#10b981', points: true, label: 'Solution' },
+              ],
+              bounds: { left: -2, right: 6, bottom: -4, top: 8 },
+            },
+            description: 'Lines intersect at (3, 1)',
+          },
+        ],
+        keyPoints: [
+          'Intersection point satisfies both equations',
+          'Parallel lines mean no solution',
+          'Identical lines mean infinite solutions',
+          'Always verify your solution by substituting back',
+        ],
+      },
+      {
+        title: 'Quadratic Inequalities',
+        content: `Solving inequalities involving quadratic expressions.
+
+**Steps:**
+1. Rearrange to standard form: $ax^2 + bx + c > 0$ (or $<$, $\\geq$, $\\leq$)
+2. Find roots by factoring or quadratic formula
+3. Sketch the parabola
+4. Determine solution region based on inequality sign
+
+**Example:** Solve $x^2 - 5x + 6 < 0$
+
+Factoring: $(x - 2)(x - 3) < 0$
+Roots: $x = 2$ and $x = 3$
+Since parabola opens upward, negative region is between roots.
+**Solution:** $2 < x < 3$`,
+        graphs: [
+          {
+            title: 'Quadratic Inequality',
+            config: {
+              expressions: [
+                { latex: 'y = x^2 - 5x + 6', color: '#2563eb', lineWidth: 3 },
+                { latex: 'y = 0', color: '#ef4444', lineStyle: 'DASHED' },
+                { latex: 'x = 2', color: '#10b981', lineStyle: 'DOTTED' },
+                { latex: 'x = 3', color: '#10b981', lineStyle: 'DOTTED' },
+              ],
+              bounds: { left: 0, right: 5, bottom: -2, top: 4 },
+            },
+            description: 'Solution region: 2 < x < 3 where y < 0',
+          },
+        ],
+        keyPoints: [
+          'Find roots first (quadratic formula or factoring)',
+          'Sketch parabola to visualize solution regions',
+          'Test a point in each region to confirm signs',
+          'Use open circles (< , >) or closed circles (≤ , ≥)',
+        ],
+        examples: [
+          {
+            question: 'Solve $-x^2 + 4x - 3 \\geq 0$',
+            solution: `$-x^2 + 4x - 3 \\geq 0$
+Multiply by -1 (flip inequality): $x^2 - 4x + 3 \\leq 0$
+Factor: $(x - 1)(x - 3) \\leq 0$
+Roots: $x = 1$ and $x = 3$
+
+Original parabola opens downward (coefficient is negative).
+Non-negative region: between roots.
+
+**Solution:** $1 \\leq x \\leq 3$`,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    topic: 'A3',
+    title: 'Surds',
+    sections: [
+      {
+        title: 'Simplifying Surds',
+        content: `A surd is an irrational number involving roots that cannot be simplified to a rational number.
+
+**Simplification Rules:**
+- $\\sqrt{ab} = \\sqrt{a} \\times \\sqrt{b}$
+- $\\sqrt{\\frac{a}{b}} = \\frac{\\sqrt{a}}{\\sqrt{b}}$
+- $\\sqrt{a^2b} = a\\sqrt{b}$ (where $a \\geq 0$)
+
+**Example:** Simplify $\\sqrt{72}$
+$\\sqrt{72} = \\sqrt{36 \\times 2} = \\sqrt{36} \\times \\sqrt{2} = 6\\sqrt{2}$`,
+        keyPoints: [
+          'Look for perfect square factors',
+          'Simplify by extracting squares from under the root',
+          'Cannot add/subtract surds with different roots',
+          'Like surds: √2 + 3√2 = 4√2',
+        ],
+        examples: [
+          {
+            question: 'Simplify $\\sqrt{50} + \\sqrt{32}$',
+            solution: `$\\sqrt{50} + \\sqrt{32}$
+$= \\sqrt{25 \\times 2} + \\sqrt{16 \\times 2}$
+$= 5\\sqrt{2} + 4\\sqrt{2}$
+$= 9\\sqrt{2}$`,
+          },
+        ],
+      },
+      {
+        title: 'Rationalizing the Denominator',
+        content: `Removing surds from denominators by multiplying by the conjugate.
+
+**For single surd:** Multiply top and bottom by the surd
+$\\frac{1}{\\sqrt{a}} = \\frac{1}{\\sqrt{a}} \\times \\frac{\\sqrt{a}}{\\sqrt{a}} = \\frac{\\sqrt{a}}{a}$
+
+**For binomial:** Use conjugate $(a + b)(a - b) = a^2 - b^2$
+$\\frac{1}{a + \\sqrt{b}} \\times \\frac{a - \\sqrt{b}}{a - \\sqrt{b}} = \\frac{a - \\sqrt{b}}{a^2 - b}$`,
+        keyPoints: [
+          'Conjugate of (a + √b) is (a - √b)',
+          'Product of conjugates eliminates the surd',
+          'Always simplify the result',
+          'Rationalizing makes fractions easier to work with',
+        ],
+        examples: [
+          {
+            question: 'Rationalize $\\frac{6}{2 + \\sqrt{3}}$',
+            solution: `$\\frac{6}{2 + \\sqrt{3}} \\times \\frac{2 - \\sqrt{3}}{2 - \\sqrt{3}}$
+
+$= \\frac{6(2 - \\sqrt{3})}{(2 + \\sqrt{3})(2 - \\sqrt{3})}$
+
+$= \\frac{12 - 6\\sqrt{3}}{4 - 3}$
+
+$= \\frac{12 - 6\\sqrt{3}}{1}$
+
+$= 12 - 6\\sqrt{3}$`,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    topic: 'A4',
+    title: 'Polynomials and Partial Fractions',
+    sections: [
+      {
+        title: 'Factor Theorem & Remainder Theorem',
+        content: `**Remainder Theorem:** When polynomial $f(x)$ is divided by $(x - a)$, remainder is $f(a)$
+
+**Factor Theorem:** $(x - a)$ is a factor of $f(x)$ if and only if $f(a) = 0$
+
+**Example:** Is $(x - 2)$ a factor of $f(x) = x^3 - 5x^2 + 8x - 4$?
+
+Check: $f(2) = 2^3 - 5(2)^2 + 8(2) - 4 = 8 - 20 + 16 - 4 = 0$
+
+Yes! $(x - 2)$ is a factor because $f(2) = 0$.`,
+        keyPoints: [
+          'Factor theorem finds factors quickly',
+          'Remainder theorem finds remainders without division',
+          'Try small integers (±1, ±2, ±3) as potential roots',
+          'Once you find one factor, use polynomial division for others',
+        ],
+        examples: [
+          {
+            question: 'Find the remainder when $x^3 + 2x^2 - 5x + 7$ is divided by $(x + 3)$',
+            solution: `Using remainder theorem with $a = -3$:
+
+$f(-3) = (-3)^3 + 2(-3)^2 - 5(-3) + 7$
+$= -27 + 18 + 15 + 7$
+$= 13$
+
+**Remainder is 13**`,
+          },
+        ],
+      },
+      {
+        title: 'Partial Fractions',
+        content: `Decomposing rational expressions into simpler fractions.
+
+**Type 1: Distinct Linear Factors**
+$\\frac{A}{x + a} + \\frac{B}{x + b}$
+
+**Type 2: Repeated Linear Factor**
+$\\frac{A}{x + a} + \\frac{B}{(x + a)^2}$
+
+**Type 3: Irreducible Quadratic**
+$\\frac{Ax + B}{x^2 + bx + c}$
+
+**Example:** Express $\\frac{5x + 1}{(x + 1)(x - 2)}$ in partial fractions
+
+$\\frac{5x + 1}{(x + 1)(x - 2)} = \\frac{A}{x + 1} + \\frac{B}{x - 2}$
+
+$5x + 1 = A(x - 2) + B(x + 1)$
+
+Let $x = -1$: $-4 = -3A$, so $A = \\frac{4}{3}$
+Let $x = 2$: $11 = 3B$, so $B = \\frac{11}{3}$
+
+Answer: $\\frac{4/3}{x + 1} + \\frac{11/3}{x - 2}$`,
+        keyPoints: [
+          'Denominator must be factored first',
+          'Cover-up rule for distinct linear factors',
+          'Substitute convenient values to find constants',
+          'Used in integration and Laplace transforms',
+        ],
+      },
+    ],
+  },
+  {
+    topic: 'A5',
+    title: 'Binomial Expansions',
+    sections: [
+      {
+        title: 'Binomial Theorem',
+        content: `Expanding $(a + b)^n$ using Pascal's Triangle or the binomial formula.
+
+**Binomial Formula:**
+$(a + b)^n = \\sum_{r=0}^{n} \\binom{n}{r} a^{n-r} b^r$
+
+Where $\\binom{n}{r} = \\frac{n!}{r!(n-r)!}$
+
+**Pascal's Triangle:**
+\`\`\`
+       1
+      1 1
+     1 2 1
+    1 3 3 1
+   1 4 6 4 1
+\`\`\`
+
+**Example:** Expand $(x + 2)^3$
+
+$(x + 2)^3 = \\binom{3}{0}x^3(2)^0 + \\binom{3}{1}x^2(2)^1 + \\binom{3}{2}x^1(2)^2 + \\binom{3}{3}x^0(2)^3$
+
+$= 1 \\cdot x^3 \\cdot 1 + 3 \\cdot x^2 \\cdot 2 + 3 \\cdot x \\cdot 4 + 1 \\cdot 1 \\cdot 8$
+
+$= x^3 + 6x^2 + 12x + 8$`,
+        keyPoints: [
+          'Coefficients from Pascal\'s triangle or combination formula',
+          'Powers of first term decrease, second term increase',
+          'Total power in each term equals n',
+          'General term: T_{r+1} = C(n,r) a^{n-r} b^r',
+        ],
+      },
+      {
+        title: 'Finding Specific Terms',
+        content: `To find a specific term without full expansion:
+
+**General Term:** $T_{r+1} = \\binom{n}{r} a^{n-r} b^r$
+
+**Example:** Find the coefficient of $x^5$ in $(2x - 3)^7$
+
+General term: $T_{r+1} = \\binom{7}{r} (2x)^{7-r} (-3)^r$
+
+For $x^5$: power of $x$ is $7 - r = 5$, so $r = 2$
+
+$T_3 = \\binom{7}{2} (2x)^5 (-3)^2$
+$= 21 \\times 32x^5 \\times 9$
+$= 6048x^5$
+
+**Coefficient is 6048**`,
+        keyPoints: [
+          'Use general term formula for specific terms',
+          'Match powers to find which term you need',
+          'Be careful with negative signs',
+          'Binomial coefficients: C(n,r) = n!/(r!(n-r)!)',
+        ],
+        examples: [
+          {
+            question: 'Find the constant term in $(x^2 - \\frac{1}{x})^6$',
+            solution: `General term: $T_{r+1} = \\binom{6}{r} (x^2)^{6-r} (-\\frac{1}{x})^r$
+
+$= \\binom{6}{r} x^{12-2r} \\times (-1)^r x^{-r}$
+
+$= \\binom{6}{r} (-1)^r x^{12-3r}$
+
+For constant term: $12 - 3r = 0$, so $r = 4$
+
+$T_5 = \\binom{6}{4} (-1)^4 x^0 = 15 \\times 1 = 15$
+
+**Constant term is 15**`,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    topic: 'G2',
+    title: 'Coordinate Geometry',
+    sections: [
+      {
+        title: 'Distance Formula & Midpoint',
+        content: `**Distance Formula:** Distance between points $(x_1, y_1)$ and $(x_2, y_2)$:
+$d = \\sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}$
+
+**Midpoint Formula:**
+$M = \\left(\\frac{x_1 + x_2}{2}, \\frac{y_1 + y_2}{2}\\right)$
+
+**Example:** Find distance and midpoint between $A(1, 2)$ and $B(7, 10)$
+
+Distance: $d = \\sqrt{(7-1)^2 + (10-2)^2} = \\sqrt{36 + 64} = \\sqrt{100} = 10$
+
+Midpoint: $M = \\left(\\frac{1+7}{2}, \\frac{2+10}{2}\\right) = (4, 6)$`,
+        keyPoints: [
+          'Distance formula derived from Pythagoras theorem',
+          'Midpoint is average of x-coordinates and y-coordinates',
+          'Used for finding perimeters, areas, and centers',
+          'Can extend to 3D with same principles',
+        ],
+      },
+      {
+        title: 'Equation of a Circle',
+        content: `**Standard Form:** $(x - h)^2 + (y - k)^2 = r^2$
+- Center: $(h, k)$
+- Radius: $r$
+
+**General Form:** $x^2 + y^2 + 2gx + 2fy + c = 0$
+- Center: $(-g, -f)$
+- Radius: $\\sqrt{g^2 + f^2 - c}$
+
+**Converting:** Complete the square on both $x$ and $y$
+
+**Example:** Find center and radius of $x^2 + y^2 - 6x + 4y - 3 = 0$
+
+Complete the square:
+$(x^2 - 6x + 9) + (y^2 + 4y + 4) = 3 + 9 + 4$
+$(x - 3)^2 + (y + 2)^2 = 16$
+
+**Center:** $(3, -2)$, **Radius:** $4$`,
+        graphs: [
+          {
+            title: 'Circle Example',
+            config: {
+              expressions: [
+                { latex: '(x - 3)^2 + (y + 2)^2 = 16', color: '#2563eb', lineWidth: 3 },
+                { latex: '(3, -2)', color: '#ef4444', points: true, label: 'Center' },
+              ],
+              bounds: { left: -2, right: 8, bottom: -7, top: 3 },
+            },
+            description: 'Circle with center (3, -2) and radius 4',
+          },
+        ],
+        keyPoints: [
+          'Standard form shows center and radius directly',
+          'Complete the square to convert general to standard form',
+          'Point (x, y) is ON circle if it satisfies equation',
+          'Tangent to circle is perpendicular to radius at point of contact',
+        ],
+      },
+      {
+        title: 'Parallel and Perpendicular Lines',
+        content: `**Slope (Gradient):** $m = \\frac{y_2 - y_1}{x_2 - x_1}$
+
+**Parallel Lines:** Same slope
+If $m_1 = m_2$, lines are parallel
+
+**Perpendicular Lines:** Product of slopes is -1
+If $m_1 \\times m_2 = -1$, lines are perpendicular
+Or: $m_2 = -\\frac{1}{m_1}$ (negative reciprocal)
+
+**Example:** Are lines $y = 3x + 2$ and $y = -\\frac{1}{3}x + 5$ perpendicular?
+
+$m_1 = 3$, $m_2 = -\\frac{1}{3}$
+
+Check: $m_1 \\times m_2 = 3 \\times (-\\frac{1}{3}) = -1$ ✓
+
+**Yes, they are perpendicular!**`,
+        keyPoints: [
+          'Parallel: m₁ = m₂ (equal slopes)',
+          'Perpendicular: m₁ × m₂ = -1 (negative reciprocal)',
+          'Vertical line (undefined slope) ⊥ horizontal line (slope = 0)',
+          'Use point-slope form: y - y₁ = m(x - x₁)',
+        ],
+      },
+    ],
+  },
+  {
+    topic: 'G3',
+    title: 'Proofs in Plane Geometry',
+    sections: [
+      {
+        title: 'Triangle Congruence Tests',
+        content: `Two triangles are **congruent** if they have the same shape and size.
+
+**Four Congruence Tests:**
+
+**1. SSS (Side-Side-Side):** All three sides equal
+**2. SAS (Side-Angle-Side):** Two sides and included angle equal
+**3. ASA (Angle-Side-Angle):** Two angles and included side equal
+**4. RHS (Right angle-Hypotenuse-Side):** Right angle, hypotenuse, and one other side equal
+
+**Example:** Prove △ABC ≅ △DEF given:
+- AB = DE = 5 cm
+- BC = EF = 7 cm
+- ∠B = ∠E = 60°
+
+**Proof:** Using SAS test:
+- Two sides: AB = DE and BC = EF ✓
+- Included angle: ∠B = ∠E ✓
+
+Therefore △ABC ≅ △DEF by SAS`,
+        keyPoints: [
+          'SSS: Three sides determine a unique triangle',
+          'SAS: Angle must be BETWEEN the two sides',
+          'ASA: Side must be BETWEEN the two angles',
+          'AAA is NOT a congruence test (shows similarity, not congruence)',
+        ],
+      },
+      {
+        title: 'Triangle Similarity Tests',
+        content: `Two triangles are **similar** if they have the same shape (but not necessarily size).
+
+**Three Similarity Tests:**
+
+**1. AAA (Angle-Angle-Angle):** All three angles equal
+**2. SSS Ratio:** All sides in same ratio
+**3. SAS Ratio:** Two sides in same ratio and included angle equal
+
+**Properties of Similar Triangles:**
+- Corresponding angles are equal
+- Corresponding sides are in proportion
+- Ratio of areas = (ratio of sides)²
+
+**Example:** △ABC ~ △DEF with AB:DE = 2:3
+If area of △ABC = 12 cm², find area of △DEF
+
+Ratio of sides = 2:3
+Ratio of areas = 2²:3² = 4:9
+
+$\\frac{12}{\\text{Area of DEF}} = \\frac{4}{9}$
+
+Area of △DEF = $\\frac{12 \\times 9}{4} = 27$ cm²`,
+        keyPoints: [
+          'Similar triangles have equal angles, proportional sides',
+          'AAA is sufficient for similarity (not for congruence)',
+          'Areas scale with square of linear scale factor',
+          'Volumes scale with cube of linear scale factor',
+        ],
+      },
+      {
+        title: 'Circle Theorems',
+        content: `Key theorems for angles and lines in circles:
+
+**1. Angle at Center = 2 × Angle at Circumference**
+(when subtending the same arc)
+
+**2. Angles in Same Segment are Equal**
+(angles subtended by same arc at circumference)
+
+**3. Angle in Semicircle = 90°**
+(angle subtended by diameter)
+
+**4. Opposite Angles in Cyclic Quadrilateral = 180°**
+(quadrilateral with all vertices on circle)
+
+**5. Tangent ⊥ Radius**
+(tangent perpendicular to radius at point of contact)
+
+**6. Alternate Segment Theorem**
+(angle between tangent and chord = angle in alternate segment)`,
+        keyPoints: [
+          'Angles in same segment are equal',
+          'Angle in semicircle is always 90°',
+          'Tangent perpendicular to radius is key for many proofs',
+          'Cyclic quadrilateral: opposite angles sum to 180°',
+        ],
+      },
+    ],
+  },
 ]
 
 export default function NotesPage() {

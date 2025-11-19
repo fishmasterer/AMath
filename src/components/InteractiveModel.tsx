@@ -771,4 +771,418 @@ export const MathModels = {
       'Integration gives height as function of time: h(t) = h₀ - (k/A)t',
     ],
   }),
+
+  // Coordinate Geometry: Circle Equations
+  circleGeometry: (): ModelConfig => ({
+    title: 'Circle Equations & Tangent Lines',
+    description: 'Explore circles in coordinate geometry with centers, radii, and tangent lines',
+    scenario: 'A circle with adjustable center and radius, showing how the equation changes',
+    realWorldContext: 'Used in GPS systems, satellite coverage areas, and architectural design',
+    parameters: [
+      {
+        name: 'h',
+        label: 'Center X-coordinate',
+        min: -5,
+        max: 5,
+        step: 0.5,
+        default: 0,
+        description: 'Horizontal position of circle center',
+      },
+      {
+        name: 'k',
+        label: 'Center Y-coordinate',
+        min: -5,
+        max: 5,
+        step: 0.5,
+        default: 0,
+        description: 'Vertical position of circle center',
+      },
+      {
+        name: 'r',
+        label: 'Radius',
+        min: 1,
+        max: 6,
+        step: 0.5,
+        default: 3,
+        unit: 'units',
+        description: 'Distance from center to any point on circle',
+      },
+    ],
+    generateGraph: (params) => {
+      const h = params.h
+      const k = params.k
+      const r = params.r
+
+      return {
+        expressions: [
+          {
+            latex: `(x - ${h.toFixed(1)})^2 + (y - ${k.toFixed(1)})^2 = ${(r * r).toFixed(1)}`,
+            color: '#3b82f6',
+            lineWidth: 3,
+            label: 'Circle',
+          },
+          {
+            latex: `(${h.toFixed(1)}, ${k.toFixed(1)})`,
+            color: '#ef4444',
+            label: 'Center',
+            points: true,
+          },
+          {
+            latex: `x = ${h.toFixed(1)}`,
+            color: '#9ca3af',
+            lineStyle: 'DASHED',
+            lineWidth: 1,
+          },
+          {
+            latex: `y = ${k.toFixed(1)}`,
+            color: '#9ca3af',
+            lineStyle: 'DASHED',
+            lineWidth: 1,
+          },
+        ],
+        bounds: { left: h - r - 2, right: h + r + 2, bottom: k - r - 2, top: k + r + 2 },
+      }
+    },
+    explanation: (params) => {
+      const h = params.h
+      const k = params.k
+      const r = params.r
+      const area = Math.PI * r * r
+      const circumference = 2 * Math.PI * r
+
+      return `Circle equation: (x - ${h.toFixed(1)})² + (y - ${k.toFixed(1)})² = ${(r * r).toFixed(1)}. Center: (${h.toFixed(1)}, ${k.toFixed(1)}), Radius: ${r.toFixed(1)} units. Area = πr² = ${area.toFixed(2)} square units. Circumference = 2πr = ${circumference.toFixed(2)} units. Distance formula: d = √[(x₂-x₁)² + (y₂-y₁)²]`
+    },
+    keyInsights: [
+      'Standard circle form: (x-h)² + (y-k)² = r² where (h,k) is center',
+      'Expanding gives general form: x² + y² + Dx + Ey + F = 0',
+      'Complete the square to convert general form to standard form',
+      'Tangent lines are perpendicular to the radius at point of contact',
+    ],
+  }),
+
+  // Linear Systems: Simultaneous Equations
+  simultaneousEquations: (): ModelConfig => ({
+    title: 'Simultaneous Linear Equations',
+    description: 'Visualize the intersection point of two linear equations',
+    scenario: 'Two lines representing equations - find where they meet',
+    realWorldContext: 'Used in economics (supply/demand equilibrium), physics (motion problems), and optimization',
+    parameters: [
+      {
+        name: 'm1',
+        label: 'Line 1 Slope',
+        min: -3,
+        max: 3,
+        step: 0.25,
+        default: 2,
+        description: 'Steepness of first line',
+      },
+      {
+        name: 'b1',
+        label: 'Line 1 Y-intercept',
+        min: -5,
+        max: 5,
+        step: 0.5,
+        default: 1,
+        description: 'Where first line crosses y-axis',
+      },
+      {
+        name: 'm2',
+        label: 'Line 2 Slope',
+        min: -3,
+        max: 3,
+        step: 0.25,
+        default: -1,
+        description: 'Steepness of second line',
+      },
+      {
+        name: 'b2',
+        label: 'Line 2 Y-intercept',
+        min: -5,
+        max: 5,
+        step: 0.5,
+        default: 6,
+        description: 'Where second line crosses y-axis',
+      },
+    ],
+    generateGraph: (params) => {
+      const m1 = params.m1
+      const b1 = params.b1
+      const m2 = params.m2
+      const b2 = params.b2
+
+      // Find intersection: m1*x + b1 = m2*x + b2
+      // x = (b2 - b1) / (m1 - m2)
+      let intersectionX = 0
+      let intersectionY = 0
+      let hasIntersection = Math.abs(m1 - m2) > 0.01
+
+      if (hasIntersection) {
+        intersectionX = (b2 - b1) / (m1 - m2)
+        intersectionY = m1 * intersectionX + b1
+      }
+
+      const expressions: any[] = [
+        {
+          latex: `y = ${m1.toFixed(2)}x + ${b1.toFixed(2)}`,
+          color: '#3b82f6',
+          lineWidth: 3,
+          label: 'Line 1',
+        },
+        {
+          latex: `y = ${m2.toFixed(2)}x + ${b2.toFixed(2)}`,
+          color: '#10b981',
+          lineWidth: 3,
+          label: 'Line 2',
+        },
+      ]
+
+      if (hasIntersection) {
+        expressions.push({
+          latex: `(${intersectionX.toFixed(2)}, ${intersectionY.toFixed(2)})`,
+          color: '#ef4444',
+          label: 'Intersection',
+          points: true,
+        })
+      }
+
+      return {
+        expressions,
+        bounds: { left: -10, right: 10, bottom: -10, top: 10 },
+      }
+    },
+    explanation: (params) => {
+      const m1 = params.m1
+      const b1 = params.b1
+      const m2 = params.m2
+      const b2 = params.b2
+
+      if (Math.abs(m1 - m2) < 0.01) {
+        if (Math.abs(b1 - b2) < 0.01) {
+          return `Lines are IDENTICAL - infinite solutions! Both equations represent the same line: y = ${m1.toFixed(2)}x + ${b1.toFixed(2)}. Every point on the line satisfies both equations.`
+        } else {
+          return `Lines are PARALLEL - no solution! Slopes are equal (m₁ = m₂ = ${m1.toFixed(2)}) but different y-intercepts. Parallel lines never intersect, so there's no (x,y) that satisfies both equations.`
+        }
+      }
+
+      const intersectionX = (b2 - b1) / (m1 - m2)
+      const intersectionY = m1 * intersectionX + b1
+
+      return `Lines intersect at (${intersectionX.toFixed(2)}, ${intersectionY.toFixed(2)}). Solution method: Set equations equal: ${m1.toFixed(2)}x + ${b1.toFixed(2)} = ${m2.toFixed(2)}x + ${b2.toFixed(2)}. Solve for x: x = ${intersectionX.toFixed(2)}. Substitute back: y = ${intersectionY.toFixed(2)}. This point satisfies BOTH equations simultaneously!`
+    },
+    keyInsights: [
+      'Intersection point satisfies both equations simultaneously',
+      'Parallel lines (equal slopes) have no solution',
+      'Identical lines have infinite solutions',
+      'Can solve by substitution, elimination, or graphical methods',
+    ],
+  }),
+
+  // Polynomials: Cubic Functions
+  polynomialRoots: (): ModelConfig => ({
+    title: 'Polynomial Functions & Roots',
+    description: 'Explore cubic polynomials and their roots (x-intercepts)',
+    scenario: 'A cubic function showing how coefficient changes affect the curve and roots',
+    realWorldContext: 'Used in engineering (stress-strain curves), economics (cost functions), and computer graphics',
+    parameters: [
+      {
+        name: 'a',
+        label: 'Leading Coefficient (a)',
+        min: -2,
+        max: 2,
+        step: 0.25,
+        default: 1,
+        description: 'Coefficient of x³ term',
+      },
+      {
+        name: 'b',
+        label: 'Quadratic Term (b)',
+        min: -5,
+        max: 5,
+        step: 0.5,
+        default: -3,
+        description: 'Coefficient of x² term',
+      },
+      {
+        name: 'c',
+        label: 'Linear Term (c)',
+        min: -5,
+        max: 5,
+        step: 0.5,
+        default: 0,
+        description: 'Coefficient of x term',
+      },
+      {
+        name: 'd',
+        label: 'Constant Term (d)',
+        min: -5,
+        max: 5,
+        step: 0.5,
+        default: 0,
+        description: 'Constant term',
+      },
+    ],
+    generateGraph: (params) => {
+      const a = params.a
+      const b = params.b
+      const c = params.c
+      const d = params.d
+
+      return {
+        expressions: [
+          {
+            latex: `y = ${a.toFixed(2)}x^3 + ${b.toFixed(2)}x^2 + ${c.toFixed(2)}x + ${d.toFixed(2)}`,
+            color: '#3b82f6',
+            lineWidth: 3,
+            label: 'Polynomial',
+          },
+          {
+            latex: 'y = 0',
+            color: '#ef4444',
+            lineStyle: 'DASHED',
+            label: 'x-axis (roots)',
+          },
+        ],
+        bounds: { left: -5, right: 5, bottom: -10, top: 10 },
+      }
+    },
+    explanation: (params) => {
+      const a = params.a
+      const b = params.b
+      const c = params.c
+      const d = params.d
+
+      const sign_a = a > 0 ? 'rises' : 'falls'
+      const behavior = a > 0
+        ? 'falls to the left and rises to the right'
+        : 'rises to the left and falls to the right'
+
+      return `Polynomial: f(x) = ${a.toFixed(2)}x³ + ${b.toFixed(2)}x² + ${c.toFixed(2)}x + ${d.toFixed(2)}. Since a = ${a.toFixed(2)} ${a > 0 ? '> 0' : '< 0'}, the curve ${behavior}. A cubic function can have 1, 2, or 3 real roots (x-intercepts). Use factor theorem: if f(r) = 0, then (x-r) is a factor. Remainder theorem: dividing by (x-r) gives remainder f(r).`
+    },
+    keyInsights: [
+      'Degree 3 polynomial has up to 3 real roots',
+      'Factor theorem: f(r) = 0 ⟺ (x-r) is a factor',
+      'Remainder theorem: f(x) ÷ (x-r) has remainder f(r)',
+      'End behavior determined by leading coefficient sign',
+    ],
+  }),
+
+  // Inequalities: Quadratic Inequality
+  quadraticInequality: (): ModelConfig => ({
+    title: 'Quadratic Inequalities',
+    description: 'Visualize solution regions for quadratic inequalities',
+    scenario: 'Find where a quadratic function is above or below the x-axis',
+    realWorldContext: 'Used in physics (projectile safe zones), economics (profit regions), and engineering (design constraints)',
+    parameters: [
+      {
+        name: 'a',
+        label: 'Leading Coefficient',
+        min: -2,
+        max: 2,
+        step: 0.25,
+        default: 1,
+        description: 'Determines if parabola opens up or down',
+      },
+      {
+        name: 'b',
+        label: 'Linear Coefficient',
+        min: -6,
+        max: 6,
+        step: 0.5,
+        default: -2,
+        description: 'Affects vertex position',
+      },
+      {
+        name: 'c',
+        label: 'Constant Term',
+        min: -8,
+        max: 8,
+        step: 0.5,
+        default: -3,
+        description: 'Y-intercept of parabola',
+      },
+    ],
+    generateGraph: (params) => {
+      const a = params.a
+      const b = params.b
+      const c = params.c
+
+      // Find roots using quadratic formula
+      const discriminant = b * b - 4 * a * c
+      let root1 = 0
+      let root2 = 0
+      let hasRoots = discriminant >= 0
+
+      if (hasRoots && a !== 0) {
+        root1 = (-b + Math.sqrt(discriminant)) / (2 * a)
+        root2 = (-b - Math.sqrt(discriminant)) / (2 * a)
+      }
+
+      const expressions: any[] = [
+        {
+          latex: `y = ${a.toFixed(2)}x^2 + ${b.toFixed(2)}x + ${c.toFixed(2)}`,
+          color: '#3b82f6',
+          lineWidth: 3,
+          label: 'Parabola',
+        },
+        {
+          latex: 'y = 0',
+          color: '#ef4444',
+          lineStyle: 'DASHED',
+          label: 'y = 0 boundary',
+        },
+      ]
+
+      if (hasRoots && Math.abs(a) > 0.01) {
+        const minRoot = Math.min(root1, root2)
+        const maxRoot = Math.max(root1, root2)
+
+        expressions.push({
+          latex: `${minRoot.toFixed(2)} < x < ${maxRoot.toFixed(2)} \\{y > 0\\}`,
+          color: a > 0 ? '#10b981' : '#9ca3af',
+          lineStyle: 'DOTTED',
+        })
+      }
+
+      return {
+        expressions,
+        bounds: { left: -10, right: 10, bottom: -15, top: 15 },
+      }
+    },
+    explanation: (params) => {
+      const a = params.a
+      const b = params.b
+      const c = params.c
+
+      if (Math.abs(a) < 0.01) {
+        return `Not a quadratic (a ≈ 0). This is a linear function: ${b.toFixed(2)}x + ${c.toFixed(2)}`
+      }
+
+      const discriminant = b * b - 4 * a * c
+
+      if (discriminant < 0) {
+        if (a > 0) {
+          return `No real roots (discriminant < 0). Parabola opens upward and is entirely ABOVE x-axis. Inequality ax² + bx + c > 0 is true for ALL x ∈ ℝ. Inequality ax² + bx + c < 0 has NO solution.`
+        } else {
+          return `No real roots (discriminant < 0). Parabola opens downward and is entirely BELOW x-axis. Inequality ax² + bx + c < 0 is true for ALL x ∈ ℝ. Inequality ax² + bx + c > 0 has NO solution.`
+        }
+      }
+
+      const root1 = (-b + Math.sqrt(discriminant)) / (2 * a)
+      const root2 = (-b - Math.sqrt(discriminant)) / (2 * a)
+      const minRoot = Math.min(root1, root2)
+      const maxRoot = Math.max(root1, root2)
+
+      if (a > 0) {
+        return `Roots: x = ${minRoot.toFixed(2)} and x = ${maxRoot.toFixed(2)}. Parabola opens UPWARD. Solutions: y > 0 when x < ${minRoot.toFixed(2)} OR x > ${maxRoot.toFixed(2)}. Solutions: y < 0 when ${minRoot.toFixed(2)} < x < ${maxRoot.toFixed(2)}. Test point method: pick x-value and check sign!`
+      } else {
+        return `Roots: x = ${minRoot.toFixed(2)} and x = ${maxRoot.toFixed(2)}. Parabola opens DOWNWARD. Solutions: y > 0 when ${minRoot.toFixed(2)} < x < ${maxRoot.toFixed(2)}. Solutions: y < 0 when x < ${minRoot.toFixed(2)} OR x > ${maxRoot.toFixed(2)}. Remember to flip inequality when multiplying by negative!`
+      }
+    },
+    keyInsights: [
+      'Find roots first by factoring or quadratic formula',
+      'Test points in each region to determine sign',
+      'Parabola opening direction determines solution regions',
+      'No real roots means always positive or always negative',
+    ],
+  }),
 }

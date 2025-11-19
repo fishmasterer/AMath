@@ -16,6 +16,7 @@ interface ModelInfo {
 }
 
 const availableModels: ModelInfo[] = [
+  // Quadratic Models (A1)
   {
     id: 'projectile',
     title: 'Projectile Motion',
@@ -33,6 +34,34 @@ const availableModels: ModelInfo[] = [
     getConfig: MathModels.revenueOptimization,
   },
   {
+    id: 'inequality',
+    title: 'Quadratic Inequalities',
+    category: 'quadratic',
+    topic: 'Inequalities (A2)',
+    difficulty: 'Medium',
+    getConfig: MathModels.quadraticInequality,
+  },
+
+  // Algebra Models (A2, A4)
+  {
+    id: 'simultaneous',
+    title: 'Simultaneous Equations',
+    category: 'quadratic',
+    topic: 'Equations (A2)',
+    difficulty: 'Easy',
+    getConfig: MathModels.simultaneousEquations,
+  },
+  {
+    id: 'polynomial',
+    title: 'Polynomial Roots',
+    category: 'quadratic',
+    topic: 'Polynomials (A4)',
+    difficulty: 'Hard',
+    getConfig: MathModels.polynomialRoots,
+  },
+
+  // Exponential Models (A6)
+  {
     id: 'population',
     title: 'Population Growth',
     category: 'exponential',
@@ -48,6 +77,8 @@ const availableModels: ModelInfo[] = [
     difficulty: 'Easy',
     getConfig: MathModels.radioactiveDecay,
   },
+
+  // Trigonometric Models (G1)
   {
     id: 'wave',
     title: 'Wave Motion',
@@ -56,6 +87,18 @@ const availableModels: ModelInfo[] = [
     difficulty: 'Medium',
     getConfig: MathModels.waveMotion,
   },
+
+  // Geometry Models (G2)
+  {
+    id: 'circle',
+    title: 'Circle Geometry',
+    category: 'quadratic',
+    topic: 'Coordinate Geometry (G2)',
+    difficulty: 'Medium',
+    getConfig: MathModels.circleGeometry,
+  },
+
+  // Calculus Models (C1)
   {
     id: 'box',
     title: 'Box Optimization',
