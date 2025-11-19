@@ -482,6 +482,55 @@ export default function TutorDashboard() {
             {activeTab === 'overview' && (
               <div>
                 <h2 className="text-2xl font-bold text-white mb-6">Welcome Back!</h2>
+
+                {/* Quick Action Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                  <Link href="/tutor/session-planner" className="group">
+                    <div className="p-6 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-lg hover:from-purple-500/20 hover:to-pink-500/20 hover:scale-105 transition-all">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <span className="text-2xl">📅</span>
+                        </div>
+                        <div>
+                          <h3 className="text-white font-bold">Session Planner</h3>
+                          <p className="text-purple-400 text-xs">AI-powered lessons</p>
+                        </div>
+                      </div>
+                      <p className="text-gray-400 text-sm">Get automated lesson plans based on student performance</p>
+                    </div>
+                  </Link>
+
+                  <Link href="/tutor/question-bank" className="group">
+                    <div className="p-6 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-lg hover:from-blue-500/20 hover:to-cyan-500/20 hover:scale-105 transition-all">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <span className="text-2xl">📚</span>
+                        </div>
+                        <div>
+                          <h3 className="text-white font-bold">Question Bank</h3>
+                          <p className="text-blue-400 text-xs">Smart tagging</p>
+                        </div>
+                      </div>
+                      <p className="text-gray-400 text-sm">Organize questions with smart tagging and filtering</p>
+                    </div>
+                  </Link>
+
+                  <Link href="/tutor/submissions" className="group">
+                    <div className="p-6 bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-lg hover:from-green-500/20 hover:to-emerald-500/20 hover:scale-105 transition-all">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <span className="text-2xl">📊</span>
+                        </div>
+                        <div>
+                          <h3 className="text-white font-bold">View Submissions</h3>
+                          <p className="text-green-400 text-xs">Review work</p>
+                        </div>
+                      </div>
+                      <p className="text-gray-400 text-sm">Review student quiz attempts and provide feedback</p>
+                    </div>
+                  </Link>
+                </div>
+
                 <div className="space-y-4">
                   <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
                     <h3 className="text-lg font-semibold text-blue-400 mb-2">Quick Start</h3>
@@ -489,6 +538,8 @@ export default function TutorDashboard() {
                       <li>• Click "Upload Quiz" to add a new quiz via JSON</li>
                       <li>• View and manage existing quizzes in the "Manage" tab</li>
                       <li>• Track student performance in "Analytics"</li>
+                      <li>• Use Session Planner for AI-powered lesson recommendations</li>
+                      <li>• Build your Question Bank for easy quiz assembly</li>
                     </ul>
                   </div>
 
