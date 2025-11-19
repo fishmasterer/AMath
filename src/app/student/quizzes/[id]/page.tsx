@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useEffect, useState } from 'react'
+import { use, useEffect, useState, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { QuizTopic, QuizDifficulty, TOPIC_NAMES } from '@/lib/types'
@@ -65,10 +65,10 @@ export default function QuizDetailPage({ params }: { params: Promise<{ id: strin
     }
   }
 
-  const handleStartQuiz = () => {
+  const handleStartQuiz = useCallback(() => {
     // Navigate to quiz attempt page (to be built in Chunk 3)
     router.push(`/student/quizzes/${id}/attempt`)
-  }
+  }, [router, id])
 
   const getDifficultyColor = (difficulty: QuizDifficulty) => {
     switch (difficulty) {
@@ -104,7 +104,7 @@ export default function QuizDetailPage({ params }: { params: Promise<{ id: strin
     })
   }
 
-  const formatDueDate = (dateString: string) => {
+  const formatDueDate = useCallback((dateString: string) => {
     const date = new Date(dateString)
     const now = new Date()
     const diffTime = date.getTime() - now.getTime()
@@ -115,7 +115,7 @@ export default function QuizDetailPage({ params }: { params: Promise<{ id: strin
     if (diffDays === 1) return { text: 'Due tomorrow', urgent: true }
     if (diffDays < 7) return { text: `Due in ${diffDays} days`, urgent: false }
     return { text: formatDate(dateString), urgent: false }
-  }
+  }, [])
 
   if (loading) {
     return (

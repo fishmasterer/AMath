@@ -7,7 +7,16 @@ export async function POST(
 ) {
   try {
     const { id: quizId } = await params
-    const studentId = '00000000-0000-0000-0000-000000000001' // Single student setup
+
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Not authenticated' },
+        { status: 401 }
+      )
+    }
+    const studentId = user.id
 
     // Use service role to bypass RLS for quiz operations
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;

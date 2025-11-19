@@ -5,9 +5,15 @@ export async function GET() {
   try {
     const supabase = await createClient()
 
-    // For single student setup, we'll use a hardcoded student ID
-    // In a full auth system, this would come from the session
-    const studentId = '00000000-0000-0000-0000-000000000001'
+    // Get authenticated user
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Not authenticated' },
+        { status: 401 }
+      )
+    }
+    const studentId = user.id
 
     // Get all quiz attempts for this student
     const { data: attempts, error: attemptsError } = await supabase
