@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { usePreferences } from '@/lib/hooks'
 
 interface Profile {
   full_name: string
@@ -13,6 +14,7 @@ interface Profile {
 export default function ProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
+  const { preferences, setShowLatex, setShowExplanations, setAutoSave, syncing } = usePreferences()
 
   useEffect(() => {
     fetchProfile()
@@ -130,18 +132,39 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Study Preferences */}
+      {/* Study Preferences - Synced Across Devices */}
       <div className="bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-6">
-        <h3 className="text-xl font-bold text-white mb-4">Study Preferences</h3>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-xl font-bold text-white">Study Preferences</h3>
+            <p className="text-gray-400 text-sm mt-1">Syncs automatically across all your devices</p>
+          </div>
+          {syncing && (
+            <div className="flex items-center gap-2 text-sm text-blue-400">
+              <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-blue-500"></div>
+              <span>Syncing...</span>
+            </div>
+          )}
+        </div>
         <div className="space-y-4">
           <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
             <div>
               <p className="text-white font-medium">Show LaTeX in Questions</p>
               <p className="text-gray-400 text-sm">Display mathematical notation</p>
             </div>
-            <div className="w-12 h-6 bg-green-500 rounded-full relative">
-              <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
-            </div>
+            <button
+              onClick={() => setShowLatex(!preferences.show_latex)}
+              disabled={syncing}
+              className={`w-12 h-6 rounded-full relative transition-colors ${
+                preferences.show_latex ? 'bg-green-500' : 'bg-gray-600'
+              } disabled:opacity-50`}
+            >
+              <div
+                className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                  preferences.show_latex ? 'right-1' : 'left-1'
+                }`}
+              ></div>
+            </button>
           </div>
 
           <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
@@ -149,9 +172,19 @@ export default function ProfilePage() {
               <p className="text-white font-medium">Show Explanations</p>
               <p className="text-gray-400 text-sm">View explanations after quiz submission</p>
             </div>
-            <div className="w-12 h-6 bg-green-500 rounded-full relative">
-              <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
-            </div>
+            <button
+              onClick={() => setShowExplanations(!preferences.show_explanations)}
+              disabled={syncing}
+              className={`w-12 h-6 rounded-full relative transition-colors ${
+                preferences.show_explanations ? 'bg-green-500' : 'bg-gray-600'
+              } disabled:opacity-50`}
+            >
+              <div
+                className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                  preferences.show_explanations ? 'right-1' : 'left-1'
+                }`}
+              ></div>
+            </button>
           </div>
 
           <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
@@ -159,9 +192,28 @@ export default function ProfilePage() {
               <p className="text-white font-medium">Auto-save Answers</p>
               <p className="text-gray-400 text-sm">Automatically save quiz progress</p>
             </div>
-            <div className="w-12 h-6 bg-green-500 rounded-full relative">
-              <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
-            </div>
+            <button
+              onClick={() => setAutoSave(!preferences.auto_save)}
+              disabled={syncing}
+              className={`w-12 h-6 rounded-full relative transition-colors ${
+                preferences.auto_save ? 'bg-green-500' : 'bg-gray-600'
+              } disabled:opacity-50`}
+            >
+              <div
+                className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                  preferences.auto_save ? 'right-1' : 'left-1'
+                }`}
+              ></div>
+            </button>
+          </div>
+
+          <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg text-blue-400 text-sm flex items-start gap-2">
+            <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>
+              Your preferences are automatically saved and synced across all devices where you're logged in.
+            </span>
           </div>
         </div>
       </div>

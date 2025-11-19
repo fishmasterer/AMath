@@ -1,11 +1,12 @@
 'use client'
 
-import { use, useEffect, useState, useCallback, useMemo } from 'react'
+import { use, useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Timer from '@/components/quiz/Timer'
 import QuestionPalette from '@/components/quiz/QuestionPalette'
 import QuestionRenderer from '@/components/quiz/QuestionRenderer'
 import { Question, StudentAnswer } from '@/lib/types'
+import { useQuizSession, usePreferences } from '@/lib/hooks'
 
 interface QuizAttemptData {
   attemptId: string
@@ -40,9 +41,53 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  // Track if we've restored session to prevent loops
+  const sessionRestoredRef = useRef(false)
+
+  // User preferences for auto-save
+  const { preferences } = usePreferences()
+
+  // Cross-device session sync
+  const { session, updateSessionState, deleteSession, syncing: sessionSyncing, loading: sessionLoading } = useQuizSession({
+    quizId: id,
+    autoSaveInterval: 10000, // 10 seconds
+    enabled: !!attemptData && !attemptData.timeIsUp && preferences.auto_save
+  })
+
   useEffect(() => {
     initializeQuiz()
+    // Reset session restored flag when quiz ID changes
+    sessionRestoredRef.current = false
   }, [id])
+
+  // Restore session state from another device (ONLY ONCE)
+  useEffect(() => {
+    if (session && attemptData && !loading && !sessionLoading && !sessionRestoredRef.current) {
+      sessionRestoredRef.current = true
+
+      // Restore current question from session if different
+      if (session.current_question !== currentQuestionIndex && session.current_question < attemptData.quiz.questions.length) {
+        setCurrentQuestionIndex(session.current_question)
+      }
+
+      // Restore flagged questions from session
+      if (session.session_data?.flagged_questions && Array.isArray(session.session_data.flagged_questions)) {
+        setFlaggedQuestions(new Set(session.session_data.flagged_questions))
+      }
+    }
+  }, [session, attemptData, loading, sessionLoading, currentQuestionIndex])
+
+  // Sync current question and flags to session (after restoration)
+  useEffect(() => {
+    if (attemptData && !loading && sessionRestoredRef.current) {
+      updateSessionState({
+        current_question: currentQuestionIndex,
+        session_data: {
+          flagged_questions: Array.from(flaggedQuestions)
+        }
+      })
+    }
+  }, [currentQuestionIndex, flaggedQuestions, attemptData, loading])
 
   const initializeQuiz = async () => {
     try {
@@ -102,16 +147,16 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
     }
   }
 
-  // Auto-save every 30 seconds
+  // Auto-save every 30 seconds (if enabled in preferences)
   useEffect(() => {
-    if (!attemptData) return
+    if (!attemptData || !preferences.auto_save) return
 
     const interval = setInterval(() => {
       saveAnswers()
     }, 30000) // 30 seconds
 
     return () => clearInterval(interval)
-  }, [attemptData, answers])
+  }, [attemptData, answers, preferences.auto_save])
 
   const saveAnswers = useCallback(async () => {
     if (!attemptData || autoSaving) return
@@ -243,6 +288,13 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
       })
 
       if (response.ok) {
+        // Clean up quiz session
+        try {
+          await deleteSession()
+        } catch (err) {
+          console.error('Error deleting quiz session:', err)
+        }
+
         // Navigate to results page
         router.push(`/student/quizzes/${id}/results`)
       } else {
@@ -337,17 +389,24 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
             <div className="flex items-center gap-4">
               {/* Auto-save indicator */}
               <div className="text-sm text-gray-400 flex items-center gap-2">
-                {autoSaving ? (
+                {!preferences.auto_save ? (
+                  <>
+                    <svg className="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <span className="text-yellow-400">Auto-save disabled</span>
+                  </>
+                ) : (autoSaving || sessionSyncing) ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-blue-500"></div>
-                    <span>Saving...</span>
+                    <span>Syncing...</span>
                   </>
                 ) : lastSaved ? (
                   <>
                     <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span>Saved {lastSaved.toLocaleTimeString()}</span>
+                    <span>Synced {lastSaved.toLocaleTimeString()}</span>
                   </>
                 ) : null}
               </div>
