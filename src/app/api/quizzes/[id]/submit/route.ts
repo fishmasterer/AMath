@@ -86,11 +86,30 @@ export async function POST(
       }
     }
 
+    // Convert numeric correct answers to letters (A, B, C, D, etc.)
+    const optionLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+
     const transformedQuestions = Array.isArray(questionsData)
-      ? questionsData.map((q: any) => ({
-          ...q,
-          question: q.question || q.text || '',
-        }))
+      ? questionsData.map((q: any) => {
+          const transformed: any = {
+            ...q,
+            question: q.question || q.text || '',
+          };
+
+          // Convert numeric correctAnswer to letter for MCQ
+          if (q.type === 'mcq' && typeof q.correctAnswer === 'number') {
+            transformed.correctAnswer = optionLetters[q.correctAnswer] || optionLetters[0];
+          }
+
+          // Convert numeric correctAnswers array to letters for multi-select
+          if (q.type === 'multi_select' && Array.isArray(q.correctAnswers)) {
+            transformed.correctAnswers = q.correctAnswers.map((idx: number) =>
+              typeof idx === 'number' ? optionLetters[idx] : idx
+            );
+          }
+
+          return transformed;
+        })
       : [];
 
     console.log('Starting grading with:', {
