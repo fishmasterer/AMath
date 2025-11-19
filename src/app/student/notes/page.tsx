@@ -427,6 +427,20 @@ export default function NotesPage() {
           </Link>
           <h1 className="text-4xl font-bold text-white mb-2">📚 Study Notes</h1>
           <p className="text-gray-400">Interactive notes with graphs for O-Level Additional Mathematics</p>
+
+          {/* Link to Models */}
+          <Link
+            href="/student/models"
+            className="mt-4 inline-flex items-center gap-2 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/30 rounded-lg px-4 py-3 text-cyan-400 hover:from-cyan-500/20 hover:to-blue-500/20 transition-all group"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+            </svg>
+            <span className="font-semibold">Explore Real-World Applications</span>
+            <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">

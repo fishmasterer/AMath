@@ -209,7 +209,7 @@ export default function StudentDashboard() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         <Link
           href="/student/quizzes"
           className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-xl p-6 hover:from-blue-500/20 hover:to-cyan-500/20 hover:scale-105 transition-all duration-300 group"
@@ -240,6 +240,23 @@ export default function StudentDashboard() {
             <div>
               <h3 className="text-white font-bold">Notes</h3>
               <p className="text-gray-400 text-sm">Study materials</p>
+            </div>
+          </div>
+        </Link>
+
+        <Link
+          href="/student/models"
+          className="bg-gradient-to-br from-cyan-500/10 to-teal-500/10 border border-cyan-500/30 rounded-xl p-6 hover:from-cyan-500/20 hover:to-teal-500/20 hover:scale-105 transition-all duration-300 group"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-cyan-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+              <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-white font-bold">Models</h3>
+              <p className="text-gray-400 text-sm">Real-world math</p>
             </div>
           </div>
         </Link>
