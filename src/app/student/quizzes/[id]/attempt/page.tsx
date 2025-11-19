@@ -6,6 +6,7 @@ import Timer from '@/components/quiz/Timer'
 import QuestionPalette from '@/components/quiz/QuestionPalette'
 import QuestionRenderer from '@/components/quiz/QuestionRenderer'
 import { Question, StudentAnswer } from '@/lib/types'
+import { useQuizSession } from '@/lib/hooks'
 
 interface QuizAttemptData {
   attemptId: string
@@ -40,9 +41,39 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  // Cross-device session sync
+  const { session, updateSessionState, deleteSession, syncing: sessionSyncing } = useQuizSession({
+    quizId: id,
+    autoSaveInterval: 10000, // 10 seconds
+    enabled: !!attemptData && !attemptData.timeIsUp
+  })
+
   useEffect(() => {
     initializeQuiz()
   }, [id])
+
+  // Restore session state from another device
+  useEffect(() => {
+    if (session && attemptData && !loading) {
+      // Restore current question from session
+      if (session.current_question !== currentQuestionIndex) {
+        setCurrentQuestionIndex(session.current_question)
+      }
+      // Note: Timer state is managed by the Timer component
+    }
+  }, [session, attemptData, loading])
+
+  // Sync current question to session
+  useEffect(() => {
+    if (attemptData && !loading) {
+      updateSessionState({
+        current_question: currentQuestionIndex,
+        session_data: {
+          flagged_questions: Array.from(flaggedQuestions)
+        }
+      })
+    }
+  }, [currentQuestionIndex, flaggedQuestions, attemptData, loading, updateSessionState])
 
   const initializeQuiz = async () => {
     try {
@@ -101,6 +132,13 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
       setLoading(false)
     }
   }
+
+  // Restore flagged questions from session
+  useEffect(() => {
+    if (session?.session_data?.flagged_questions && Array.isArray(session.session_data.flagged_questions)) {
+      setFlaggedQuestions(new Set(session.session_data.flagged_questions))
+    }
+  }, [session])
 
   // Auto-save every 30 seconds
   useEffect(() => {
@@ -243,6 +281,13 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
       })
 
       if (response.ok) {
+        // Clean up quiz session
+        try {
+          await deleteSession()
+        } catch (err) {
+          console.error('Error deleting quiz session:', err)
+        }
+
         // Navigate to results page
         router.push(`/student/quizzes/${id}/results`)
       } else {
@@ -337,17 +382,17 @@ export default function QuizAttemptPage({ params }: { params: Promise<{ id: stri
             <div className="flex items-center gap-4">
               {/* Auto-save indicator */}
               <div className="text-sm text-gray-400 flex items-center gap-2">
-                {autoSaving ? (
+                {(autoSaving || sessionSyncing) ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-blue-500"></div>
-                    <span>Saving...</span>
+                    <span>Syncing...</span>
                   </>
                 ) : lastSaved ? (
                   <>
                     <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span>Saved {lastSaved.toLocaleTimeString()}</span>
+                    <span>Synced {lastSaved.toLocaleTimeString()}</span>
                   </>
                 ) : null}
               </div>

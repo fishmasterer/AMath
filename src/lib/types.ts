@@ -17,6 +17,30 @@ export interface Profile {
   updated_at: string;
 }
 
+export type ThemePreference = 'light' | 'dark' | 'system';
+
+export interface UserPreferences {
+  user_id: string;
+  show_latex: boolean;
+  show_explanations: boolean;
+  auto_save: boolean;
+  theme: ThemePreference;
+  preferences: Record<string, any>; // Flexible JSON for additional settings
+  created_at: string;
+  updated_at: string;
+}
+
+export interface QuizSession {
+  id: string;
+  quiz_id: string;
+  student_id: string;
+  current_question: number;
+  time_remaining_seconds: number | null;
+  session_data: Record<string, any>; // Flexible session state
+  last_activity: string;
+  created_at: string;
+}
+
 // ============================================================================
 // QUIZ TYPES
 // ============================================================================
