@@ -97,15 +97,28 @@ export async function POST(
           };
 
           // Convert numeric correctAnswer to letter for MCQ
-          if (q.type === 'mcq' && typeof q.correctAnswer === 'number') {
-            transformed.correctAnswer = optionLetters[q.correctAnswer] || optionLetters[0];
+          if (q.type === 'mcq') {
+            if (typeof q.correctAnswer === 'number') {
+              transformed.correctAnswer = optionLetters[q.correctAnswer] || optionLetters[0];
+            } else if (typeof q.correctAnswer === 'string') {
+              // Already a string, keep it
+              transformed.correctAnswer = q.correctAnswer;
+            } else {
+              // Fallback
+              transformed.correctAnswer = optionLetters[0];
+            }
           }
 
           // Convert numeric correctAnswers array to letters for multi-select
-          if (q.type === 'multi_select' && Array.isArray(q.correctAnswers)) {
-            transformed.correctAnswers = q.correctAnswers.map((idx: number) =>
-              typeof idx === 'number' ? optionLetters[idx] : idx
-            );
+          if (q.type === 'multi_select') {
+            if (Array.isArray(q.correctAnswers)) {
+              transformed.correctAnswers = q.correctAnswers.map((idx: any) =>
+                typeof idx === 'number' ? optionLetters[idx] : idx
+              );
+            } else {
+              // Fallback to empty array
+              transformed.correctAnswers = [];
+            }
           }
 
           return transformed;
@@ -167,14 +180,19 @@ export async function POST(
       question_text: result.question_text,
       topic: result.topic,
       question_type: result.question_type,
-      student_answer: result.student_answer || '',
+      // Keep student_answer and correct_answer as-is (string for MCQ, array for multi-select)
+      // Supabase will automatically convert to JSONB
+      student_answer: result.student_answer !== undefined && result.student_answer !== null
+        ? result.student_answer
+        : (result.question_type === 'multi_select' ? [] : ''),
       correct_answer: result.correct_answer,
       is_correct: result.is_correct,
       marks_awarded: result.marks_awarded,
       marks_possible: result.marks_possible,
     }));
 
-    console.log('Inserting question results:', JSON.stringify(questionResultsToInsert, null, 2));
+    console.log('Inserting question results count:', questionResultsToInsert.length);
+    console.log('First result to insert:', JSON.stringify(questionResultsToInsert[0], null, 2));
 
     const { error: resultsError } = await supabase
       .from('question_results')
