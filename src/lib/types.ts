@@ -333,3 +333,42 @@ export interface FilterConfig {
   published?: boolean;
   completed?: boolean;
 }
+
+// ============================================================================
+// QUESTION BANK TYPES (Paper-based Homework)
+// ============================================================================
+
+export interface QuestionBank {
+  id: string;
+  question_code: string; // e.g., A1.1.1, G2.3.2
+  topic: QuizTopic;
+  question_type: 'exam' | 'practice';
+  question_text: string;
+  answer_text: string;
+  marks: number | null;
+  difficulty: QuizDifficulty | null;
+  source: string | null; // e.g., "2023 Mock Exam"
+  created_at: string;
+  updated_at: string;
+}
+
+export interface HomeworkAssignment {
+  id: string;
+  student_id: string;
+  question_id: string;
+  assigned_by: string;
+  assigned_at: string;
+  due_date: string | null;
+  completed: boolean;
+  completed_at: string | null;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface HomeworkAssignmentWithQuestion extends HomeworkAssignment {
+  question: QuestionBank;
+}
+
+export interface QuestionBankWithAssignment extends QuestionBank {
+  assignment?: HomeworkAssignment;
+}

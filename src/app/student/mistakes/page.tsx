@@ -356,7 +356,7 @@ export default function MistakesPage() {
                             <div className="flex items-center gap-2 mb-1">
                               <span className="text-white font-semibold">{mistake.quiz_title}</span>
                               <span className="text-xs px-2 py-0.5 bg-purple-500/20 text-purple-400 border border-purple-500/50 rounded">
-                                -{(mistake.marks_possible - mistake.marks_awarded).toFixed(1)} marks
+                                -{((mistake.marks_possible ?? 0) - (mistake.marks_awarded ?? 0)).toFixed(1)} marks
                               </span>
                             </div>
                             <div className="text-gray-400 text-sm">

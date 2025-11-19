@@ -380,6 +380,60 @@ export default function StudentDashboard() {
         </div>
       </div>
 
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Link
+          href="/student/quizzes"
+          className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 backdrop-blur-xl rounded-xl border border-blue-500/30 p-6 hover:border-blue-500/50 transition-all group"
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-blue-500/20 rounded-lg group-hover:bg-blue-500/30 transition-colors">
+              <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-white font-semibold text-lg mb-1">Online Quizzes</h3>
+              <p className="text-gray-400 text-sm">Take MCQ practice quizzes</p>
+            </div>
+          </div>
+        </Link>
+
+        <Link
+          href="/student/homework"
+          className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 backdrop-blur-xl rounded-xl border border-purple-500/30 p-6 hover:border-purple-500/50 transition-all group"
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-purple-500/20 rounded-lg group-hover:bg-purple-500/30 transition-colors">
+              <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-white font-semibold text-lg mb-1">Paper Homework</h3>
+              <p className="text-gray-400 text-sm">View assigned questions</p>
+            </div>
+          </div>
+        </Link>
+
+        <Link
+          href="/student/mistakes"
+          className="bg-gradient-to-br from-orange-500/10 to-red-500/10 backdrop-blur-xl rounded-xl border border-orange-500/30 p-6 hover:border-orange-500/50 transition-all group"
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-orange-500/20 rounded-lg group-hover:bg-orange-500/30 transition-colors">
+              <svg className="w-8 h-8 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-white font-semibold text-lg mb-1">Mistake Journal</h3>
+              <p className="text-gray-400 text-sm">Review your mistakes</p>
+            </div>
+          </div>
+        </Link>
+      </div>
+
       {/* Upcoming quizzes */}
       <div className="bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-6">
         <div className="flex items-center justify-between mb-6">
