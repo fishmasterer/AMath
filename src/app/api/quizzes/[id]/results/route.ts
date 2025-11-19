@@ -108,7 +108,7 @@ export async function GET(
       const question = quiz.questions[result.question_index]
       return {
         ...result,
-        question: question?.question || '',
+        question: question?.question || question?.text || '',
         options: question?.options || [],
         explanation: question?.explanation,
         question_type_display: result.question_type === 'mcq' ? 'Multiple Choice' : 'Multiple Select',
