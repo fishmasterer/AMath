@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function TutorLoginPage() {
@@ -8,6 +8,37 @@ export default function TutorLoginPage() {
   const [error, setError] = useState('');
   const [isShaking, setIsShaking] = useState(false);
   const router = useRouter();
+
+  // Add keyboard support for numpad (desktop only)
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Only enable on desktop (not mobile/touch devices)
+      const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      if (isMobile) return;
+
+      // Prevent default behavior for number keys to avoid typing in background inputs
+      if (e.key >= '0' && e.key <= '9') {
+        e.preventDefault();
+        handleNumberClick(e.key);
+      }
+      // Support numpad keys
+      else if (e.code.startsWith('Numpad')) {
+        e.preventDefault();
+        const num = e.code.replace('Numpad', '');
+        if (num >= '0' && num <= '9') {
+          handleNumberClick(num);
+        }
+      }
+      // Support backspace and delete
+      else if (e.key === 'Backspace' || e.key === 'Delete') {
+        e.preventDefault();
+        handleBackspace();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [passcode]); // Re-attach when passcode changes
 
   const handleNumberClick = (num: string) => {
     if (passcode.length < 4) {
@@ -118,6 +149,13 @@ export default function TutorLoginPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414a2 2 0 001.414.586H19a2 2 0 002-2V7a2 2 0 00-2-2h-8.172a2 2 0 00-1.414.586L3 12z" />
             </svg>
           </button>
+        </div>
+
+        {/* Keyboard hint (desktop only) */}
+        <div className="hidden sm:block text-center mb-4">
+          <p className="text-slate-500 text-xs">
+            💡 You can use your keyboard or numpad to enter the code
+          </p>
         </div>
 
         {/* Back to Home */}
