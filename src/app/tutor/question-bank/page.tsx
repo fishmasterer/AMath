@@ -6,17 +6,18 @@ import { TOPIC_NAMES, QuizTopic } from '@/lib/types'
 
 interface Question {
   id: string
+  question_code?: string
   question_text: string
-  question_type: 'mcq' | 'short_answer' | 'structured'
-  difficulty: 'Easy' | 'Medium' | 'Hard'
+  question_type: 'mcq' | 'multi_select' | 'short_answer' | 'structured' | 'exam' | 'practice'
+  difficulty: 'Easy' | 'Medium' | 'Hard' | 'foundational' | 'intermediate' | 'exam_level'
   marks: number
   topic: QuizTopic
-  subtopics: string[]
-  keywords: string[]
+  subtopics?: string[]
+  keywords?: string[]
   source_type?: string
   source_reference?: string
   source_year?: number
-  times_used: number
+  times_used?: number
   created_at: string
 }
 
@@ -60,10 +61,13 @@ export default function QuestionBankPage() {
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case 'Easy':
+      case 'foundational':
         return 'bg-green-500/20 text-green-400 border-green-500/50'
       case 'Medium':
+      case 'intermediate':
         return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50'
       case 'Hard':
+      case 'exam_level':
         return 'bg-red-500/20 text-red-400 border-red-500/50'
       default:
         return 'bg-gray-500/20 text-gray-400 border-gray-500/50'
@@ -73,11 +77,15 @@ export default function QuestionBankPage() {
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'mcq':
+      case 'multi_select':
         return '☑️'
       case 'short_answer':
         return '✏️'
       case 'structured':
         return '📝'
+      case 'exam':
+      case 'practice':
+        return '📄'
       default:
         return '❓'
     }
@@ -171,7 +179,7 @@ export default function QuestionBankPage() {
             </div>
             <div>
               <div className="text-2xl font-bold text-white">
-                {questions.reduce((sum, q) => sum + q.times_used, 0)}
+                {questions.reduce((sum, q) => sum + (q.times_used || 0), 0)}
               </div>
               <div className="text-gray-400 text-sm">Times Used</div>
             </div>
@@ -221,6 +229,9 @@ export default function QuestionBankPage() {
               className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"
             >
               <option value="">All Difficulties</option>
+              <option value="foundational">Foundational</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="exam_level">Exam Level</option>
               <option value="Easy">Easy</option>
               <option value="Medium">Medium</option>
               <option value="Hard">Hard</option>
@@ -318,11 +329,16 @@ export default function QuestionBankPage() {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-2xl">{getTypeIcon(question.question_type)}</span>
+                      {question.question_code && (
+                        <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs font-mono font-bold border border-green-500/50">
+                          {question.question_code}
+                        </span>
+                      )}
                       <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded text-xs font-mono">
                         {question.topic}
                       </span>
                       <span className={`px-2 py-1 rounded text-xs font-semibold border ${getDifficultyColor(question.difficulty)}`}>
-                        {question.difficulty}
+                        {question.difficulty.replace('_', ' ')}
                       </span>
                       <span className="text-gray-400 text-xs">
                         {question.marks} {question.marks === 1 ? 'mark' : 'marks'}
@@ -344,7 +360,7 @@ export default function QuestionBankPage() {
                       {question.source_reference && (
                         <span>📄 {question.source_reference}</span>
                       )}
-                      <span>Used {question.times_used} times</span>
+                      <span>Used {question.times_used || 0} times</span>
                       <span>{new Date(question.created_at).toLocaleDateString()}</span>
                     </div>
                   </div>

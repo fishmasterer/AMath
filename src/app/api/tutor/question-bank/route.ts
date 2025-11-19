@@ -26,11 +26,11 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50')
     const offset = parseInt(searchParams.get('offset') || '0')
 
-    // Build query
+    // Build query - show both tutor's questions AND textbook questions (tutor_id = NULL)
     let query = supabase
       .from('question_bank')
       .select('*', { count: 'exact' })
-      .eq('tutor_id', tutorId)
+      .or(`tutor_id.eq.${tutorId},tutor_id.is.null`)
       .order('created_at', { ascending: false })
 
     // Apply filters
