@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { GraphInteractQuestion } from '@/lib/lessons/types';
 import { Check, X, Lightbulb, ArrowRight, Target, RefreshCw } from 'lucide-react';
 import katex from 'katex';
-import { DesmosCalculator } from '@/types/desmos.d';
+import { DesmosCalculator } from '@/types/desmos';
 
 interface GraphInteractProps {
   question: GraphInteractQuestion;

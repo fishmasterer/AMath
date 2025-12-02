@@ -49,3 +49,6 @@ declare global {
     };
   }
 }
+
+// Required for module augmentation
+export {};

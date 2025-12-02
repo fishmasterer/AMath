@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { DesmosExpression, DesmosBounds } from '@/types/desmos.d';
+import { DesmosExpression, DesmosBounds } from '@/types/desmos';
 
 interface DesmosGraphProps {
   expressions: DesmosExpression[];

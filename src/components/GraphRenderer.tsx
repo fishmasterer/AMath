@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef } from 'react'
-import '@/types/desmos.d'
+import '@/types/desmos'
 
 export interface GraphConfig {
   equations?: string[]  // e.g., ["y = x^2", "y = 2x + 1"]
