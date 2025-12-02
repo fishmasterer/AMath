@@ -1,15 +1,7 @@
 'use client'
 
 import React, { useEffect, useRef } from 'react'
-
-// Desmos Calculator types
-declare global {
-  interface Window {
-    Desmos?: {
-      GraphingCalculator: (element: HTMLElement, options?: any) => any
-    }
-  }
-}
+import '@/types/desmos.d'
 
 export interface GraphConfig {
   equations?: string[]  // e.g., ["y = x^2", "y = 2x + 1"]
@@ -93,7 +85,7 @@ export const GraphRenderer: React.FC<GraphRendererProps> = ({
       }
 
       // Initialize calculator
-      calculatorInstance.current = window.Desmos.GraphingCalculator(calculatorRef.current, options)
+      calculatorInstance.current = new window.Desmos.GraphingCalculator(calculatorRef.current, options)
 
       // Set bounds if provided
       if (config.bounds) {
