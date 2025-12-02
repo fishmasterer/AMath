@@ -141,14 +141,16 @@ export function GraphInteract({ question, onAnswer, showHints = true }: GraphInt
       const targetValue = parseFloat(question.validation.target);
       const tolerance = question.validation.tolerance || 0.01;
 
-      Object.values(analysis).forEach((a) => {
-        if (a.evaluation?.value !== undefined) {
-          if (Math.abs(a.evaluation.value - targetValue) <= tolerance) {
-            correct = true;
-            userAnswer = a.evaluation.value.toString();
+      if (analysis) {
+        Object.values(analysis).forEach((a) => {
+          if (a.evaluation?.value !== undefined) {
+            if (Math.abs(a.evaluation.value - targetValue) <= tolerance) {
+              correct = true;
+              userAnswer = a.evaluation.value.toString();
+            }
           }
-        }
-      });
+        });
+      }
     } else if (question.validation.type === 'expression') {
       const userExpr = expressions.find((e) => e.id === 'user_expr');
       if (userExpr) {
