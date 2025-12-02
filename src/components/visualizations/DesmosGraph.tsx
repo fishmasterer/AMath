@@ -1,34 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-
-// Desmos API types
-interface DesmosExpression {
-  id?: string;
-  latex?: string;
-  color?: string;
-  lineStyle?: 'SOLID' | 'DASHED' | 'DOTTED';
-  pointStyle?: 'POINT' | 'OPEN' | 'CROSS';
-  lineWidth?: number;
-  pointSize?: number;
-  fill?: boolean;
-  fillOpacity?: number;
-  label?: string;
-  showLabel?: boolean;
-  hidden?: boolean;
-  sliderBounds?: {
-    min?: number;
-    max?: number;
-    step?: number;
-  };
-}
-
-interface DesmosBounds {
-  left?: number;
-  right?: number;
-  bottom?: number;
-  top?: number;
-}
+import { DesmosExpression, DesmosBounds } from '@/types/desmos.d';
 
 interface DesmosGraphProps {
   expressions: DesmosExpression[];
@@ -43,25 +16,6 @@ interface DesmosGraphProps {
   yAxisLabel?: string;
   className?: string;
   onCalculatorReady?: (calculator: unknown) => void;
-}
-
-// Declare the Desmos global type
-declare global {
-  interface Window {
-    Desmos?: {
-      GraphingCalculator: new (
-        element: HTMLElement,
-        options?: Record<string, unknown>
-      ) => {
-        setExpression: (expr: DesmosExpression) => void;
-        setMathBounds: (bounds: DesmosBounds) => void;
-        destroy: () => void;
-        getState: () => unknown;
-        setState: (state: unknown) => void;
-        observeEvent: (event: string, callback: () => void) => void;
-      };
-    };
-  }
 }
 
 export function DesmosGraph({

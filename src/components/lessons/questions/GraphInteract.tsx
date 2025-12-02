@@ -4,27 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { GraphInteractQuestion } from '@/lib/lessons/types';
 import { Check, X, Lightbulb, ArrowRight, Target, RefreshCw } from 'lucide-react';
 import katex from 'katex';
-
-// Desmos types
-declare global {
-  interface Window {
-    Desmos?: {
-      GraphingCalculator: new (
-        element: HTMLElement,
-        options?: Record<string, unknown>
-      ) => DesmosCalculator;
-    };
-  }
-}
-
-interface DesmosCalculator {
-  setExpression: (expression: { id?: string; latex: string; color?: string; hidden?: boolean }) => void;
-  setMathBounds: (bounds: { left: number; right: number; bottom: number; top: number }) => void;
-  getExpressions: () => Array<{ id: string; latex: string }>;
-  destroy: () => void;
-  observeEvent: (event: string, callback: () => void) => void;
-  expressionAnalysis: Record<string, { evaluation?: { value?: number } }>;
-}
+import { DesmosCalculator } from '@/types/desmos.d';
 
 interface GraphInteractProps {
   question: GraphInteractQuestion;
