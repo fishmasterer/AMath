@@ -20,6 +20,7 @@ import {
   XPCelebration,
   LevelUpModal,
   RankProgressDisplay,
+  XPHistoryFeed,
   useStudentToast,
 } from '@/components/student';
 import { useGamification } from '@/lib/hooks/useGamification';
@@ -114,8 +115,15 @@ function StudentDashboardContent() {
     dailyGoal,
     unlockedAchievements,
     recentXP,
+    fetchXPHistory,
     loading: gamificationLoading,
   } = useGamification();
+
+  // XP History state
+  const [xpHistory, setXPHistory] = useState<typeof recentXP>([]);
+  const [xpHistoryLoading, setXPHistoryLoading] = useState(false);
+  const [xpHistoryHasMore, setXPHistoryHasMore] = useState(true);
+  const [showActivityTab, setShowActivityTab] = useState(false);
 
   // Calculate active multipliers
   const getActiveMultipliers = useCallback((): XPMultiplier[] => {
@@ -242,6 +250,29 @@ function StudentDashboardContent() {
   // Handle level click to show rank progress
   const handleLevelClick = () => {
     setShowRankProgress(!showRankProgress);
+  };
+
+  // Initialize XP history with recentXP
+  useEffect(() => {
+    if (recentXP.length > 0 && xpHistory.length === 0) {
+      setXPHistory(recentXP);
+    }
+  }, [recentXP, xpHistory.length]);
+
+  // Load more XP history
+  const loadMoreXPHistory = async () => {
+    if (xpHistoryLoading || !xpHistoryHasMore) return;
+
+    setXPHistoryLoading(true);
+    try {
+      const result = await fetchXPHistory(20, xpHistory.length);
+      setXPHistory(prev => [...prev, ...result.transactions]);
+      setXPHistoryHasMore(result.pagination.hasMore);
+    } catch (error) {
+      console.error('Error loading XP history:', error);
+    } finally {
+      setXPHistoryLoading(false);
+    }
   };
 
   // Demo: Trigger level up (for testing)
@@ -433,63 +464,139 @@ function StudentDashboardContent() {
           </div>
         </section>
 
-        {/* Upcoming Quizzes */}
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-bold text-white">Upcoming Quizzes</h2>
-            <Link
-              href="/student/quizzes"
-              className="text-emerald-400 hover:text-emerald-300 text-sm font-medium flex items-center gap-1"
-            >
-              View all
+        {/* Content Toggle - Quizzes vs Activity */}
+        <div className="flex items-center gap-2 bg-slate-800/50 p-1 rounded-xl">
+          <motion.button
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setShowActivityTab(false)}
+            className={`flex-1 py-2.5 px-4 rounded-lg font-medium text-sm transition-all ${
+              !showActivityTab
+                ? 'bg-emerald-500 text-white shadow-lg'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <span className="flex items-center justify-center gap-2">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
-            </Link>
-          </div>
+              Quizzes & Progress
+            </span>
+          </motion.button>
+          <motion.button
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setShowActivityTab(true)}
+            className={`flex-1 py-2.5 px-4 rounded-lg font-medium text-sm transition-all ${
+              showActivityTab
+                ? 'bg-emerald-500 text-white shadow-lg'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <span className="flex items-center justify-center gap-2">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Activity Feed
+            </span>
+          </motion.button>
+        </div>
 
-          <AnimatePresence mode="wait">
-            {upcomingQuizzes.length > 0 ? (
-              <div className="space-y-3">
-                {upcomingQuizzes.map((quiz, index) => (
-                  <StudentQuizCard key={quiz.id} quiz={quiz} index={index} />
-                ))}
+        <AnimatePresence mode="wait">
+          {!showActivityTab ? (
+            <motion.div
+              key="quizzes-progress"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-6"
+            >
+              {/* Upcoming Quizzes */}
+              <section>
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-bold text-white">Upcoming Quizzes</h2>
+                  <Link
+                    href="/student/quizzes"
+                    className="text-emerald-400 hover:text-emerald-300 text-sm font-medium flex items-center gap-1"
+                  >
+                    View all
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                </div>
+
+                <AnimatePresence mode="wait">
+                  {upcomingQuizzes.length > 0 ? (
+                    <div className="space-y-3">
+                      {upcomingQuizzes.map((quiz, index) => (
+                        <StudentQuizCard key={quiz.id} quiz={quiz} index={index} />
+                      ))}
+                    </div>
+                  ) : (
+                    <StudentEmptyState
+                      icon="quizzes"
+                      title="No Quizzes Yet"
+                      description="Your tutor hasn't assigned any quizzes yet. Check back later!"
+                      action={{
+                        label: 'Browse Study Materials',
+                        href: '/student/notes',
+                      }}
+                    />
+                  )}
+                </AnimatePresence>
+              </section>
+
+              {/* Topic Progress */}
+              <section>
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-bold text-white">Topic Progress</h2>
+                  <Link
+                    href="/student/progress"
+                    className="text-emerald-400 hover:text-emerald-300 text-sm font-medium flex items-center gap-1"
+                  >
+                    Details
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                </div>
+
+                <div className="space-y-2">
+                  {topicProgress.map((topic, index) => (
+                    <TopicProgressCard key={topic.code} topic={topic} index={index} />
+                  ))}
+                </div>
+              </section>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="activity-feed"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="space-y-4"
+            >
+              {/* Activity Feed Header */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-bold text-white">Recent Activity</h2>
+                  <p className="text-slate-500 text-sm">Your XP earnings and achievements</p>
+                </div>
+                <div className="flex items-center gap-1 bg-emerald-500/20 px-3 py-1.5 rounded-full">
+                  <span className="text-sm">⭐</span>
+                  <span className="text-emerald-400 font-bold text-sm">{level.totalXP.toLocaleString()} XP</span>
+                </div>
               </div>
-            ) : (
-              <StudentEmptyState
-                icon="quizzes"
-                title="No Quizzes Yet"
-                description="Your tutor hasn't assigned any quizzes yet. Check back later!"
-                action={{
-                  label: 'Browse Study Materials',
-                  href: '/student/notes',
-                }}
+
+              {/* XP History Feed */}
+              <XPHistoryFeed
+                transactions={xpHistory.length > 0 ? xpHistory : recentXP}
+                loading={xpHistoryLoading}
+                onLoadMore={loadMoreXPHistory}
+                hasMore={xpHistoryHasMore}
               />
-            )}
-          </AnimatePresence>
-        </section>
-
-        {/* Topic Progress */}
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-bold text-white">Topic Progress</h2>
-            <Link
-              href="/student/progress"
-              className="text-emerald-400 hover:text-emerald-300 text-sm font-medium flex items-center gap-1"
-            >
-              Details
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
-          </div>
-
-          <div className="space-y-2">
-            {topicProgress.map((topic, index) => (
-              <TopicProgressCard key={topic.code} topic={topic} index={index} />
-            ))}
-          </div>
-        </section>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Recent Achievements */}
         {unlockedAchievements.length > 0 && (
