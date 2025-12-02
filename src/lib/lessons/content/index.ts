@@ -17,70 +17,70 @@ export {
 } from './trigonometry';
 
 export {
-  equationsLessons,
+  EQUATIONS_LESSONS,
   MODULE_EQUATIONS,
 } from './equations-inequalities';
 
 export {
-  surdsLessons,
+  SURDS_LESSONS,
   MODULE_SURDS,
 } from './surds';
 
 export {
-  polynomialsLessons,
+  POLYNOMIALS_LESSONS,
   MODULE_POLYNOMIALS,
 } from './polynomials';
 
 export {
-  binomialLessons,
+  BINOMIAL_LESSONS,
   MODULE_BINOMIAL,
 } from './binomial';
 
 export {
-  exponentialsLessons,
+  EXPONENTIALS_LESSONS,
   MODULE_EXPONENTIALS,
 } from './exponentials';
 
 export {
-  coordinateGeometryLessons,
-  MODULE_COORDINATE_GEOMETRY,
+  COORDINATE_LESSONS,
+  MODULE_COORDINATE,
 } from './coordinate-geometry';
 
 export {
-  proofsLessons,
+  GEOMETRY_PROOFS_LESSONS,
   MODULE_PROOFS,
 } from './geometry-proofs';
 
 export {
-  calculusLessons,
+  CALCULUS_LESSONS,
   MODULE_CALCULUS,
 } from './calculus';
 
 // Combined exports
 import { QUADRATIC_LESSONS, MODULE_QUADRATICS } from './quadratics';
 import { TRIGONOMETRY_LESSONS, MODULE_TRIGONOMETRY } from './trigonometry';
-import { equationsLessons, MODULE_EQUATIONS } from './equations-inequalities';
-import { surdsLessons, MODULE_SURDS } from './surds';
-import { polynomialsLessons, MODULE_POLYNOMIALS } from './polynomials';
-import { binomialLessons, MODULE_BINOMIAL } from './binomial';
-import { exponentialsLessons, MODULE_EXPONENTIALS } from './exponentials';
-import { coordinateGeometryLessons, MODULE_COORDINATE_GEOMETRY } from './coordinate-geometry';
-import { proofsLessons, MODULE_PROOFS } from './geometry-proofs';
-import { calculusLessons, MODULE_CALCULUS } from './calculus';
+import { EQUATIONS_LESSONS, MODULE_EQUATIONS } from './equations-inequalities';
+import { SURDS_LESSONS, MODULE_SURDS } from './surds';
+import { POLYNOMIALS_LESSONS, MODULE_POLYNOMIALS } from './polynomials';
+import { BINOMIAL_LESSONS, MODULE_BINOMIAL } from './binomial';
+import { EXPONENTIALS_LESSONS, MODULE_EXPONENTIALS } from './exponentials';
+import { COORDINATE_LESSONS, MODULE_COORDINATE } from './coordinate-geometry';
+import { GEOMETRY_PROOFS_LESSONS, MODULE_PROOFS } from './geometry-proofs';
+import { CALCULUS_LESSONS, MODULE_CALCULUS } from './calculus';
 import { Lesson, LessonModule } from '../types';
 
 // All lessons combined
 export const ALL_LESSONS: Lesson[] = [
   ...QUADRATIC_LESSONS,
   ...TRIGONOMETRY_LESSONS,
-  ...equationsLessons,
-  ...surdsLessons,
-  ...polynomialsLessons,
-  ...binomialLessons,
-  ...exponentialsLessons,
-  ...coordinateGeometryLessons,
-  ...proofsLessons,
-  ...calculusLessons,
+  ...EQUATIONS_LESSONS,
+  ...SURDS_LESSONS,
+  ...POLYNOMIALS_LESSONS,
+  ...BINOMIAL_LESSONS,
+  ...EXPONENTIALS_LESSONS,
+  ...COORDINATE_LESSONS,
+  ...GEOMETRY_PROOFS_LESSONS,
+  ...CALCULUS_LESSONS,
 ];
 
 // All modules combined
@@ -92,7 +92,7 @@ export const ALL_MODULES: LessonModule[] = [
   MODULE_POLYNOMIALS,
   MODULE_BINOMIAL,
   MODULE_EXPONENTIALS,
-  MODULE_COORDINATE_GEOMETRY,
+  MODULE_COORDINATE,
   MODULE_PROOFS,
   MODULE_CALCULUS,
 ];
