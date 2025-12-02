@@ -2,7 +2,7 @@
 // Covers differentiation and integration with real-world applications
 
 import { Lesson, LessonModule, LessonStep } from '../types';
-import { QuizTopic } from '@/lib/knowledgeBase/types';
+import { QuizTopic } from '../../types';
 
 // =============================================================================
 // LESSON 1: Introduction to Differentiation (30 XP)
