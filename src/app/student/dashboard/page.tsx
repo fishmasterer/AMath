@@ -1,569 +1,551 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { useGamification } from '@/lib/hooks/useGamification'
+import { Suspense, useEffect, useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import {
-  XPBar,
-  StreakDisplay,
-  DailyGoalRing,
-  LevelBadge,
-  RecentAchievements,
-} from '@/components/gamification'
+  XPProgressCardSkeleton,
+  XPProgressCardEnhanced,
+  StreakCard,
+  StreakCardSkeleton,
+  DailyGoalCard,
+  DailyGoalCardSkeleton,
+  QuickActionButton,
+  QuickActionButtonSkeleton,
+  StudentQuizCard,
+  StudentQuizCardSkeleton,
+  TopicProgressCard,
+  StudentEmptyState,
+  XPCelebration,
+  LevelUpModal,
+  RankProgressDisplay,
+  useStudentToast,
+} from '@/components/student';
+import { useGamification } from '@/lib/hooks/useGamification';
 
 interface Stats {
-  quizzesDue: number
-  averageScore: number
-  topicsMastered: number
-  studyStreak: number
-  totalQuizzes: number
-  completedQuizzes: number
-  performanceHistory: Array<{
-    quiz_number: number
-    percentage: number
-    score: number
-    total: number
-    date: string
-  }>
+  quizzesDue: number;
+  averageScore: number;
+  topicsMastered: number;
+  studyStreak: number;
+  totalQuizzes: number;
+  completedQuizzes: number;
 }
 
 interface Profile {
-  full_name: string
+  full_name: string;
 }
 
 interface UpcomingQuiz {
-  id: string
-  title: string
-  topic: string
-  due_date: string
-  difficulty: string
-  total_marks: number
-  time_limit_minutes: number
+  id: string;
+  title: string;
+  topic: string;
+  due_date: string;
+  difficulty: 'foundational' | 'intermediate' | 'exam_level';
+  total_marks: number;
+  time_limit_minutes: number;
+  status: 'not_started' | 'in_progress' | 'completed' | 'overdue';
+  score?: number;
 }
 
-interface Activity {
-  id: string
-  type: 'quiz_completed' | 'quiz_assigned' | 'achievement'
-  title: string
-  description: string
-  timestamp: string
-  icon: string
+interface TopicProgress {
+  code: string;
+  name: string;
+  progress: number;
+  totalQuizzes: number;
+  completedQuizzes: number;
+  averageScore: number;
 }
 
-export default function StudentDashboard() {
-  const [stats, setStats] = useState<Stats | null>(null)
-  const [profile, setProfile] = useState<Profile | null>(null)
-  const [upcomingQuizzes, setUpcomingQuizzes] = useState<UpcomingQuiz[]>([])
-  const [recentActivity, setRecentActivity] = useState<Activity[]>([])
-  const [loading, setLoading] = useState(true)
+interface XPMultiplier {
+  type: 'streak' | 'first_of_day' | 'weekend' | 'perfect';
+  value: number;
+  label: string;
+  icon: string;
+}
 
-  // Gamification state
+function DashboardLoading() {
+  return (
+    <div className="min-h-screen bg-slate-950 p-4 md:p-6 space-y-6">
+      <div className="h-8 w-48 bg-slate-800 rounded animate-pulse" />
+      <XPProgressCardSkeleton />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <StreakCardSkeleton />
+        <DailyGoalCardSkeleton />
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[...Array(4)].map((_, i) => (
+          <QuickActionButtonSkeleton key={i} />
+        ))}
+      </div>
+      <div className="space-y-3">
+        {[...Array(3)].map((_, i) => (
+          <StudentQuizCardSkeleton key={i} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function StudentDashboardContent() {
+  const searchParams = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'home';
+  const { showToast } = useStudentToast();
+
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [upcomingQuizzes, setUpcomingQuizzes] = useState<UpcomingQuiz[]>([]);
+  const [topicProgress, setTopicProgress] = useState<TopicProgress[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Celebration states
+  const [showXPCelebration, setShowXPCelebration] = useState(false);
+  const [xpCelebrationAmount, setXPCelebrationAmount] = useState(0);
+  const [showLevelUpModal, setShowLevelUpModal] = useState(false);
+  const [newLevelInfo, setNewLevelInfo] = useState({ level: 1, rank: 'bronze', title: 'Math Novice' });
+  const [showRankProgress, setShowRankProgress] = useState(false);
+  const [recentXPGain, setRecentXPGain] = useState<number | undefined>();
+  const [previousTotalXP, setPreviousTotalXP] = useState<number>(0);
+
   const {
     level,
     streak,
     dailyGoal,
     unlockedAchievements,
+    recentXP,
     loading: gamificationLoading,
-  } = useGamification()
+  } = useGamification();
+
+  // Calculate active multipliers
+  const getActiveMultipliers = useCallback((): XPMultiplier[] => {
+    const multipliers: XPMultiplier[] = [];
+
+    if (streak.currentStreak >= 3) {
+      const streakMultiplier = 1 + Math.min(streak.currentStreak * 0.1, 0.5);
+      multipliers.push({
+        type: 'streak',
+        value: parseFloat(streakMultiplier.toFixed(1)),
+        label: `${streak.currentStreak} day streak bonus`,
+        icon: '🔥',
+      });
+    }
+
+    if (!streak.isActiveToday) {
+      multipliers.push({
+        type: 'first_of_day',
+        value: 1.5,
+        label: 'First quiz of the day bonus',
+        icon: '🌅',
+      });
+    }
+
+    const today = new Date().getDay();
+    if (today === 0 || today === 6) {
+      multipliers.push({
+        type: 'weekend',
+        value: 1.2,
+        label: 'Weekend bonus',
+        icon: '🎉',
+      });
+    }
+
+    return multipliers;
+  }, [streak]);
+
+  // Track XP changes for animations
+  useEffect(() => {
+    if (level.totalXP > previousTotalXP && previousTotalXP > 0) {
+      const xpGained = level.totalXP - previousTotalXP;
+      setRecentXPGain(xpGained);
+
+      // Show celebration for significant XP gains
+      if (xpGained >= 50) {
+        setXPCelebrationAmount(xpGained);
+        setShowXPCelebration(true);
+      }
+
+      // Clear after animation
+      setTimeout(() => setRecentXPGain(undefined), 3000);
+    }
+    setPreviousTotalXP(level.totalXP);
+  }, [level.totalXP, previousTotalXP]);
 
   useEffect(() => {
-    fetchDashboardData()
-  }, [])
+    fetchDashboardData();
+  }, []);
 
   const fetchDashboardData = async () => {
     try {
-      // Fetch stats and profile in parallel
-      const [statsRes, profileRes] = await Promise.all([
+      const [statsRes, profileRes, quizzesRes] = await Promise.all([
         fetch('/api/student/stats'),
         fetch('/api/student/profile'),
-      ])
+        fetch('/api/quizzes?limit=5&sortBy=due_date&sortOrder=asc'),
+      ]);
 
       if (statsRes.ok) {
-        const statsData = await statsRes.json()
-        setStats(statsData)
+        const statsData = await statsRes.json();
+        setStats(statsData);
       }
 
       if (profileRes.ok) {
-        const profileData = await profileRes.json()
-        setProfile(profileData)
+        const profileData = await profileRes.json();
+        setProfile(profileData);
       }
 
-      // Fetch upcoming quizzes from API
-      const quizzesRes = await fetch('/api/quizzes?limit=3&sortBy=due_date&sortOrder=asc')
       if (quizzesRes.ok) {
-        const quizzesData = await quizzesRes.json()
-        setUpcomingQuizzes(quizzesData.quizzes?.slice(0, 3) || [])
+        const quizzesData = await quizzesRes.json();
+        setUpcomingQuizzes(quizzesData.quizzes?.slice(0, 5) || []);
       }
 
-      setRecentActivity([])
+      // Mock topic progress for demo
+      setTopicProgress([
+        { code: 'A1', name: 'Quadratic Functions', progress: 85, totalQuizzes: 5, completedQuizzes: 4, averageScore: 88 },
+        { code: 'A2', name: 'Equations & Inequalities', progress: 60, totalQuizzes: 5, completedQuizzes: 3, averageScore: 75 },
+        { code: 'A3', name: 'Surds', progress: 40, totalQuizzes: 5, completedQuizzes: 2, averageScore: 70 },
+        { code: 'A4', name: 'Polynomials & Partial Fractions', progress: 20, totalQuizzes: 5, completedQuizzes: 1, averageScore: 65 },
+        { code: 'G1', name: 'Trigonometric Functions', progress: 0, totalQuizzes: 5, completedQuizzes: 0, averageScore: 0 },
+      ]);
 
-      setLoading(false)
+      setLoading(false);
     } catch (error) {
-      console.error('Error fetching dashboard data:', error)
-      setLoading(false)
+      console.error('Error fetching dashboard data:', error);
+      setLoading(false);
     }
-  }
+  };
 
   const getGreeting = () => {
-    const hour = new Date().getHours()
-    if (hour < 12) return 'Good Morning'
-    if (hour < 18) return 'Good Afternoon'
-    return 'Good Evening'
-  }
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 18) return 'Good Afternoon';
+    return 'Good Evening';
+  };
 
-  const formatDueDate = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffTime = date.getTime() - now.getTime()
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  const getMotivationalMessage = () => {
+    if (streak.currentStreak >= 7) return "You're on fire! Keep it up!";
+    if (streak.currentStreak >= 3) return "Great momentum! Don't break the chain!";
+    if (dailyGoal.isComplete) return "Daily goal crushed!";
+    return "Let's make today count!";
+  };
 
-    if (diffDays === 0) return 'Due today'
-    if (diffDays === 1) return 'Due tomorrow'
-    if (diffDays < 7) return `Due in ${diffDays} days`
-    return date.toLocaleDateString()
-  }
-
-  const formatRelativeTime = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffTime = now.getTime() - date.getTime()
-    const diffHours = Math.floor(diffTime / (1000 * 60 * 60))
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-
-    if (diffHours < 1) return 'Just now'
-    if (diffHours < 24) return `${diffHours}h ago`
-    if (diffDays < 7) return `${diffDays}d ago`
-    return date.toLocaleDateString()
-  }
-
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'foundational':
-        return 'bg-green-500/20 text-green-400 border-green-500/50'
-      case 'intermediate':
-        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50'
-      case 'exam_level':
-        return 'bg-red-500/20 text-red-400 border-red-500/50'
-      default:
-        return 'bg-gray-500/20 text-gray-400 border-gray-500/50'
+  // Calculate streak days for the week
+  const getStreakDays = () => {
+    const today = new Date().getDay();
+    const streakDays = new Array(7).fill(false);
+    for (let i = 0; i < Math.min(streak.currentStreak, 7); i++) {
+      const dayIndex = (today - i + 7) % 7;
+      streakDays[dayIndex] = true;
     }
+    return streakDays;
+  };
+
+  // Handle level click to show rank progress
+  const handleLevelClick = () => {
+    setShowRankProgress(!showRankProgress);
+  };
+
+  // Demo: Trigger level up (for testing)
+  const triggerDemoLevelUp = () => {
+    setNewLevelInfo({
+      level: level.level + 1,
+      rank: level.rank,
+      title: level.title,
+    });
+    setShowLevelUpModal(true);
+  };
+
+  if (loading || gamificationLoading) {
+    return <DashboardLoading />;
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    )
-  }
+  const activeMultipliers = getActiveMultipliers();
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      {/* Gamified Welcome Header */}
-      <div className="bg-gradient-to-r from-blue-500/10 via-cyan-500/10 to-purple-500/10 backdrop-blur-xl rounded-2xl border border-white/10 p-6">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-          {/* Left: Welcome + Level */}
-          <div className="flex items-center gap-4">
-            <LevelBadge level={level} size="lg" />
+    <div className="min-h-screen bg-slate-950">
+      {/* XP Celebration Overlay */}
+      <XPCelebration
+        show={showXPCelebration}
+        amount={xpCelebrationAmount}
+        type={xpCelebrationAmount >= 100 ? 'large' : 'medium'}
+        onComplete={() => setShowXPCelebration(false)}
+      />
+
+      {/* Level Up Modal */}
+      <LevelUpModal
+        show={showLevelUpModal}
+        newLevel={newLevelInfo.level}
+        newRank={newLevelInfo.rank}
+        newTitle={newLevelInfo.title}
+        onClose={() => setShowLevelUpModal(false)}
+      />
+
+      {/* Header */}
+      <header className="sticky top-0 z-30 bg-slate-900/80 backdrop-blur-xl border-b border-white/10">
+        <div className="px-4 md:px-6 py-4">
+          <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-white">
-                {getGreeting()}, {profile?.full_name || 'Student'}!
-              </h1>
-              <p className="text-gray-400 text-sm">
-                Ready to continue your A-Math journey?
-              </p>
+              <motion.h1
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-xl md:text-2xl font-bold text-white"
+              >
+                {getGreeting()}, {profile?.full_name?.split(' ')[0] || 'Student'}!
+              </motion.h1>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.1 }}
+                className="text-slate-400 text-sm"
+              >
+                {getMotivationalMessage()}
+              </motion.p>
             </div>
-          </div>
 
-          {/* Right: Daily Goal + Streak */}
-          <div className="flex items-center gap-6">
-            <DailyGoalRing dailyGoal={dailyGoal} size="sm" showDetails={false} />
-            <div className="flex flex-col items-center">
-              <div className={`text-3xl ${streak.currentStreak > 0 ? 'animate-fire' : 'opacity-50'}`}>
-                {streak.currentStreak > 0 ? '🔥' : '🕯️'}
-              </div>
-              <span className={`font-bold ${streak.currentStreak > 0 ? 'text-orange-400' : 'text-white/50'}`}>
-                {streak.currentStreak}
-              </span>
-              <span className="text-xs text-white/50">streak</span>
+            {/* Quick stats */}
+            <div className="flex items-center gap-3">
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  // Demo XP celebration
+                  setXPCelebrationAmount(50);
+                  setShowXPCelebration(true);
+                }}
+                className="flex items-center gap-1 bg-amber-500/20 px-3 py-1.5 rounded-full cursor-pointer"
+              >
+                <span className="text-lg">⭐</span>
+                <span className="text-amber-400 font-bold text-sm">{level.totalXP.toLocaleString()}</span>
+              </motion.button>
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                animate={streak.currentStreak > 0 ? { scale: [1, 1.1, 1] } : {}}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="flex items-center gap-1 bg-orange-500/20 px-3 py-1.5 rounded-full"
+              >
+                <span className="text-lg">{streak.currentStreak > 0 ? '🔥' : '🕯️'}</span>
+                <span className={`font-bold text-sm ${streak.currentStreak > 0 ? 'text-orange-400' : 'text-slate-500'}`}>
+                  {streak.currentStreak}
+                </span>
+              </motion.div>
             </div>
           </div>
         </div>
+      </header>
 
-        {/* XP Progress Bar */}
-        <div className="mt-4">
-          <XPBar level={level} size="sm" />
+      {/* Content */}
+      <div className="p-4 md:p-6 space-y-6">
+        {/* Enhanced XP Progress */}
+        <XPProgressCardEnhanced
+          level={level.level}
+          currentXP={level.currentXP}
+          xpToNextLevel={level.xpForNextLevel}
+          totalXP={level.totalXP}
+          rank={level.rank}
+          title={level.title}
+          activeMultipliers={activeMultipliers}
+          recentXPGain={recentXPGain}
+          onLevelClick={handleLevelClick}
+        />
+
+        {/* Rank Progression (toggleable) */}
+        <AnimatePresence>
+          {showRankProgress && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+            >
+              <RankProgressDisplay
+                currentLevel={level.level}
+                currentRank={level.rank}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Streak & Daily Goal */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <StreakCard
+            currentStreak={streak.currentStreak}
+            longestStreak={streak.longestStreak}
+            streakDays={getStreakDays()}
+          />
+          <DailyGoalCard
+            completed={dailyGoal.earnedXP}
+            target={dailyGoal.targetXP}
+            xpEarned={dailyGoal.earnedXP}
+          />
         </div>
-      </div>
 
-      {/* Stats cards - Now with XP focus */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Total XP */}
-        <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 backdrop-blur-xl rounded-xl border border-yellow-500/20 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-yellow-500/20 rounded-lg">
-              <span className="text-2xl">⭐</span>
-            </div>
-            <span className="text-3xl font-bold text-yellow-400">{level.totalXP.toLocaleString()}</span>
+        {/* Quick Actions */}
+        <section>
+          <h2 className="text-lg font-bold text-white mb-3">Quick Actions</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <QuickActionButton
+              href="/student/quizzes"
+              icon={
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              }
+              label="Quizzes"
+              sublabel={stats?.quizzesDue ? `${stats.quizzesDue} due` : 'Practice'}
+              color="emerald"
+              badge={stats?.quizzesDue ? String(stats.quizzesDue) : undefined}
+              delay={0}
+            />
+            <QuickActionButton
+              href="/student/notes"
+              icon={
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              }
+              label="Learn"
+              sublabel="Study notes"
+              color="blue"
+              delay={0.05}
+            />
+            <QuickActionButton
+              href="/student/models"
+              icon={
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                </svg>
+              }
+              label="Models"
+              sublabel="Interactive"
+              color="cyan"
+              delay={0.1}
+            />
+            <QuickActionButton
+              href="/student/mistakes"
+              icon={
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              }
+              label="Mistakes"
+              sublabel="Review errors"
+              color="orange"
+              delay={0.15}
+            />
           </div>
-          <h3 className="text-gray-400 text-sm font-medium">Total XP</h3>
-          <p className="text-gray-500 text-xs mt-1">Keep earning more!</p>
-        </div>
+        </section>
 
-        {/* Quizzes Due */}
-        <div className="bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-blue-500/20 rounded-lg">
-              <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        {/* Upcoming Quizzes */}
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-bold text-white">Upcoming Quizzes</h2>
+            <Link
+              href="/student/quizzes"
+              className="text-emerald-400 hover:text-emerald-300 text-sm font-medium flex items-center gap-1"
+            >
+              View all
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
-            </div>
-            <span className="text-3xl font-bold text-white">{stats?.quizzesDue || 0}</span>
-          </div>
-          <h3 className="text-gray-400 text-sm font-medium">Quizzes Due</h3>
-          <p className="text-gray-500 text-xs mt-1">Next 7 days</p>
-        </div>
-
-        {/* Topics Mastered */}
-        <div className="bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-purple-500/20 rounded-lg">
-              <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-              </svg>
-            </div>
-            <span className="text-3xl font-bold text-white">{stats?.topicsMastered || 0}/10</span>
-          </div>
-          <h3 className="text-gray-400 text-sm font-medium">Topics Mastered</h3>
-          <p className="text-gray-500 text-xs mt-1">≥80% accuracy</p>
-        </div>
-
-        {/* Achievements */}
-        <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 backdrop-blur-xl rounded-xl border border-green-500/20 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-green-500/20 rounded-lg">
-              <span className="text-2xl">🏆</span>
-            </div>
-            <span className="text-3xl font-bold text-green-400">{unlockedAchievements.length}</span>
-          </div>
-          <h3 className="text-gray-400 text-sm font-medium">Achievements</h3>
-          <p className="text-gray-500 text-xs mt-1">Badges earned</p>
-        </div>
-      </div>
-
-      {/* Recent Achievements */}
-      {unlockedAchievements.length > 0 && (
-        <div className="bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-white">Recent Achievements</h2>
-            <Link href="/student/achievements" className="text-cyan-400 hover:text-cyan-300 text-sm">
-              View All →
             </Link>
           </div>
-          <RecentAchievements achievements={unlockedAchievements} limit={3} />
-        </div>
-      )}
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        <Link
-          href="/student/quizzes"
-          className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-xl p-6 hover:from-blue-500/20 hover:to-cyan-500/20 hover:scale-105 transition-all duration-300 group"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-              <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="text-white font-bold">Quizzes</h3>
-              <p className="text-gray-400 text-sm">Take a quiz</p>
-            </div>
-          </div>
-        </Link>
-
-        <Link
-          href="/student/notes"
-          className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-xl p-6 hover:from-green-500/20 hover:to-emerald-500/20 hover:scale-105 transition-all duration-300 group"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-              <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="text-white font-bold">Notes</h3>
-              <p className="text-gray-400 text-sm">Study materials</p>
-            </div>
-          </div>
-        </Link>
-
-        <Link
-          href="/student/models"
-          className="bg-gradient-to-br from-cyan-500/10 to-teal-500/10 border border-cyan-500/30 rounded-xl p-6 hover:from-cyan-500/20 hover:to-teal-500/20 hover:scale-105 transition-all duration-300 group"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-cyan-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-              <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="text-white font-bold">Models</h3>
-              <p className="text-gray-400 text-sm">Real-world math</p>
-            </div>
-          </div>
-        </Link>
-
-        <Link
-          href="/student/progress"
-          className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-xl p-6 hover:from-purple-500/20 hover:to-pink-500/20 hover:scale-105 transition-all duration-300 group"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-              <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="text-white font-bold">Progress</h3>
-              <p className="text-gray-400 text-sm">View analytics</p>
-            </div>
-          </div>
-        </Link>
-
-        <Link
-          href="/student/mistakes"
-          className="bg-gradient-to-br from-orange-500/10 to-amber-500/10 border border-orange-500/30 rounded-xl p-6 hover:from-orange-500/20 hover:to-amber-500/20 hover:scale-105 transition-all duration-300 group"
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
-              <svg className="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="text-white font-bold">Mistakes</h3>
-              <p className="text-gray-400 text-sm">Review errors</p>
-            </div>
-          </div>
-        </Link>
-      </div>
-
-      {/* Main content grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Performance chart */}
-        <div className="lg:col-span-2 bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-6">
-          <h2 className="text-xl font-bold text-white mb-6">Performance Trend</h2>
-          {stats?.performanceHistory && stats.performanceHistory.length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={stats.performanceHistory}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis
-                  dataKey="quiz_number"
-                  stroke="#9CA3AF"
-                  label={{ value: 'Quiz Number', position: 'insideBottom', offset: -5, fill: '#9CA3AF' }}
-                />
-                <YAxis
-                  stroke="#9CA3AF"
-                  domain={[0, 100]}
-                  label={{ value: 'Score %', angle: -90, position: 'insideLeft', fill: '#9CA3AF' }}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#1e293b',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '8px',
-                    color: '#fff',
-                  }}
-                  formatter={(value: any, name: string) => {
-                    if (name === 'percentage') return [`${value}%`, 'Score']
-                    return [value, name]
-                  }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="percentage"
-                  stroke="#3b82f6"
-                  strokeWidth={3}
-                  dot={{ fill: '#3b82f6', r: 5 }}
-                  activeDot={{ r: 7 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="flex items-center justify-center h-[300px] text-gray-400">
-              <div className="text-center">
-                <svg className="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-                <p>No quiz data yet</p>
-                <p className="text-sm mt-1">Complete some quizzes to see your progress!</p>
+          <AnimatePresence mode="wait">
+            {upcomingQuizzes.length > 0 ? (
+              <div className="space-y-3">
+                {upcomingQuizzes.map((quiz, index) => (
+                  <StudentQuizCard key={quiz.id} quiz={quiz} index={index} />
+                ))}
               </div>
-            </div>
-          )}
-        </div>
+            ) : (
+              <StudentEmptyState
+                icon="quizzes"
+                title="No Quizzes Yet"
+                description="Your tutor hasn't assigned any quizzes yet. Check back later!"
+                action={{
+                  label: 'Browse Study Materials',
+                  href: '/student/notes',
+                }}
+              />
+            )}
+          </AnimatePresence>
+        </section>
 
-        {/* Recent activity */}
-        <div className="bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-6">
-          <h2 className="text-xl font-bold text-white mb-6">Recent Activity</h2>
-          {recentActivity.length > 0 ? (
-            <div className="space-y-4">
-              {recentActivity.map((activity) => (
-                <div key={activity.id} className="flex gap-3">
-                  <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center text-xl flex-shrink-0">
-                    {activity.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white text-sm font-medium">{activity.title}</p>
-                    <p className="text-gray-400 text-xs">{activity.description}</p>
-                    <p className="text-gray-500 text-xs mt-1">{formatRelativeTime(activity.timestamp)}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8 text-gray-400">
-              <svg className="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        {/* Topic Progress */}
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-bold text-white">Topic Progress</h2>
+            <Link
+              href="/student/progress"
+              className="text-emerald-400 hover:text-emerald-300 text-sm font-medium flex items-center gap-1"
+            >
+              Details
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
-              <p>No recent activity</p>
-              <p className="text-sm mt-1">Complete some quizzes to see your activity!</p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Link
-          href="/student/quizzes"
-          className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 backdrop-blur-xl rounded-xl border border-blue-500/30 p-6 hover:border-blue-500/50 transition-all group"
-        >
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-blue-500/20 rounded-lg group-hover:bg-blue-500/30 transition-colors">
-              <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="text-white font-semibold text-lg mb-1">Online Quizzes</h3>
-              <p className="text-gray-400 text-sm">Take MCQ practice quizzes</p>
-            </div>
+            </Link>
           </div>
-        </Link>
 
-        <Link
-          href="/student/homework"
-          className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 backdrop-blur-xl rounded-xl border border-purple-500/30 p-6 hover:border-purple-500/50 transition-all group"
-        >
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-purple-500/20 rounded-lg group-hover:bg-purple-500/30 transition-colors">
-              <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="text-white font-semibold text-lg mb-1">Paper Homework</h3>
-              <p className="text-gray-400 text-sm">View assigned questions</p>
-            </div>
-          </div>
-        </Link>
-
-        <Link
-          href="/student/mistakes"
-          className="bg-gradient-to-br from-orange-500/10 to-red-500/10 backdrop-blur-xl rounded-xl border border-orange-500/30 p-6 hover:border-orange-500/50 transition-all group"
-        >
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-orange-500/20 rounded-lg group-hover:bg-orange-500/30 transition-colors">
-              <svg className="w-8 h-8 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="text-white font-semibold text-lg mb-1">Mistake Journal</h3>
-              <p className="text-gray-400 text-sm">Review your mistakes</p>
-            </div>
-          </div>
-        </Link>
-      </div>
-
-      {/* Upcoming quizzes */}
-      <div className="bg-white/5 backdrop-blur-xl rounded-xl border border-white/10 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-white">Upcoming Quizzes</h2>
-          <Link href="/student/quizzes" className="text-blue-400 hover:text-blue-300 text-sm flex items-center gap-1">
-            View All
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </Link>
-        </div>
-        {upcomingQuizzes.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {upcomingQuizzes.map((quiz) => (
-              <Link
-                key={quiz.id}
-                href={`/student/quizzes/${quiz.id}`}
-                className="bg-white/5 rounded-lg border border-white/10 p-5 hover:bg-white/10 transition-all"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <h3 className="text-white font-semibold mb-1">{quiz.title}</h3>
-                    <div className="flex items-center gap-2">
-                      <span className="text-blue-400 text-xs font-mono">{quiz.topic}</span>
-                      <span className={`text-xs px-2 py-1 rounded border ${getDifficultyColor(quiz.difficulty)}`}>
-                        {quiz.difficulty.replace('_', ' ')}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center gap-2 text-gray-400">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    {quiz.time_limit_minutes} minutes
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-400">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    {quiz.total_marks} marks
-                  </div>
-                  <div className="flex items-center gap-2 text-orange-400 font-medium">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    {formatDueDate(quiz.due_date)}
-                  </div>
-                </div>
-              </Link>
+          <div className="space-y-2">
+            {topicProgress.map((topic, index) => (
+              <TopicProgressCard key={topic.code} topic={topic} index={index} />
             ))}
           </div>
-        ) : (
-          <div className="text-center py-8">
-            <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-8 max-w-md mx-auto">
-              <svg className="w-16 h-16 mx-auto mb-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <h3 className="text-white font-semibold mb-2">No Quizzes Yet</h3>
-              <p className="text-gray-400 text-sm mb-4">
-                Your tutor hasn't assigned any quizzes yet. Once quizzes are available, they'll appear here!
-              </p>
+        </section>
+
+        {/* Recent Achievements */}
+        {unlockedAchievements.length > 0 && (
+          <section>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-bold text-white">Recent Achievements</h2>
               <Link
-                href="/student/quizzes"
-                className="inline-block px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
+                href="/student/profile?tab=achievements"
+                className="text-emerald-400 hover:text-emerald-300 text-sm font-medium flex items-center gap-1"
               >
-                Browse Quiz Library
+                View all
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
               </Link>
             </div>
-          </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {unlockedAchievements.slice(0, 4).map((studentAchievement, index) => (
+                <motion.div
+                  key={studentAchievement.id}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ scale: 1.05 }}
+                  className="bg-gradient-to-br from-amber-500/10 to-yellow-500/10 rounded-xl border border-amber-500/20 p-4 text-center"
+                >
+                  <div className="text-3xl mb-2">{studentAchievement.achievement?.icon || '🏆'}</div>
+                  <h4 className="text-white font-medium text-sm truncate">{studentAchievement.achievement?.name || 'Achievement'}</h4>
+                  <p className="text-slate-500 text-xs truncate">{studentAchievement.achievement?.description || ''}</p>
+                </motion.div>
+              ))}
+            </div>
+          </section>
         )}
+
+        {/* Motivational Footer */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="text-center py-8"
+        >
+          <p className="text-slate-500 text-sm">
+            "The only way to learn mathematics is to do mathematics." - Paul Halmos
+          </p>
+        </motion.div>
       </div>
     </div>
-  )
+  );
+}
+
+export default function StudentDashboard() {
+  return (
+    <Suspense fallback={<DashboardLoading />}>
+      <StudentDashboardContent />
+    </Suspense>
+  );
 }
