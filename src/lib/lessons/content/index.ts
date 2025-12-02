@@ -43,7 +43,7 @@ export {
 
 export {
   COORDINATE_LESSONS,
-  MODULE_COORDINATE_GEOMETRY,
+  MODULE_COORDINATE,
 } from './coordinate-geometry';
 
 export {
@@ -64,7 +64,7 @@ import { SURDS_LESSONS, MODULE_SURDS } from './surds';
 import { POLYNOMIALS_LESSONS, MODULE_POLYNOMIALS } from './polynomials';
 import { BINOMIAL_LESSONS, MODULE_BINOMIAL } from './binomial';
 import { EXPONENTIALS_LESSONS, MODULE_EXPONENTIALS } from './exponentials';
-import { COORDINATE_LESSONS, MODULE_COORDINATE_GEOMETRY } from './coordinate-geometry';
+import { COORDINATE_LESSONS, MODULE_COORDINATE } from './coordinate-geometry';
 import { GEOMETRY_PROOFS_LESSONS, MODULE_PROOFS } from './geometry-proofs';
 import { CALCULUS_LESSONS, MODULE_CALCULUS } from './calculus';
 import { Lesson, LessonModule } from '../types';
@@ -92,7 +92,7 @@ export const ALL_MODULES: LessonModule[] = [
   MODULE_POLYNOMIALS,
   MODULE_BINOMIAL,
   MODULE_EXPONENTIALS,
-  MODULE_COORDINATE_GEOMETRY,
+  MODULE_COORDINATE,
   MODULE_PROOFS,
   MODULE_CALCULUS,
 ];
