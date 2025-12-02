@@ -52,7 +52,7 @@ export {
 } from './geometry-proofs';
 
 export {
-  calculusLessons,
+  CALCULUS_LESSONS,
   MODULE_CALCULUS,
 } from './calculus';
 
@@ -66,7 +66,7 @@ import { binomialLessons, MODULE_BINOMIAL } from './binomial';
 import { exponentialsLessons, MODULE_EXPONENTIALS } from './exponentials';
 import { coordinateGeometryLessons, MODULE_COORDINATE_GEOMETRY } from './coordinate-geometry';
 import { proofsLessons, MODULE_PROOFS } from './geometry-proofs';
-import { calculusLessons, MODULE_CALCULUS } from './calculus';
+import { CALCULUS_LESSONS, MODULE_CALCULUS } from './calculus';
 import { Lesson, LessonModule } from '../types';
 
 // All lessons combined
@@ -80,7 +80,7 @@ export const ALL_LESSONS: Lesson[] = [
   ...exponentialsLessons,
   ...coordinateGeometryLessons,
   ...proofsLessons,
-  ...calculusLessons,
+  ...CALCULUS_LESSONS,
 ];
 
 // All modules combined
