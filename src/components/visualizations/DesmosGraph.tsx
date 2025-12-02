@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { DesmosExpression, DesmosBounds } from '@/types/desmos';
+import { DesmosExpression, DesmosBounds, DesmosCalculator } from '@/types/desmos';
 
 interface DesmosGraphProps {
   expressions: DesmosExpression[];
@@ -33,9 +33,7 @@ export function DesmosGraph({
   onCalculatorReady,
 }: DesmosGraphProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const calculatorRef = useRef<ReturnType<
-    typeof window.Desmos.GraphingCalculator
-  > | null>(null);
+  const calculatorRef = useRef<DesmosCalculator | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
