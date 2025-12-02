@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -50,7 +50,17 @@ interface AnalyticsData {
 
 type Tab = 'home' | 'upload' | 'manage' | 'analytics';
 
-export default function TutorDashboard() {
+// Loading fallback for Suspense
+function DashboardLoading() {
+  return (
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500"></div>
+    </div>
+  );
+}
+
+// Main dashboard content wrapped to use searchParams
+function TutorDashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { showToast } = useToast();
@@ -885,5 +895,14 @@ Use LaTeX for math: $x^2$, $\\frac{a}{b}$, $\\sqrt{x}$`;
         </div>
       </main>
     </div>
+  );
+}
+
+// Default export with Suspense boundary for useSearchParams
+export default function TutorDashboard() {
+  return (
+    <Suspense fallback={<DashboardLoading />}>
+      <TutorDashboardContent />
+    </Suspense>
   );
 }
