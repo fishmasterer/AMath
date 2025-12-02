@@ -31,18 +31,29 @@ interface InteractiveModelProps {
 }
 
 export const InteractiveModel: React.FC<InteractiveModelProps> = ({ config, className = '' }) => {
-  const [params, setParams] = useState<Record<string, number>>(
-    config.parameters.reduce((acc, param) => ({
+  // Initialize params from config defaults
+  const getDefaultParams = (cfg: ModelConfig) =>
+    cfg.parameters.reduce((acc, param) => ({
       ...acc,
       [param.name]: param.default,
-    }), {})
-  )
+    }), {} as Record<string, number>)
 
-  const [graphConfig, setGraphConfig] = useState<GraphConfig>(config.generateGraph(params))
+  const [params, setParams] = useState<Record<string, number>>(getDefaultParams(config))
+  const [graphConfig, setGraphConfig] = useState<GraphConfig | null>(null)
 
+  // Reset params when config changes (e.g., switching models)
   useEffect(() => {
-    setGraphConfig(config.generateGraph(params))
-  }, [params, config])
+    const newParams = getDefaultParams(config)
+    setParams(newParams)
+    setGraphConfig(config.generateGraph(newParams))
+  }, [config])
+
+  // Update graph when params change
+  useEffect(() => {
+    if (params && Object.keys(params).length > 0) {
+      setGraphConfig(config.generateGraph(params))
+    }
+  }, [params])
 
   const handleParamChange = (name: string, value: number) => {
     setParams((prev) => ({ ...prev, [name]: value }))
@@ -70,7 +81,7 @@ export const InteractiveModel: React.FC<InteractiveModelProps> = ({ config, clas
 
       {/* Graph */}
       <div className="mb-6">
-        <GraphRenderer config={graphConfig} height={400} />
+        {graphConfig && <GraphRenderer config={graphConfig} height={400} />}
       </div>
 
       {/* Parameter Controls */}
@@ -84,7 +95,7 @@ export const InteractiveModel: React.FC<InteractiveModelProps> = ({ config, clas
                 {param.unit && <span className="text-gray-400 ml-1">({param.unit})</span>}
               </label>
               <span className="text-blue-400 font-mono text-lg">
-                {params[param.name].toFixed(2)}
+                {(params[param.name] ?? param.default).toFixed(2)}
                 {param.unit && <span className="text-sm ml-1">{param.unit}</span>}
               </span>
             </div>
@@ -96,7 +107,7 @@ export const InteractiveModel: React.FC<InteractiveModelProps> = ({ config, clas
               min={param.min}
               max={param.max}
               step={param.step}
-              value={params[param.name]}
+              value={params[param.name] ?? param.default}
               onChange={(e) => handleParamChange(param.name, parseFloat(e.target.value))}
               className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
             />
