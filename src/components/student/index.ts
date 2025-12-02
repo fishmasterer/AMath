@@ -1,5 +1,6 @@
 export { StudentMobileNav } from './StudentMobileNav';
 export { XPProgressCard, XPProgressCardSkeleton } from './XPProgressCard';
+export { XPProgressCardEnhanced } from './XPProgressCardEnhanced';
 export { StreakCard, StreakCardSkeleton } from './StreakCard';
 export { DailyGoalCard, DailyGoalCardSkeleton } from './DailyGoalCard';
 export { QuickActionButton, QuickActionButtonSkeleton } from './QuickActionButton';
@@ -7,3 +8,7 @@ export { StudentQuizCard, StudentQuizCardSkeleton } from './StudentQuizCard';
 export { TopicProgressCard, TopicProgressCardSkeleton } from './TopicProgressCard';
 export { StudentToastProvider, useStudentToast } from './StudentToast';
 export { StudentEmptyState } from './StudentEmptyState';
+export { XPCelebration, XPPopup, StreakCelebration } from './XPCelebration';
+export { LevelUpModal } from './LevelUpModal';
+export { RankProgressDisplay } from './RankProgressDisplay';
+export { XPHistoryFeed } from './XPHistoryFeed';

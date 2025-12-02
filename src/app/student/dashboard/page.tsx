@@ -1,12 +1,12 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import {
-  XPProgressCard,
   XPProgressCardSkeleton,
+  XPProgressCardEnhanced,
   StreakCard,
   StreakCardSkeleton,
   DailyGoalCard,
@@ -16,8 +16,11 @@ import {
   StudentQuizCard,
   StudentQuizCardSkeleton,
   TopicProgressCard,
-  TopicProgressCardSkeleton,
   StudentEmptyState,
+  XPCelebration,
+  LevelUpModal,
+  RankProgressDisplay,
+  useStudentToast,
 } from '@/components/student';
 import { useGamification } from '@/lib/hooks/useGamification';
 
@@ -55,6 +58,13 @@ interface TopicProgress {
   averageScore: number;
 }
 
+interface XPMultiplier {
+  type: 'streak' | 'first_of_day' | 'weekend' | 'perfect';
+  value: number;
+  label: string;
+  icon: string;
+}
+
 function DashboardLoading() {
   return (
     <div className="min-h-screen bg-slate-950 p-4 md:p-6 space-y-6">
@@ -81,6 +91,7 @@ function DashboardLoading() {
 function StudentDashboardContent() {
   const searchParams = useSearchParams();
   const activeTab = searchParams.get('tab') || 'home';
+  const { showToast } = useStudentToast();
 
   const [stats, setStats] = useState<Stats | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -88,13 +99,77 @@ function StudentDashboardContent() {
   const [topicProgress, setTopicProgress] = useState<TopicProgress[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Celebration states
+  const [showXPCelebration, setShowXPCelebration] = useState(false);
+  const [xpCelebrationAmount, setXPCelebrationAmount] = useState(0);
+  const [showLevelUpModal, setShowLevelUpModal] = useState(false);
+  const [newLevelInfo, setNewLevelInfo] = useState({ level: 1, rank: 'bronze', title: 'Math Novice' });
+  const [showRankProgress, setShowRankProgress] = useState(false);
+  const [recentXPGain, setRecentXPGain] = useState<number | undefined>();
+  const [previousTotalXP, setPreviousTotalXP] = useState<number>(0);
+
   const {
     level,
     streak,
     dailyGoal,
     unlockedAchievements,
+    recentXP,
     loading: gamificationLoading,
   } = useGamification();
+
+  // Calculate active multipliers
+  const getActiveMultipliers = useCallback((): XPMultiplier[] => {
+    const multipliers: XPMultiplier[] = [];
+
+    if (streak.currentStreak >= 3) {
+      const streakMultiplier = 1 + Math.min(streak.currentStreak * 0.1, 0.5);
+      multipliers.push({
+        type: 'streak',
+        value: parseFloat(streakMultiplier.toFixed(1)),
+        label: `${streak.currentStreak} day streak bonus`,
+        icon: '🔥',
+      });
+    }
+
+    if (!streak.isActiveToday) {
+      multipliers.push({
+        type: 'first_of_day',
+        value: 1.5,
+        label: 'First quiz of the day bonus',
+        icon: '🌅',
+      });
+    }
+
+    const today = new Date().getDay();
+    if (today === 0 || today === 6) {
+      multipliers.push({
+        type: 'weekend',
+        value: 1.2,
+        label: 'Weekend bonus',
+        icon: '🎉',
+      });
+    }
+
+    return multipliers;
+  }, [streak]);
+
+  // Track XP changes for animations
+  useEffect(() => {
+    if (level.totalXP > previousTotalXP && previousTotalXP > 0) {
+      const xpGained = level.totalXP - previousTotalXP;
+      setRecentXPGain(xpGained);
+
+      // Show celebration for significant XP gains
+      if (xpGained >= 50) {
+        setXPCelebrationAmount(xpGained);
+        setShowXPCelebration(true);
+      }
+
+      // Clear after animation
+      setTimeout(() => setRecentXPGain(undefined), 3000);
+    }
+    setPreviousTotalXP(level.totalXP);
+  }, [level.totalXP, previousTotalXP]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -164,12 +239,46 @@ function StudentDashboardContent() {
     return streakDays;
   };
 
+  // Handle level click to show rank progress
+  const handleLevelClick = () => {
+    setShowRankProgress(!showRankProgress);
+  };
+
+  // Demo: Trigger level up (for testing)
+  const triggerDemoLevelUp = () => {
+    setNewLevelInfo({
+      level: level.level + 1,
+      rank: level.rank,
+      title: level.title,
+    });
+    setShowLevelUpModal(true);
+  };
+
   if (loading || gamificationLoading) {
     return <DashboardLoading />;
   }
 
+  const activeMultipliers = getActiveMultipliers();
+
   return (
     <div className="min-h-screen bg-slate-950">
+      {/* XP Celebration Overlay */}
+      <XPCelebration
+        show={showXPCelebration}
+        amount={xpCelebrationAmount}
+        type={xpCelebrationAmount >= 100 ? 'large' : 'medium'}
+        onComplete={() => setShowXPCelebration(false)}
+      />
+
+      {/* Level Up Modal */}
+      <LevelUpModal
+        show={showLevelUpModal}
+        newLevel={newLevelInfo.level}
+        newRank={newLevelInfo.rank}
+        newTitle={newLevelInfo.title}
+        onClose={() => setShowLevelUpModal(false)}
+      />
+
       {/* Header */}
       <header className="sticky top-0 z-30 bg-slate-900/80 backdrop-blur-xl border-b border-white/10">
         <div className="px-4 md:px-6 py-4">
@@ -194,13 +303,19 @@ function StudentDashboardContent() {
 
             {/* Quick stats */}
             <div className="flex items-center gap-3">
-              <motion.div
+              <motion.button
                 whileHover={{ scale: 1.1 }}
-                className="flex items-center gap-1 bg-amber-500/20 px-3 py-1.5 rounded-full"
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  // Demo XP celebration
+                  setXPCelebrationAmount(50);
+                  setShowXPCelebration(true);
+                }}
+                className="flex items-center gap-1 bg-amber-500/20 px-3 py-1.5 rounded-full cursor-pointer"
               >
                 <span className="text-lg">⭐</span>
                 <span className="text-amber-400 font-bold text-sm">{level.totalXP.toLocaleString()}</span>
-              </motion.div>
+              </motion.button>
               <motion.div
                 whileHover={{ scale: 1.1 }}
                 animate={streak.currentStreak > 0 ? { scale: [1, 1.1, 1] } : {}}
@@ -219,13 +334,34 @@ function StudentDashboardContent() {
 
       {/* Content */}
       <div className="p-4 md:p-6 space-y-6">
-        {/* XP Progress */}
-        <XPProgressCard
+        {/* Enhanced XP Progress */}
+        <XPProgressCardEnhanced
           level={level.level}
           currentXP={level.currentXP}
           xpToNextLevel={level.xpForNextLevel}
           totalXP={level.totalXP}
+          rank={level.rank}
+          title={level.title}
+          activeMultipliers={activeMultipliers}
+          recentXPGain={recentXPGain}
+          onLevelClick={handleLevelClick}
         />
+
+        {/* Rank Progression (toggleable) */}
+        <AnimatePresence>
+          {showRankProgress && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+            >
+              <RankProgressDisplay
+                currentLevel={level.level}
+                currentRank={level.rank}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Streak & Daily Goal */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
