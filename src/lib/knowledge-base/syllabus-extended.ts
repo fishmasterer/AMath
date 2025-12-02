@@ -1366,6 +1366,3 @@ export const TOPIC_G3: TopicData = {
     },
   ],
 };
-
-// Export all extended topics
-export { TOPIC_A5, TOPIC_A6, TOPIC_G1, TOPIC_G2, TOPIC_G3, TOPIC_C1 };
