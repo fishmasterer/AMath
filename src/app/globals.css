@@ -209,8 +209,250 @@
   .no-print {
     display: none !important;
   }
-  
+
   .quiz-question {
     page-break-inside: avoid;
   }
+}
+
+/* =====================================================
+   GAMIFICATION ANIMATIONS
+   ===================================================== */
+
+/* Shimmer effect for XP bar */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite linear;
+}
+
+/* Fire animation for streak */
+@keyframes fire {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1);
+  }
+  25% {
+    transform: scale(1.1) rotate(-3deg);
+    filter: brightness(1.2);
+  }
+  50% {
+    transform: scale(1.05) rotate(3deg);
+    filter: brightness(1.1);
+  }
+  75% {
+    transform: scale(1.08) rotate(-2deg);
+    filter: brightness(1.15);
+  }
+}
+
+.animate-fire {
+  animation: fire 1.5s ease-in-out infinite;
+}
+
+/* Slow bounce for celebrations */
+@keyframes bounce-slow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 2s ease-in-out infinite;
+}
+
+/* Ping once (for goal completion) */
+@keyframes ping-once {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.animate-ping-once {
+  animation: ping-once 0.6s ease-out forwards;
+}
+
+/* Fade in */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* Scale in (for modals) */
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out;
+}
+
+/* Slide in from right (for notifications) */
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+/* Float up (for XP numbers) */
+@keyframes float-up {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-30px) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-60px) scale(0.8);
+  }
+}
+
+.animate-float-up {
+  animation: float-up 1.5s ease-out forwards;
+}
+
+/* Confetti burst */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.animate-confetti {
+  animation: confetti-fall 3s ease-in-out forwards;
+}
+
+/* Glow pulse for important elements */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(34, 211, 238, 0.3),
+                0 0 10px rgba(34, 211, 238, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.6),
+                0 0 30px rgba(34, 211, 238, 0.4);
+  }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* Celebration shake */
+@keyframes celebration-shake {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: rotate(-5deg);
+  }
+  20%, 40%, 60%, 80% {
+    transform: rotate(5deg);
+  }
+}
+
+.animate-celebrate {
+  animation: celebration-shake 0.5s ease-in-out;
+}
+
+/* XP counter increment animation */
+@keyframes count-up {
+  0% {
+    opacity: 0.5;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-count-up {
+  animation: count-up 0.3s ease-out;
+}
+
+/* Streak freeze wobble */
+@keyframes freeze-wobble {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-10deg);
+  }
+  75% {
+    transform: rotate(10deg);
+  }
+}
+
+.animate-freeze-wobble {
+  animation: freeze-wobble 0.5s ease-in-out;
+}
+
+/* Level up glow */
+@keyframes level-up-glow {
+  0% {
+    box-shadow: 0 0 0 rgba(168, 85, 247, 0);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(168, 85, 247, 0.8),
+                0 0 60px rgba(168, 85, 247, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(168, 85, 247, 0);
+  }
+}
+
+.animate-level-up-glow {
+  animation: level-up-glow 1s ease-out;
 }
