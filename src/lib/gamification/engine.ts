@@ -608,43 +608,46 @@ export async function getGamificationState(
   dailyGoal: DailyGoal;
   recentXP: XPTransaction[];
 }> {
-  // Get profile
-  let { data: profile, error } = await supabase
-    .from('student_gamification')
-    .select('*')
-    .eq('student_id', studentId)
-    .single();
+  // Fetch profile and recent XP in parallel for better performance
+  const [profileResult, recentXPResult] = await Promise.all([
+    supabase
+      .from('student_gamification')
+      .select('*')
+      .eq('student_id', studentId)
+      .single(),
+    supabase
+      .from('xp_transactions')
+      .select('*')
+      .eq('student_id', studentId)
+      .order('created_at', { ascending: false })
+      .limit(10),
+  ]);
+
+  let profile = profileResult.data;
 
   // If no profile, initialize one
-  if (error || !profile) {
+  if (profileResult.error || !profile) {
     profile = await initializeGamificationProfile(supabase, studentId);
   }
 
   // Check if we need to reset daily XP (new day)
   const today = getTodayDate();
   if (profile.last_activity_date !== today && profile.last_activity_date !== null) {
-    // Reset daily XP for new day
-    await supabase
+    // Reset daily XP for new day (fire and forget for performance)
+    supabase
       .from('student_gamification')
       .update({ daily_xp_earned: 0 })
-      .eq('student_id', studentId);
+      .eq('student_id', studentId)
+      .then(() => {});
     profile.daily_xp_earned = 0;
   }
-
-  // Get recent XP transactions
-  const { data: recentXP } = await supabase
-    .from('xp_transactions')
-    .select('*')
-    .eq('student_id', studentId)
-    .order('created_at', { ascending: false })
-    .limit(10);
 
   return {
     profile,
     level: getLevelInfo(profile.total_xp),
     streak: getStreakInfo(profile),
     dailyGoal: getDailyGoalInfo(profile),
-    recentXP: recentXP || [],
+    recentXP: recentXPResult.data || [],
   };
 }
 

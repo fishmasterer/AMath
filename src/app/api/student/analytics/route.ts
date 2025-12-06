@@ -41,6 +41,7 @@ export async function GET() {
       .eq('student_id', studentId)
       .eq('completed', true)
       .order('submitted_at', { ascending: true })
+      .limit(200) // Limit to recent attempts for performance
 
     if (attemptsError) {
       console.error('Error fetching attempts:', attemptsError)

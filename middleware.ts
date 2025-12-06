@@ -26,15 +26,19 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
   
-  // If authenticated and trying to access auth pages
-  if (session && isPublicRoute) {
-    // Get user profile to determine role
-    const { data: profile } = await supabase
+  // Fetch profile once if authenticated (used for redirects and role protection)
+  let profile: { role: string } | null = null;
+  if (session) {
+    const { data } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', session.user.id)
       .single();
-    
+    profile = data;
+  }
+
+  // If authenticated and trying to access auth pages
+  if (session && isPublicRoute) {
     // Redirect to appropriate dashboard
     if (profile?.role === 'tutor') {
       return NextResponse.redirect(new URL('/tutor/dashboard', request.url));
@@ -42,20 +46,14 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/student/homework', request.url));
     }
   }
-  
+
   // Role-based route protection
   if (session) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', session.user.id)
-      .single();
-    
     // Protect tutor routes
     if (pathname.startsWith('/tutor') && profile?.role !== 'tutor') {
       return NextResponse.redirect(new URL('/student/homework', request.url));
     }
-    
+
     // Protect student routes
     if (pathname.startsWith('/student') && profile?.role !== 'student') {
       return NextResponse.redirect(new URL('/tutor/dashboard', request.url));

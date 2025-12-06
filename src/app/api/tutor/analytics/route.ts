@@ -30,7 +30,8 @@ export async function GET() {
         )
       `)
       .eq('completed', true)
-      .order('submitted_at', { ascending: true })
+      .order('submitted_at', { ascending: false })
+      .limit(500) // Limit to recent attempts for performance
 
     if (attemptsError) {
       console.error('Error fetching attempts:', attemptsError)
@@ -41,6 +42,7 @@ export async function GET() {
     const { data: allQuizzes, error: quizzesError } = await supabase
       .from('quizzes')
       .select('id, title, topic, difficulty, published')
+      .limit(500) // Limit for performance
 
     if (quizzesError) {
       console.error('Error fetching quizzes:', quizzesError)

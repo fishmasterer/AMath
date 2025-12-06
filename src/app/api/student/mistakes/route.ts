@@ -46,6 +46,7 @@ export async function GET(request: NextRequest) {
       .eq('quiz_attempts.completed', true)
       .eq('is_correct', false)
       .order('created_at', { ascending: false })
+      .limit(300) // Limit for performance
 
     if (mistakesError) {
       console.error('Error fetching mistakes:', mistakesError)
